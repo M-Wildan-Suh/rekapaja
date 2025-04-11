@@ -13,7 +13,7 @@ class SitemapController extends Controller
     {
         $sitemap = Sitemap::create()
             ->add(Url::create('/')->setLastModificationDate(now()))
-            ->add(Url::create('/product')->setLastModificationDate(now()));
+            ->add(Url::create('/bisnis')->setLastModificationDate(now()));
 
         // Dynamically add more URLs if needed, such as from a database
         foreach (Product::where('status', 'active')->get() as $model) {
