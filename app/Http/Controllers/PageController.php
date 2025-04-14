@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -379,5 +380,9 @@ class PageController extends Controller
         $whatsappUrl = "https://wa.me/{$no_tlp}?text=" . urlencode($message);
 
         return redirect()->away($whatsappUrl);
+    }
+    public function test() {
+        $data = Product::where('status', 'active')->inRandomOrder()->get();
+        return view('test', compact('data'));
     }
 }

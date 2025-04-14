@@ -8,7 +8,7 @@
     <div class="mt-4">
         <div class="py-4 px-4">
             <div class="max-w-xl mx-auto">
-                <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
                         <div class=" grid grid-cols-3 gap-2 sm:gap-4 font-bold">
@@ -139,19 +139,13 @@
                             </div>
                         @endif
                         <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ Auth::user()->role }}')" class=" space-y-4">
-                            <div class=" flex items-center gap-2">
+                            <div class=" space-y-2">
                                 <p class=" text-sm sm:text-base font-semibold">Produk / Layanan {{ in_array(Auth::user()->role, ['admin', 'premium']) || $product->productHighlight->count() < 3 ? 'Unlimited' : '( Max 3 )' }}
                                 </p>
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <button type="button" @click="multiple = true"
-                                        class=" w-4 h-4 text-[#ff7100] hover:scale-110 duration-300">
-                                        <svg viewBox="0 0 24 24" xml:space="preserve"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            enable-background="new 0 0 24 24">
-                                            <path
-                                                d="M12 1C5.9 1 1 5.9 1 12s4.9 11 11 11 11-4.9 11-11S18.1 1 12 1zm5 13h-3v3c0 1.1-.9 2-2 2s-2-.9-2-2v-3H7c-1.1 0-2-.9-2-2s.9-2 2-2h3V7c0-1.1.9-2 2-2s2 .9 2 2v3h3c1.1 0 2 .9 2 2s-.9 2-2 2z"
-                                                fill="currentColor" class="fill-000000"></path>
-                                        </svg>
+                                        class="font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">
+                                        Tambah Produk Massal
                                     </button>
                                     <div x-show="multiple" class=" fixed inset-0 flex items-center justify-center bg-black/20 z-50 px-4">
                                         <div class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-[#ff7100]">

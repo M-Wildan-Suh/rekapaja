@@ -7,10 +7,16 @@
                     <div class=" w-full flex items-center gap-4 md:gap-6">
                         <p class=" text-lg sm:text-[28px] font-black capitalize text-left">Bisnis Terdaftar{{ ($filter ?? null) ? ' - '.$filter : ''}}</p>
                     </div>
-                    <div class="w-full flex items-center flex-wrap gap-2">
+                    <div class=" hide-scroll max-w-xl flex items-center overflow-x-auto overscroll-none gap-2">
+                        <style>
+                            /* menyembunyikan scrollbar hanya untuk elemen ini */
+                            .hide-scroll::-webkit-scrollbar {
+                              display: none;
+                            }
+                        </style>
                         @foreach ($category as $item)
                             <a href="{{route('category.business', ['category' => Str::lower($item->category)])}}">
-                                <button class=" py-1 px-2 border-2 {{ ($filter ?? '') === Str::lower($item->category) ? 'bg-[#ff7100] text-white' : 'text-[#ff7100]  hover:bg-[#ff7100] hover:text-white' }} border-[#ff7100] text-xs sm:text-sm rounded-full duration-300">{{ $item->category }} - {{ $item->products->count() }}
+                                <button class=" py-1 px-2 border-2 {{ ($filter ?? '') === Str::lower($item->category) ? 'bg-[#ff7100] text-white' : 'text-[#ff7100]  hover:bg-[#ff7100] hover:text-white' }} border-[#ff7100] text-xs sm:text-sm rounded-full duration-300 text-nowrap">{{ $item->category }} - {{ $item->products->count() }}
                                 </button>
                             </a>
                         @endforeach

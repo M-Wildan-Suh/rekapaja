@@ -63,7 +63,7 @@ Route::get('/create-product', [PageController::class, 'createproduct'])->name('c
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
-Route::get('/invoice/{code}', [InvoiceController::class, 'invoice'])->name('invoice.show');
+Route::get('/rekap/{code}', [InvoiceController::class, 'invoice'])->name('invoice.show');
 
 Route::middleware('auth')->group(function () {
 
@@ -107,6 +107,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+Route::get('/embed/event', [PageController::class, 'test'])->name('test');
 Route::get('/{slug}', [PageController::class, 'detail'])->name('detail');
 Route::get('/template/{slug}', [PageController::class, 'templatedetail'])->name('template.detail');
 
