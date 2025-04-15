@@ -12,6 +12,6 @@ class Category extends Model
     protected $fillable = ['category'];
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'pivot_product_categories');
+        return $this->belongsToMany(Product::class, 'pivot_product_categories', 'category_id', 'product_id');
     }
 }

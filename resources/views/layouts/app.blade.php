@@ -22,13 +22,13 @@
         <link href="{{ asset('build/assets/app.css') }}" rel="stylesheet" />
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-[#D9EAFD]">
+        <div class="min-h-screen bg-neutral-100">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-[#F8FAFC] px-4 shadow">
-                    <div class=" w-full max-w-[1080px] mx-auto py-3 md:py-6">
+                <header class="bg-black px-4 shadow">
+                    <div class=" w-full max-w-xl mx-auto py-3 md:py-6">
                         {{ $header }}
                     </div>
                 </header>

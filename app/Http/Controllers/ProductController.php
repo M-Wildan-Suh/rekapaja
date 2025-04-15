@@ -107,6 +107,8 @@ class ProductController extends Controller
                 $categoryIds[] = $category->id;
             }
             $newdata->category()->attach($categoryIds);
+
+            Category::doesntHave('products')->delete();
         }
 
         if ($request->tag) {

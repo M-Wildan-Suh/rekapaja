@@ -34,7 +34,7 @@
                                     src="{{ asset('storage/images/product/' . $item->image) }}" alt="">
                                 <div class=" absolute bottom-4 left-4 z-20 flex flex-wrap gap-2">
                                     @foreach ($item->category as $category)
-                                        <div class=" text-xs sm:text-sm backdrop-blur bg-black/50 cursor-default rounded-full border-2 border-[#ff7100] text-[#ff7100] px-2 py-1">{{$category->category}}</div>
+                                        <div class=" text-xs sm:text-sm backdrop-blur bg-[#ff7100]/70 cursor-default rounded-full border-2 border-[#ff7100] text-white px-2 py-1">{{$category->category}}</div>
                                     @endforeach
                                 </div>
                             </div>

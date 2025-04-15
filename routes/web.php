@@ -15,10 +15,6 @@ use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\TemplateGalleryController;
 use App\Http\Controllers\TemplateHighlightController;
 use App\Http\Controllers\UserController;
-use App\Models\Highlight;
-use App\Models\Invoice;
-use App\Models\Template;
-use App\Models\TemplateHighlight;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 

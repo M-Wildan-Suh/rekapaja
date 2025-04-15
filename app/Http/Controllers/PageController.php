@@ -341,7 +341,7 @@ class PageController extends Controller
         $invoice = new Invoice;
 
         $invoice->business_id = $request->product_id;
-        $invoice->invoice_code = Str::random(10);
+        $invoice->invoice_code = strtoupper(Str::random(10));
         $invoice->invoice_text = '';
         // $data = Highlight::whereIn('id', $request->order)->get();
 
@@ -349,9 +349,14 @@ class PageController extends Controller
         // $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
 
         $message = "Halo, saya ingin memesan produk/layanan Anda.\n";
-        $invoiceText = "\n";
+        $tanggal = Carbon::now('Asia/Jakarta')->locale('id')->format('d-m-Y');
         $total = 0;
+        $invoiceText = '';
 
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
+        $invoiceText .= "<p>" . $tanggal . "</p>";
+
+        $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
         foreach ($request->order as $item) {
             // dd($item['id']);
             if (isset($item['id'])) {
@@ -362,20 +367,17 @@ class PageController extends Controller
                     
                     $message .= "\n- " . $data->title . ", Jumlah: " . $item['quantity'];
                     
-                    $invoiceText .= "{$data->title}\n";
-                    $invoiceText .= "Jumlah: {$item['quantity']} x " . number_format($data->price, 0, ',', '.') . "\n";
-                    $invoiceText .= "Subtotal: " . number_format($subtotal, 0, ',', '.') . "\n";
-                    $invoiceText .= "----------------------\n";
+                    $invoiceText .= '<div style="font-size: 0.875rem;display: flex; justify-content: space-between;"><b>- '.$data->title.'</b><p>'. $item['quantity'] .' x '.number_format($data->price, 0, ',', '.').' = '. number_format($subtotal, 0, ',', '.') .'</p></div>';
                 }
             }
         }
-        $invoiceText .= "<b>TOTAL: " . number_format($total, 0, ',', '.') . "</b>\n";
-        $invoiceText .= "*Belum termasuk ongkir\n";
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Total</p>';
+        $invoiceText .= "<b>Rp" . number_format($total, 0, ',', '.') . "</b>";
         $invoice->invoice_text = $invoiceText;
         $invoice->save();
 
         $invoiceUrl = url("/invoice/{$invoice->invoice_code}");
-        $message .= "\n\nDetail Invoice: {$invoiceUrl}";
+        $message .= "\n\nDetail Rekapan: {$invoiceUrl}";
         $message .= "\nUntuk produk/layanan diatas apakah masih tersedia?";
         $whatsappUrl = "https://wa.me/{$no_tlp}?text=" . urlencode($message);
 
