@@ -16,7 +16,7 @@
                         </style>
                         @foreach ($category as $item)
                             <a href="{{route('category.business', ['category' => Str::lower($item->category)])}}">
-                                <button class=" py-1 px-2 border-2 {{ ($filter ?? '') === Str::lower($item->category) ? 'bg-[#ff7100] text-white' : 'text-[#ff7100]  hover:bg-[#ff7100] hover:text-white' }} border-[#ff7100] text-xs sm:text-sm rounded-full duration-300 text-nowrap">{{ $item->category }} - {{ $item->products->count() }}
+                                <button class=" py-1 px-2 border-2 {{ ($filter ?? '') === Str::lower($item->category) ? 'bg-[#ff7100] text-white' : 'text-[#ff7100]  hover:bg-[#ff7100] hover:text-white' }} border-[#ff7100] text-xs sm:text-sm rounded-full duration-300 text-nowrap">{{ $item->category }} - {{ $item->products->where('status', 'active')->count() }}
                                 </button>
                             </a>
                         @endforeach
