@@ -63,7 +63,9 @@ class PageController extends Controller
             $data = Product::where('status', 'active')->inRandomOrder()->paginate(10);
         }
         $data->withPath('/bisnis/page')->appends($request->only('search'));
-        $category = Category::all();
+        $category = Category::whereHas('products', function ($query) {
+            $query->where('status', 'active');
+        })->get();
         $template = Template::inRandomOrder()->get();
         return view('product', compact('data', 'no_tlp', 'template', 'category'));
     }
@@ -88,7 +90,10 @@ class PageController extends Controller
 
         $data->withPath("/bisnis/kategori/{$category->category}/page");
 
-        $category = Category::all();
+        $category = Category::whereHas('products', function ($query) {
+            $query->where('status', 'active');
+        })->get();
+        
         $template = Template::inRandomOrder()->get();
         return view('product', compact('data', 'no_tlp', 'template', 'category', 'filter'));
     }
