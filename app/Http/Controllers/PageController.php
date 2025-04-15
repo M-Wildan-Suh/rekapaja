@@ -16,9 +16,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -39,14 +41,23 @@ class PageController extends Controller
         Paginator::currentPageResolver(function () use ($request) {
             return $request->route('page', 1); // default ke halaman 1
         });
-
+    
         $no_tlp = NoHandphone::first()->no_tlp;
         $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
-        if ($request->search) {
-            $search = $request->search;
-            
-            $data = Product::where('status', 'active')
-                ->where(function ($query) use ($search) {
+    
+        $seed = Carbon::now()->format('Ymd');
+        $search = $request->search;
+        $page = $request->route('page', 1);
+        $perPage = 10;
+    
+        // Buat cache key unik per hari dan per keyword
+        $cacheKey = $search ? "products_random_ids_{$seed}_search_" . md5($search) : "products_random_ids_{$seed}";
+    
+        $productIds = Cache::remember($cacheKey, now()->endOfDay(), function () use ($search, $seed) {
+            $query = Product::where('status', 'active');
+    
+            if ($search) {
+                $query->where(function ($query) use ($search) {
                     $query->where('name', 'like', '%' . $search . '%')
                         ->orWhereHas('productTags', function ($q) use ($search) {
                             $q->whereHas('productTag', function ($q2) use ($search) {
@@ -56,15 +67,36 @@ class PageController extends Controller
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('category', 'like', '%' . $search . '%');
                         });
-                })
-                ->inRandomOrder()
-                ->paginate(10);
-        } else {
-            $data = Product::where('status', 'active')->inRandomOrder()->paginate(10);
-        }
-        $data->withPath('/bisnis/page')->appends($request->only('search'));
+                });
+            }
+    
+            return $query->select('id')
+                ->orderByRaw("SHA1(CONCAT(id, '$seed'))")
+                ->pluck('id')
+                ->toArray();
+        });
+    
+        $slicedIds = array_slice($productIds, ($page - 1) * $perPage, $perPage);
+    
+        $data = Product::whereIn('id', $slicedIds)->get()->sortBy(function ($item) use ($slicedIds) {
+            return array_search($item->id, $slicedIds);
+        });
+    
+        // Buat paginator manual
+        $data = new LengthAwarePaginator(
+            $data,
+            count($productIds),
+            $perPage,
+            $page,
+            [
+                'path' => url('/bisnis/page'),
+                'query' => $request->only('search'),
+            ]
+        );
+    
         $category = Category::all();
         $template = Template::inRandomOrder()->get();
+    
         return view('product', compact('data', 'no_tlp', 'template', 'category'));
     }
 
