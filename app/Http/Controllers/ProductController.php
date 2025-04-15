@@ -108,8 +108,9 @@ class ProductController extends Controller
             }
             $newdata->category()->attach($categoryIds);
 
-            Category::doesntHave('products')->delete();
         }
+
+        Category::doesntHave('products')->forceDelete();
 
         if ($request->tag) {
             foreach ($request->tag as $item) {
@@ -261,6 +262,8 @@ class ProductController extends Controller
 
             $product->category()->sync($categoryIds);
         }
+
+        Category::doesntHave('products')->forceDelete();
 
         PivotProductTag::where('product_id', $product->id)->delete();
         
