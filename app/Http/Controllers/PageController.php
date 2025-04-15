@@ -80,7 +80,7 @@ class PageController extends Controller
 
         $category = Category::where('category', $category)->first();
 
-        $data = Product::whereHas('category', function ($query) use ($category) {
+        $data = Product::where('status', 'active')->whereHas('category', function ($query) use ($category) {
             $query->where('category_id', $category->id);
         })->paginate(10);
 
