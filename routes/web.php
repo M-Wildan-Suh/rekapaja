@@ -43,7 +43,9 @@ Route::get('/clear-cache', function () {
 Route::get('/', [PageController::class, 'home'])->name('home');
 
 Route::get('/bisnis', [PageController::class, 'product'])->name('allproduct');
+Route::get('/bisnis/page/{page?}', [PageController::class, 'product'])->name('pageproduct');
 Route::get('/bisnis/kategori/{category}', [PageController::class, 'categorybusiness'])->name('category.business');
+Route::get('/bisnis/kategori/{category}/page/{page?}', [PageController::class, 'categorybusiness'])->name('category.business.page');
 
 Route::get('/template', [PageController::class, 'template'])->name('alltemplate');
 

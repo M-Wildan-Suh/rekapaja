@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -35,6 +36,10 @@ class PageController extends Controller
 
     public function product(Request $request) {
         // dd($request->filter);
+        Paginator::currentPageResolver(function () use ($request) {
+            return $request->route('page', 1); // default ke halaman 1
+        });
+
         $no_tlp = NoHandphone::first()->no_tlp;
         $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
         if ($request->search) {
@@ -53,16 +58,21 @@ class PageController extends Controller
                         });
                 })
                 ->inRandomOrder()
-                ->get();
+                ->paginate(10);
         } else {
-            $data = Product::where('status', 'active')->inRandomOrder()->get();
+            $data = Product::where('status', 'active')->inRandomOrder()->paginate(10);
         }
+        $data->withPath('/bisnis/page')->appends($request->only('search'));
         $category = Category::all();
         $template = Template::inRandomOrder()->get();
         return view('product', compact('data', 'no_tlp', 'template', 'category'));
     }
 
-    public function categorybusiness($category) {
+    public function categorybusiness($category, Request $request) {
+        Paginator::currentPageResolver(function () use ($request) {
+            return $request->route('page', 1); // default ke halaman 1
+        });
+
         $no_tlp = NoHandphone::first()->no_tlp;
         $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
 
@@ -72,7 +82,11 @@ class PageController extends Controller
 
         $data = Product::whereHas('category', function ($query) use ($category) {
             $query->where('category_id', $category->id);
-        })->get();
+        })->paginate(10);
+
+        $category->category = Str::lower($category->category);
+
+        $data->withPath("/bisnis/kategori/{$category->category}/page");
 
         $category = Category::all();
         $template = Template::inRandomOrder()->get();
