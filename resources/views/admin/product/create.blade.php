@@ -1,81 +1,80 @@
 <x-app-layout title="Admin - Tambah Usaha">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('Tambah Usaha') }}
         </h2>
     </x-slot>
 
     <div class="py-4 px-4">
-        <div class="max-w-[1080px] mx-auto">
+        <div class="max-w-xl mx-auto">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class=" p-4 md:p-6 text-gray-900">
                     <form action="{{route('product.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class=" w-full space-y-6">
                             <p class=" text-lg sm:text-xl font-semibold">Data Usaha</p>
-                            <div class=" grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div class=" flex flex-col gap-2">
-                                    <div class=" w-full h-full aspect-[3/2] sm:aspect-auto max-h-[268.8px] overflow-hidden relative rounded-md">
-                                        <x-admin.component.imageinput :value="null" name="thumbnail" />
-                                    </div>
-                                </div>
-                                <div class=" w-full md:col-span-2 space-y-6">
-                                    <div x-data="productChecker()">
-                                        <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
-                                            <div class=" flex gap-2">
-                                                <label for="name" class=" font-semibold">Nama Usaha Kamu</label>
-                                                <div x-show="isDuplicate" class="relative group pt-1">
-                                                    <div class=" w-2 h-2 bg-red-500 rounded-full text-sm cursor-pointer"></div>
-                                                    <span class="absolute top-0 left-5 hidden group-hover:block w-max bg-gray-800 text-white text-xs rounded px-2 py-1">
-                                                        Nama sudah digunakan
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <input 
-                                                class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" 
-                                                type="text" 
-                                                placeholder="Masukkan Nama Usaha..."
-                                                name="name" 
-                                                id="name"
-                                                x-model="inputName"
-                                                @input="checkProductName"
-                                            >
-                                        </div>
-                                        <script>
-                                            function productChecker() {
-                                                return {
-                                                    // Data produk dari backend (menggunakan Blade untuk memasukkan data)
-                                                    products: @json($product->pluck('name')).map(name => name.toLowerCase()), // Konversi nama produk menjadi huruf kecil
-                                                    inputName: '', // Nilai input
-                                                    isDuplicate: false, // Status duplikasi
-                                                    
-                                                    // Fungsi pengecekan
-                                                    checkProductName() {
-                                                        // Perbandingan tanpa memperhatikan kapitalisasi
-                                                        this.isDuplicate = this.products.includes(this.inputName.trim().toLowerCase());
-                                                    }
-                                                };
-                                            }
-                                        </script>
-                                    </div>
-                                    <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
-                                    <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
+                            <div class=" flex flex-col gap-2">
+                                <div class=" w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto">
+                                    <x-admin.component.imageinput :value="null" name="thumbnail" />
                                 </div>
                             </div>
+
+                            <div x-data="productChecker()">
+                                <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
+                                    <div class=" flex gap-2">
+                                        <label for="name" class=" font-semibold">Nama Usaha Kamu</label>
+                                        <div x-show="isDuplicate" class="relative group pt-1">
+                                            <div class=" w-2 h-2 bg-red-500 rounded-full text-sm cursor-pointer"></div>
+                                            <span class="absolute top-0 left-5 hidden group-hover:block w-max bg-gray-800 text-white text-xs rounded px-2 py-1">
+                                                Nama sudah digunakan
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <input 
+                                        class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" 
+                                        type="text" 
+                                        placeholder="Masukkan Nama Usaha..."
+                                        name="name" 
+                                        id="name"
+                                        x-model="inputName"
+                                        @input="checkProductName"
+                                    >
+                                </div>
+                                <script>
+                                    function productChecker() {
+                                        return {
+                                            // Data produk dari backend (menggunakan Blade untuk memasukkan data)
+                                            products: @json($product->pluck('name')).map(name => name.toLowerCase()), // Konversi nama produk menjadi huruf kecil
+                                            inputName: '', // Nilai input
+                                            isDuplicate: false, // Status duplikasi
+                                            
+                                            // Fungsi pengecekan
+                                            checkProductName() {
+                                                // Perbandingan tanpa memperhatikan kapitalisasi
+                                                this.isDuplicate = this.products.includes(this.inputName.trim().toLowerCase());
+                                            }
+                                        };
+                                    }
+                                </script>
+                            </div>
+
+                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
+                            
+                            <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
+
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
                             <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
                             
-                            <div class=" w-full grid grid-cols-2 gap-4">
-                                <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
-                                <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
-                            </div>
+                            <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
+
+                            <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
 
                             <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$tagposition ?? ''" name="home_button" />
 
                             <div class=" space-y-2">
                                 <label for="template" class=" text-sm sm:text-base font-semibold">Template</label>
-                                <div class=" w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     @foreach ($template as $item)
                                         <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
                                             <input type="radio" name="template_id" value="{{$item->id}}" class="hidden peer" {{ $loop->first ? 'checked' : '' }}>

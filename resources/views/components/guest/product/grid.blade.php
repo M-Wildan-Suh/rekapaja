@@ -19,7 +19,7 @@
                             <div class=" flex flex-col items-center">
                                 <p class="line-clamp-2 text-sm sm:text-base font-semibold">{{ $item->title }}</p>
                                 @if ($item->price)
-                                    <p class="line-clamp-2 text-xs sm:text-sm font-semibold text-neutral-400">Rp{{ number_format($item->price, 0, ',', '.') }}
+                                    <p class="line-clamp-2 text-xs sm:text-sm font-semibold text-white/80">Rp{{ number_format($item->price, 0, ',', '.') }}
                                     </p>
                                 @endif
                             </div>
