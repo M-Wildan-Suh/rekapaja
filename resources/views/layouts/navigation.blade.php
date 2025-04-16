@@ -75,7 +75,7 @@
 
             <!-- Hamburger -->
             <div class="flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center w-7 h-7 p-1.5 rounded-md bg-[#ff7100] hover:bg-[#b95300] text-white">
+                <button @click="open = ! open" class="inline-flex items-center justify-center w-7 h-7 p-1.5 rounded-md bg-[#ff7100] hover:bg-[#b95300] text-white duration-300">
                     <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -115,8 +115,8 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-white">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm text-white/60">{{ Auth::user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
