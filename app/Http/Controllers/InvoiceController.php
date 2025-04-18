@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
 {
@@ -19,7 +21,18 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        //
+        $data = Invoice::latest()->get();
+        
+        $data = Invoice::whereHas('product.access.user', function ($query) {
+            $query->where('id', Auth::id());
+        })->latest()->get();
+        $data->transform(function ($data) {
+            $data->date = Carbon::parse($data->created_at)->locale('id')->translatedFormat('d m Y, H:i');
+            $data->product;
+            return $data;
+        });
+        // dd($data);
+        return view('admin.invoice.index', compact('data'));
     }
 
     /**
@@ -65,8 +78,11 @@ class InvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Invoice $invoice)
+    public function destroy($id)
     {
-        //
+        $invoice = Invoice::find($id);
+        // dd($invoice);
+        $invoice->delete();
+        return redirect()->back();
     }
 }

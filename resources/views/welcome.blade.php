@@ -1,11 +1,11 @@
 <x-layout.guest>
     @include('components.guest.header')
-    <div class=" w-full h-96 pt-[72px] px-4 sm:px-6 bg-[#0B192C]">
+    <div class=" w-full h-[340px] sm:h-96 pt-[72px] px-4 sm:px-6 bg-[#0B192C]">
         <div class=" w-full h-full max-w-xl mx-auto text-white">
             <div class=" w-full h-full grid pb-16 grid-cols-2">
                 <div class=" w-full h-full flex flex-col justify-center gap-4">
                     <p class=" text-2xl sm:text-3xl font-semibold">RekapAja.com</p>
-                    <p class=" text-xs sm:text-base font-semibold">Bangun Citra Bisnis Anda dengan Website Profesional</p>
+                    <p class=" text-xs sm:text-base font-semibold capitalize">Bangun usaha online dengan sistem rekap otomatis</p>
                     <a href="{{ route('allproduct') }}">
                         <button
                             class=" text-sm sm:text-base px-3 sm:px-4 flex items-center justify-center gap-1 py-1 sm:py-2 border rounded-full text-white bg-[#ff7100] border-[#ff7100] hover:text-white hover:bg-[#b95300] hover:border-[#b95300] font-black duration-300 relative capitalize">
@@ -24,61 +24,39 @@
         <div class=" w-full -mt-14">
             <div class=" w-full space-y-6">
                 <div class=" w-full max-w-xl bg-white p-4 sm:p-6 rounded-xl mx-auto shadow-md shadow-black/20 space-y-6">
-                    <div class=" w-full flex justify-between">
+                    {{-- <div class=" w-full flex justify-between">
                         <p class="flex items-center font-semibold gap-1 text-xl">Kenapa RekapAja.com ?</p>
-                    </div>
-                    <div class=" grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    </div> --}}
+                    <div class=" grid grid-cols-3 gap-4">
                         <div class=" w-full rounded-xl flex flex-col items-center gap-2">
-                            <div class=" w-12 sm:w-14 p-2 rounded-full aspect-square bg-[#ff7100] text-white">
-                                <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill="none" d="M0 0h256v256H0z"></path>
-                                    <path
-                                        d="M221.6 149.4a96.2 96.2 0 0 0 2.4-22.2c-.4-52.9-44.2-95.7-97-95.2a96 96 0 0 0-31 186.5 23.9 23.9 0 0 0 32-22.6V192a23.9 23.9 0 0 1 24-24h46.2a24 24 0 0 0 23.4-18.6Z"
-                                        fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="24" class="stroke-000000"></path>
-                                    <circle cx="128" cy="76" r="16" fill="currentColor" class="fill-000000">
-                                    </circle>
-                                    <circle cx="83" cy="102" r="16" fill="currentColor" class="fill-000000">
-                                    </circle>
-                                    <circle cx="83" cy="154" r="16" fill="currentColor" class="fill-000000">
-                                    </circle>
-                                    <circle cx="173" cy="102" r="16" fill="currentColor" class="fill-000000">
-                                    </circle>
-                                </svg>
+                            <div class=" w-12 sm:w-14 p-2.5 rounded-full aspect-square bg-[#ff7100] text-white">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.148 2.971A2.008 2.008 0 0 0 17.434 2H6.566c-.698 0-1.355.372-1.714.971L2.143 7.485A.995.995 0 0 0 2 8a3.97 3.97 0 0 0 1 2.618V19c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-8.382A3.97 3.97 0 0 0 22 8a.995.995 0 0 0-.143-.515l-2.709-4.514zm.836 5.28A2.003 2.003 0 0 1 18 10c-1.103 0-2-.897-2-2 0-.068-.025-.128-.039-.192l.02-.004L15.22 4h2.214l2.55 4.251zM10.819 4h2.361l.813 4.065C13.958 9.137 13.08 10 12 10s-1.958-.863-1.993-1.935L10.819 4zM6.566 4H8.78l-.76 3.804.02.004C8.025 7.872 8 7.932 8 8c0 1.103-.897 2-2 2a2.003 2.003 0 0 1-1.984-1.749L6.566 4zM10 19v-3h4v3h-4zm6 0v-3c0-1.103-.897-2-2-2h-4c-1.103 0-2 .897-2 2v3H5v-7.142c.321.083.652.142 1 .142a3.99 3.99 0 0 0 3-1.357c.733.832 1.807 1.357 3 1.357s2.267-.525 3-1.357A3.99 3.99 0 0 0 18 12c.348 0 .679-.059 1-.142V19h-3z" fill="currentColor" class="fill-000000"></path></svg>
                             </div>
-                            <p class=" text-center text-sm sm:text-base font-semibold">
-                                Desain Modern dan Elegan
-                            </p>
+                            <div class=" w-full flex-grow flex items-center justify-center">
+                                <p class=" text-center text-sm sm:text-base font-semibold text-nowrap">
+                                    Simpan Usaha
+                                </p>
+                            </div>
                         </div>
                         <div class=" w-full rounded-xl flex flex-col items-center gap-2">
-                            <div class=" w-12 sm:w-14 p-2 rounded-full aspect-square bg-[#ff7100] text-white">
-                                <svg viewBox="0 0 16 16" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
-                                    enable-background="new 0 0 16 16">
-                                    <path
-                                        d="M5 16h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2zM4 2h8v12H4V2z"
-                                        fill="currentColor" class="fill-000000"></path>
-                                </svg>
+                            <div class=" w-12 sm:w-14 p-2.5 rounded-full aspect-square bg-[#ff7100] text-white">
+                                <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h256v256H0z"></path><path d="M184 184H69.8L41.9 30.6a8 8 0 0 0-7.8-6.6H16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" class="stroke-000000"></path><circle cx="80" cy="204" fill="none" r="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" class="stroke-000000"></circle><circle cx="184" cy="204" fill="none" r="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" class="stroke-000000"></circle><path d="M62.5 144h125.6a15.9 15.9 0 0 0 15.7-13.1L216 64H48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" class="stroke-000000"></path></svg>
                             </div>
-                            <p class=" text-center text-sm sm:text-base font-semibold">
-                                Responsif di Semua Perangkat
-                            </p>
+                            <div class=" w-full flex-grow flex items-center justify-center">
+                                <p class=" text-center text-sm sm:text-base font-semibold text-nowrap">
+                                    Order Masuk
+                                </p>
+                            </div>
                         </div>
-                        <div class=" col-span-2 sm:col-span-1 w-full rounded-xl flex flex-col items-center gap-2">
-                            <div class=" w-12 sm:w-14 p-2 rounded-full aspect-square bg-[#ff7100] text-white">
-                                <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill="none" d="M0 0h256v256H0z"></path>
-                                    <circle cx="128" cy="128" fill="none" r="48" stroke="currentColor"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="16"
-                                        class="stroke-000000"></circle>
-                                    <path
-                                        d="M183.7 65.1q3.8 3.5 7.2 7.2l27.3 3.9a103.2 103.2 0 0 1 10.2 24.6l-16.6 22.1s.3 6.8 0 10.2l16.6 22.1a102.2 102.2 0 0 1-10.2 24.6l-27.3 3.9s-4.7 4.9-7.2 7.2l-3.9 27.3a103.2 103.2 0 0 1-24.6 10.2l-22.1-16.6a57.9 57.9 0 0 1-10.2 0l-22.1 16.6a102.2 102.2 0 0 1-24.6-10.2l-3.9-27.3q-3.7-3.5-7.2-7.2l-27.3-3.9a103.2 103.2 0 0 1-10.2-24.6l16.6-22.1s-.3-6.8 0-10.2l-16.6-22.1a102.2 102.2 0 0 1 10.2-24.6l27.3-3.9q3.5-3.7 7.2-7.2l3.9-27.3a103.2 103.2 0 0 1 24.6-10.2l22.1 16.6a57.9 57.9 0 0 1 10.2 0l22.1-16.6a102.2 102.2 0 0 1 24.6 10.2Z"
-                                        fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="16" class="stroke-000000"></path>
-                                </svg>
+                        <div class=" w-full rounded-xl flex flex-col items-center gap-2">
+                            <div class=" w-12 sm:w-14 p-2.5 rounded-full aspect-square bg-[#ff7100] text-white">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 9h-3V2a1 1 0 0 0-1.6-.8l-2.07 1.55C12.21.42 13.1.42 10 2.75 6.89.42 7.77.42 4.66 2.75L2.6 1.2A1 1 0 0 0 1 2v18a3 3 0 0 0 3 3h16a3 3 0 0 0 3-3V10a1 1 0 0 0-1-1ZM4 21a1 1 0 0 1-1-1V4c2 1.47 1.41 1.44 4.33-.75 3.1 2.33 2.22 2.33 5.33 0 3 2.24 2.42 2.19 4.34.75 0 16.75-.08 16.3.17 17Zm17-1a1 1 0 0 1-2 0v-9h2Z" fill="currentColor" class="fill-000000"></path><path d="M6 10h3a1 1 0 0 0 0-2H6a1 1 0 0 0 0 2ZM14 12H6a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2ZM14 16H6a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2Z" fill="currentColor" class="fill-000000"></path></svg>
                             </div>
-                            <p class=" text-center text-sm sm:text-base font-semibold">
-                                Mudah Diakses dan Dikelola
-                            </p>
+                            <div class=" w-full flex-grow flex items-center justify-center">
+                                <p class=" text-center text-sm sm:text-base font-semibold text-nowrap">
+                                    Instan Rekap
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -105,8 +83,8 @@
                             x-bind:class="show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1/4'"  
                             class=" flex items-center transition-all duration-1000 ease-out">
                             <div class=" space-y-3 text-left sm:pl-4 sm:pr-8">
-                                <p class=" text-lg font-black">Buat Usaha Anda Jadi Memiliki Website Profesional</p>
-                                <p class=" text-sm text-[#4b5d70]">Tingkatkan citra usaha dengan website profesional, responsif, dan mudah diakses. Buat bisnis Anda lebih terpercaya dan menarik.</p>
+                                <p class=" text-lg font-black">Waktunya Usahamu Tampil Lebih Serius</p>
+                                <p class=" text-sm text-[#4b5d70]">Punya usaha? Yuk bikin mini web. Tampilkan produkmu, terima order langsung ke WhatsApp, dan nikmati fitur rekap otomatis yang siap bantu kamu berkembang.</p>
                                 <div class="flex justify-start pt-2">
                                     <a href="https://wa.me/{{ $no_tlp ?? '' }}">
                                         <button
@@ -177,10 +155,9 @@
                         @endif
                     </div>
                 </div>
+                @include('components.guest.footer')
                 @include('components.admin.mobile-navbar')
             </div>
         </div>
     </div>
-
-    {{-- @include('components.guest.footer') --}}
 </x-layout.guest>

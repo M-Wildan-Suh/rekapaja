@@ -138,9 +138,16 @@
                                 </div>
                             </div>
                         @endif
+                        @php
+                            if (Auth::user()->role === 'premium' && (Auth::user()->premium_type === 'lifetime') || Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))) {
+                                Auth::user()->role = 'premium';
+                            } else {
+                                Auth::user()->role = 'user';
+                            };
+                        @endphp
                         <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ Auth::user()->role }}')" class=" space-y-4">
                             <div class=" space-y-2">
-                                <p class=" text-sm sm:text-base font-semibold">Produk / Layanan {{ in_array(Auth::user()->role, ['admin', 'premium']) || $product->productHighlight->count() < 3 ? 'Unlimited' : '( Max 3 )' }}
+                                <p class=" text-sm sm:text-base font-semibold">Produk / Layanan {{ in_array(Auth::user()->role, ['admin', 'premium']) ? 'Unlimited' : '( Max 3 )' }}
                                 </p>
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <button type="button" @click="multiple = true"

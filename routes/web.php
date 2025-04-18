@@ -61,11 +61,13 @@ Route::get('/create-product', [PageController::class, 'createproduct'])->name('c
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
-Route::get('/invoice/{code}', [InvoiceController::class, 'invoice'])->name('invoice.show');
+Route::get('/rekap/{code}', [InvoiceController::class, 'invoice'])->name('invoice.show');
 
 Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', [ProductController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
+
+    Route::resource('/admin/rekap', InvoiceController::class);
 
     Route::group(['middleware' => 'cekUser'], function () {
         Route::group(['middleware' => 'cekRole'], function () {

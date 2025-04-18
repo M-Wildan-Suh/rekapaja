@@ -1,12 +1,12 @@
 <x-app-layout title="Admin - User">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('User') }}
         </h2>
     </x-slot>
 
     <div class="py-4 px-4">
-        <div class="max-w-[1080px] mx-auto">
+        <div class="max-w-xl mx-auto">
             <div x-data="auctionTable()"
                 class="w-full p-4 sm:p-8 bg-[#F8FAFC] rounded-md shadow-md shadow-black/20 flex flex-col gap-6">
                 <!-- Top Actions -->
@@ -29,7 +29,7 @@
                         <thead>
                             <tr class="h-10 bg-[#ff7100] text-white divide-x-2 divide-white">
                                 <th class=" px-1 sm:px-2 py-1">Nama User</th>
-                                <th class=" px-1 sm:px-2 py-1 hidden sm:table-cell">Email</th>
+                                {{-- <th class=" px-1 sm:px-2 py-1 hidden sm:table-cell">Email</th> --}}
                                 <th class=" px-1 sm:px-2 py-1">Role</th>
                                 <th class=" px-1 sm:px-2 py-1 hidden sm:table-cell">Expired</th>
                                 {{-- <th class=" px-1 sm:px-2 py-1">Role</th> --}}
@@ -44,7 +44,7 @@
                                     <td class="px-2 sm:px-4 py-2 text-center font-semibold" x-text="item.name"></td>
                             
                                     <!-- Kolom Email -->
-                                    <td class="px-2 sm:px-4 py-2 text-nowrap hidden sm:table-cell" x-text="item.email"></td>
+                                    {{-- <td class="px-2 sm:px-4 py-2 text-nowrap hidden sm:table-cell" x-text="item.email"></td> --}}
 
                                     <td class="px-2 sm:px-4 py-2 text-nowrap" x-text="item.role"></td>
 
@@ -261,5 +261,6 @@
                 }
             </script>
         </div>
+        @include('components.guest.footer')
     </div>
 </x-app-layout>

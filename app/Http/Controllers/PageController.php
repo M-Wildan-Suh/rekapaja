@@ -422,7 +422,7 @@ class PageController extends Controller
         $invoice->invoice_text = $invoiceText;
         $invoice->save();
 
-        $invoiceUrl = url("/invoice/{$invoice->invoice_code}");
+        $invoiceUrl = url("/rekap/{$invoice->invoice_code}");
         $message .= "\n\nDetail Rekapan: {$invoiceUrl}";
         $message .= "\nUntuk produk/layanan diatas apakah masih tersedia?";
         $whatsappUrl = "https://wa.me/{$no_tlp}?text=" . urlencode($message);

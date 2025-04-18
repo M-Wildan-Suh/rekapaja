@@ -1,21 +1,22 @@
 <x-app-layout title="Admin - Tambah Template">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('Tambah Template') }}
         </h2>
     </x-slot>
 
-    <div class="sm:pl-12 sm:pr-12 lg:pr-32 duration-300 pt-8 pb-20 sm:pb-8 px-4 space-y-6">
-        <div class="w-full p-4 sm:p-6 bg-neutral-100 rounded-md shadow-md shadow-black/20 relative overflow-hidden">
+    <div class="py-4 px-4">
+        <div class="w-full max-w-xl mx-auto bg-neutral-100 rounded-md shadow-md shadow-black/20 relative overflow-hidden">
             <div id="background" class=" absolute inset-0 flex items-center justify-center">
                 <img style="display: none" id="bg_image-now" src="" class=" w-full h-full object-cover object-center" alt="">
             </div>
             <form action="{{ route('template.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @include('components.admin.template.background')
-                <div class=" space-y-4 sm:space-y-6 relative">
+                <div class=" bg-white p-4 sm:p-6 relative">
                     <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="''" name="name" />
-
+                </div>
+                <div class=" p-4 sm:p-6 space-y-4 sm:space-y-6 relative">
                     <div class=" w-full">
                         <div class="w-full flex items-center justify-center">
                             <div class=" w-[400px] aspect-[2/1] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
@@ -181,6 +182,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class=" bg-white p-4 sm:p-6 relative">
                     <x-admin.component.submitbutton title="Tambah" />
                 </div>
             </form>

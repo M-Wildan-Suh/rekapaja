@@ -13,10 +13,15 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
+                        <x-nav-link :href="route('rekap.index')" :active="request()->routeIs('rekap.index', 'rekap.create', 'rekap.show')">
+                            {{ __('Rekap') }}
+                        </x-nav-link>
+                    @endif
                     @if (Auth::user()->role === 'admin')
                         <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.index', 'user.create', 'user.show')">
                             {{ __('User') }}
@@ -90,6 +95,9 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('rekap.index')" :active="request()->routeIs('rekap.index', 'rekap.create', 'rekap.show')">
+                {{ __('Rekap') }}
             </x-responsive-nav-link>
             @if (Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('user.index')" :active="request()->routeIs('user.index', 'user.create', 'user.show')">

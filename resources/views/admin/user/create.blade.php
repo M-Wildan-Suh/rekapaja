@@ -1,12 +1,12 @@
 <x-app-layout title="Admin - Tambah User">
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('Tambah User') }}
         </h2>
     </x-slot>
 
     <div class="py-4 px-4">
-        <div class="max-w-[1080px] mx-auto">
+        <div class="max-w-xl mx-auto">
             <div class="bg-[#F8FAFC] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class=" p-4 md:p-6 text-gray-900">
                     <form method="POST" action="{{route('user.store')}}">

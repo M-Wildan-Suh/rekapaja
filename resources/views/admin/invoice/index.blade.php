@@ -1,7 +1,7 @@
-<x-app-layout title="Admin - Akses">
+<x-app-layout title="Admin - Rekap">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-white leading-tight">
-            {{ __('Akses') }}
+            {{ __('Rekap') }}
         </h2>
     </x-slot>
 
@@ -10,11 +10,7 @@
             <div x-data="auctionTable()"
                 class="w-full p-4 sm:p-8 bg-[#F8FAFC] rounded-md shadow-md shadow-black/20 flex flex-col gap-6">
                 <!-- Top Actions -->
-                <div class="w-full flex flex-col sm:flex-row gap-2 justify-between items-center">
-                    <a href="{{ route('access.create') }}"
-                        class=" w-full text-sm sm:text-base sm:w-auto px-4 py-2 bg-[#ff7100] text-white rounded-md font-semibold border border-[#ff7100] hover:border-[#b95300] hover:bg-[#b95300] duration-300">
-                        Tambah Akses
-                    </a>
+                <div class="w-full flex flex-col sm:flex-row gap-2 justify-end items-center">
 
                     <!-- Search -->
                     <div class=" w-full sm:w-auto flex flex-row font-semibold duration-300">
@@ -28,8 +24,11 @@
                     <table class="w-full text-sm sm:text-base rounded-md overflow-hidden">
                         <thead>
                             <tr class="h-10 bg-[#ff7100] text-white divide-x-2 divide-white">
-                                <th class=" px-1 sm:px-2 py-1">Nama User</th>
-                                <th class=" px-1 sm:px-2 py-1">Nama Usaha</th>
+                                <th class=" px-1 sm:px-2 py-1">Kode Rekap</th>
+                                @if (Auth::user()->role === 'admin')
+                                    <th class=" px-1 sm:px-2 py-1 hidden sm:table-cell">Nama Usaha</th>
+                                @endif
+                                <th class=" px-1 sm:px-2 py-1">Tanggal</th>
                                 <th class=" px-1 sm:px-2 py-1">Opsi</th>
                             </tr>
                         </thead>
@@ -37,10 +36,21 @@
                             <template x-for="(item, index) in paginatedData" :key="index">
                                 <tr :class="index % 2 === 0 ? 'bg-neutral-100' : 'bg-neutral-200'"
                                     class="h-10 text-neutral-600 divide-x-2 divide-white">
-                                    <td class=" px-2 sm:px-4 py-2 text-center font-semibold" x-text="item.name"></td>
-                                    <td class=" px-2 sm:px-4 py-2 " x-text="item.product_name"></td>
+                                    <td class=" px-2 sm:px-4 py-2 text-center font-semibold" x-text="item.invoice_code"></td>
+                                    @if (Auth::user()->role === 'admin')
+                                        <td class=" px-2 sm:px-4 py-2 hidden sm:table-cell" x-text="item.product.name"></td>
+                                    @endif
+                                    <td class=" px-2 sm:px-4 py-2 " x-text="item.date"></td>
                                     <td class=" px-1 sm:px-2">
                                         <div class="flex gap-2 justify-center">
+                                            <!-- Detail -->
+                                            <button @click="showDetail(item)" class="w-5 h-5 hover:text-blue-500 duration-300">
+                                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm-.5 3A1.5 1.5 0 1 1 10 6.5 1.5 1.5 0 0 1 11.5 5ZM14 18h-1a2 2 0 0 1-2-2v-4a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1v5h1a1 1 0 0 1 0 2Z"
+                                                        fill="currentColor" class="fill-464646"></path>
+                                                </svg>
+                                            </button>
                                             <!-- Edit -->
                                             {{-- <a :href="`{{ route('user.show', '') }}/${item.id}`"
                                                 class="w-5 h-5 hover:text-green-500 duration-300">
@@ -121,6 +131,40 @@
                     </div>
                 </div>
 
+                <!-- Detail Modal -->
+                <div x-show="showModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
+                    <div class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-[#ff7100]">
+                        <button @click="showModal = false"
+                            class=" absolute top-6 right-6 w-6 h-6 text-white hover:text-red-500 duration-300">
+                            <svg viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                                enable-background="new 0 0 512 512">
+                                <path
+                                    d="M437.5 386.6 306.9 256l130.6-130.6c14.1-14.1 14.1-36.8 0-50.9-14.1-14.1-36.8-14.1-50.9 0L256 205.1 125.4 74.5c-14.1-14.1-36.8-14.1-50.9 0-14.1 14.1-14.1 36.8 0 50.9L205.1 256 74.5 386.6c-14.1 14.1-14.1 36.8 0 50.9 14.1 14.1 36.8 14.1 50.9 0L256 306.9l130.6 130.6c14.1 14.1 36.8 14.1 50.9 0 14-14.1 14-36.9 0-50.9z"
+                                    fill="currentColor" class="fill-000000"></path>
+                            </svg>
+                        </button>
+                        <div class=" pt-6 pb-3 pl-6 pr-14 bg-[#ff7100] text-white">
+                            <h2 class="text-2xl font-bold">Detail Data</h2>
+                        </div>
+                        <div class=" w-full px-6 space-y-3 max-h-[calc(100vh-200px)] overflow-auto">
+                            <div class="">
+                                <p class=" w-full text-lg font-bold">Rekap orderan</p>
+                                <p class=" text-sm text-neutral-600 font-semibold">Id Rekap</p>
+                                <p class="" x-text="modalData.invoice_code"></p>
+                                <div class=" w-full text-sm sm:text-base">
+                                    <div x-html="modalData.invoice_text"></div>
+                                    <p class=" text-sm text-neutral-600">*Belum termasuk ongkir</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 px-6">
+                            <button @click="showModal = false"
+                                class="px-4 py-1.5 bg-red-600 duration-300 hover:bg-red-900 text-white rounded">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Delete Confirmation Modal -->
                 <div x-show="confirmDeleteModal"
                     class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
@@ -137,11 +181,11 @@
                         <div class=" pt-6 pb-3 bg-[#ff7100] text-white">
                             <h2 class=" px-6 text-2xl font-bold">Apa anda yakin menghapus data ini?</h2>
                         </div>
-                        <p class="px-6 text-base">Anda akan menghapus data : <span x-text="modalData.name"></span></p>
+                        <p class="px-6 text-base">Anda akan menghapus data : <span x-text="modalData.invoice_code"></span></p>
                         <div class="flex justify-end space-x-4 px-6">
                             {{-- <button @click="confirmDeleteModal = false"
                                 class="px-4 py-2 bg-neutral-600 duration-300 hover:bg-[#ff7100] text-white rounded">Cancel</button> --}}
-                            <form :action="`{{ route('access.destroy', '') }}/${modalData.id}`" method="POST"
+                            <form :action="`{{ route('rekap.destroy', '') }}/${modalData.id}`" method="POST"
                                 class="inline">
                                 @csrf
                                 @method('DELETE')
@@ -174,7 +218,7 @@
                             if (this.search === '') {
                                 return this.data;
                             }
-                            return this.data.filter(item => item.product_name.toLowerCase().includes(this.search.toLowerCase()));
+                            return this.data.filter(item => item.invoice_code.toLowerCase().includes(this.search.toLowerCase()));
                         },
 
                         get totalPages() {

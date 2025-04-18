@@ -11,9 +11,15 @@
                 <div class="font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] text-white rounded-md text-center">Anda adalah Admin</div>
             @elseif (Auth::user()->role === 'premium')
                 <div class="font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] text-white rounded-md flex justify-center text-center gap-2">
-                    <p>Premium Aktif,</p>
-                    <p>Expired :</p>
-                    <p>{{Auth::user()->expired ?? 'Lifetime'}}</p>
+                    @if (Auth::user()->premium_type === 'lifetime' || Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired)))    
+                        <p>Premium Aktif,</p>
+                        <p>Expired :</p>
+                        <p>{{Auth::user()->expired ?? 'Lifetime'}}</p>
+                    @else
+                        <p>Premium Unaktif,</p>
+                        <p>Expired :</p>
+                        <p>{{Auth::user()->expired ?? 'Lifetime'}}</p>
+                    @endif
                 </div>
             @else
                 <a href="{{route('premium.index')}}">
