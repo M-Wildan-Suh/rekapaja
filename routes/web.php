@@ -67,8 +67,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', [ProductController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::resource('/admin/rekap', InvoiceController::class);
-
     Route::group(['middleware' => 'cekUser'], function () {
         Route::group(['middleware' => 'cekRole'], function () {
             Route::resource('/admin/user', UserController::class);
@@ -78,7 +76,7 @@ Route::middleware('auth')->group(function () {
         
             Route::resource('/admin/access', AccessController::class);
         });
-        
+        Route::resource('/admin/rekap', InvoiceController::class);
     
         Route::get('/admin/premium', [AdminController::class, 'premium'])->name('premium.index');
     
