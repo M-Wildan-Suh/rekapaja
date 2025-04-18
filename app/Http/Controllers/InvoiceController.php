@@ -21,11 +21,14 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $data = Invoice::latest()->get();
+        if (Auth::user()->role === 'admin') {
+            $data = Invoice::latest()->get();
+        } else {
+            $data = Invoice::whereHas('product.access.user', function ($query) {
+                $query->where('id', Auth::id());
+            })->latest()->get();
+        }
         
-        $data = Invoice::whereHas('product.access.user', function ($query) {
-            $query->where('id', Auth::id());
-        })->latest()->get();
         $data->transform(function ($data) {
             $data->date = Carbon::parse($data->created_at)->locale('id')->translatedFormat('d m Y, H:i');
             $data->product;
