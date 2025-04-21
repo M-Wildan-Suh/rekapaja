@@ -1,4 +1,4 @@
-@props(['title', 'placeholder', 'name', 'value', 'xModel' => null])
+@props(['title', 'placeholder', 'name', 'value' = null, 'xModel' => null])
 <div class=" w-full">
     <div class=" flex flex-col gap-2 text-sm sm:text-base font-medium">
         <label for="{{ $name }}">{{ $title }}</label>
@@ -8,7 +8,7 @@
                 class="py-2 px-3 border border-byolink-1 bg-byolink-1 text-white rounded-l-md">Rp. </label>
             <input type="number" id="{{ $name }}" min="0" name="{{ $name }}"
                 placeholder="{{ $placeholder }}" 
-                @if ($xModel)
+                @if ($xModel && !$value)
                     {{ $xModel ? 'x-model=' . $xModel : '' }}
                     x-bind:value="{{ $xModel ? '' : $value }}"
                 @endif

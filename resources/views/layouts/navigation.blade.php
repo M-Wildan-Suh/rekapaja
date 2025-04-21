@@ -13,7 +13,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-6 sm:-my-px sm:ms-10">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
@@ -37,6 +37,9 @@
                         <x-nav-link :href="route('access.index')" :active="request()->routeIs('access.index', 'access.create', 'access.show')">
                             {{ __('Akses') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('package.index')" :active="request()->routeIs('package.index', 'package.create', 'package.show')">
+                            {{ __('Premium') }}
+                        </x-nav-link>
                     @endif
                     {{-- <x-nav-link :href="route('premium.index')" :active="request()->routeIs('premium.index')">
                         {{ __('Premium') }}
@@ -45,7 +48,7 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md bg-[#ff7100] text-white hover:bg-[#b95300] duration-300">
@@ -79,8 +82,8 @@
             </div>
 
             <!-- Hamburger -->
-            <div class="flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center w-7 h-7 p-1.5 rounded-md bg-[#ff7100] hover:bg-[#b95300] text-white duration-300">
+            <div class="flex items-center">
+                <button @click="open = ! open" class="inline-flex items-center justify-center w-8 aspect-square p-1.5 rounded-md bg-[#ff7100] hover:bg-[#b95300] text-white duration-300">
                     <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -91,7 +94,7 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden w-full max-w-xl mx-auto">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
@@ -113,6 +116,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('access.index')" :active="request()->routeIs('access.index', 'access.create', 'access.show')">
                     {{ __('Akses') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('package.index')" :active="request()->routeIs('package.index', 'package.create', 'package.show')">
+                    {{ __('Premium') }}
                 </x-responsive-nav-link>
             @endif
             {{-- <x-responsive-nav-link :href="route('premium.index')" :active="request()->routeIs('premium.index')">

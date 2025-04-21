@@ -8,6 +8,7 @@ use App\Models\Highlight;
 use App\Models\Invoice;
 use App\Models\NoHandphone;
 use App\Models\PivotProductTag;
+use App\Models\PremiumPackage;
 use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductTag;
@@ -429,6 +430,25 @@ class PageController extends Controller
 
         return redirect()->away($whatsappUrl);
     }
+
+    public function premiumPackage() {
+        $no_tlp = NoHandphone::first()->no_tlp;
+        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $data = PremiumPackage::all();
+        return view('package', compact('data', 'no_tlp'));
+    }
+
+    public function buyPackage($id) {
+        $no_tlp = NoHandphone::first()->no_tlp;
+        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+
+        $data = PremiumPackage::find($id);
+
+        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di RekapAja.com dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
+
+        return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . $text);
+    }
+
     public function test() {
         $data = Product::where('status', 'active')->inRandomOrder()->get();
         return view('test', compact('data'));

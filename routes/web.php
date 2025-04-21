@@ -7,6 +7,7 @@ use App\Http\Controllers\HighlightController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NoHandphoneController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PremiumPackageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\ProfileController;
@@ -63,6 +64,10 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 Route::get('/rekap/{code}', [InvoiceController::class, 'invoice'])->name('invoice.show');
 
+Route::get('/paket-premium', [PageController::class, 'premiumPackage'])->name('premium.package');
+
+Route::get('/beli-paket/{id}', [PageController::class, 'buyPackage'])->name('buy.package');
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', [ProductController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -75,6 +80,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/template/editimage/{id}', [TemplateController::class, 'editimage'])->name('template.editimage');
         
             Route::resource('/admin/access', AccessController::class);
+
+            Route::resource('/admin/package', PremiumPackageController::class);
         });
         Route::resource('/admin/rekap', InvoiceController::class);
     

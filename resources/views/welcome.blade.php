@@ -84,7 +84,7 @@
                             class=" flex items-center transition-all duration-1000 ease-out">
                             <div class=" space-y-3 text-left sm:pl-4 sm:pr-8">
                                 <p class=" text-lg font-black">Waktunya Usahamu Tampil Lebih Serius</p>
-                                <p class=" text-sm text-[#4b5d70]">Punya usaha? Yuk bikin mini web. Tampilkan produkmu, terima order langsung ke WhatsApp, dan nikmati fitur rekap otomatis yang siap bantu kamu berkembang.</p>
+                                <p class=" text-sm text-[#4b5d70]">Punya usaha? Yuk join. Tampilkan produkmu, terima order langsung ke WhatsApp, dan nikmati fitur rekap otomatis yang siap bantu kamu berkembang.</p>
                                 <div class="flex justify-start pt-2">
                                     <a href="https://wa.me/{{ $no_tlp ?? '' }}">
                                         <button
