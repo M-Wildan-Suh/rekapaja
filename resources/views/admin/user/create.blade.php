@@ -57,10 +57,11 @@
                                     <select 
                                         name="role" 
                                         class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" 
-                                        id="user" >
+                                        id="user"
+                                        required >
                                         <option value="" selected disabled>Pilih Role</option>
-                                        <option value="user">User</option>
-                                        <option value="premium">Premium User</option>
+                                        <option value="user" @selected(old('role') === 'user')>User</option>
+                                        <option value="premium" @selected(old('role') === 'premium')>Premium User</option>
                                     </select>
                                 </div>
                             </div>
@@ -74,9 +75,9 @@
                                         x-model="premiumType"
                                         @change="updateDate">
                                         <option value="" selected disabled>Pilih Paket Premium</option>
-                                        <option value="month">Month</option>
-                                        <option value="year">Year</option>
-                                        <option value="lifetime">Lifetime</option>
+                                        <option value="month" @selected(old('premium_type') === 'month')>Month</option>
+                                        <option value="year" @selected(old('premium_type') === 'year')>Year</option>
+                                        <option value="lifetime" @selected(old('premium_type') === 'lifetime')>Lifetime</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
@@ -87,6 +88,7 @@
                                         id="expired" 
                                         class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm"
                                         x-model="expiredDate"
+                                        value="{{ old('expired') }}"
                                         x-bind:disabled="premiumType === 'lifetime'">
                                     <span x-show="premiumType === 'lifetime'" class="text-sm italic text-gray-500">Unlimited</span>
                                 </div>
@@ -95,9 +97,12 @@
                             <script>
                                 function premiumSelector() {
                                     return {
-                                        premiumType: '',
-                                        expiredDate: '',
+                                        premiumType: @json(old('premium_type', '')),
+                                        expiredDate: @json(old('expired', '')),
                                         updateDate() {
+                                            if (this.expiredDate) {
+                                                return;
+                                            }
                                             const currentDate = new Date();
                                             if (this.premiumType === 'month') {
                                                 currentDate.setMonth(currentDate.getMonth() + 1);
@@ -110,7 +115,9 @@
                                             this.expiredDate = currentDate.toISOString().split('T')[0];
                                         },
                                         init() {
-                                            this.updateDate(); // Initialize with default value
+                                            if (this.premiumType && !this.expiredDate) {
+                                                this.updateDate();
+                                            }
                                         }
                                     };
                                 }

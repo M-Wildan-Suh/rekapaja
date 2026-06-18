@@ -1,12 +1,29 @@
 <x-layout.guest>
     @include('components.guest.header')
+    @php
+        $activeTab = session('highlight', 'product');
+
+        if ($errors->has('image_gallery') || $errors->has('image_gallery.*')) {
+            $activeTab = 'gallery';
+        } elseif (
+            $errors->has('inputs') ||
+            $errors->has('inputs.*.image') ||
+            $errors->has('inputs.*.title') ||
+            $errors->has('inputs.*.price') ||
+            $errors->has('inputs.*.description')
+        ) {
+            $activeTab = 'highlight';
+        } elseif ($errors->any()) {
+            $activeTab = 'product';
+        }
+    @endphp
     <div class="pt-28 pb-8 min-h-[calc(100vh-140px)] px-4 sm:px-6 space-y-4 md:space-y-8">
         <div class=" w-full max-w-xl mx-auto space-y-2 sm:space-y-6">
             <div class=" w-full flex items-center gap-4 md:gap-6">
                 <p class=" text-lg sm:text-[28px] font-black capitalize text-left">Masukkan Data Usaha</p>
             </div>
         </div>
-        <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="w-full">
+        <div x-data="{ activeTab: '{{ $activeTab }}' }" class="w-full">
             <div class=" w-full max-w-xl mx-auto bg-white rounded-xl overflow-hidden shadow-md shadow-black/20">
                 <!-- Tabs -->
                 <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
@@ -69,6 +86,8 @@
                                                         class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm"
                                                         type="text" placeholder="Masukkan Nama Usaha..."
                                                         name="name" id="name" x-model="inputName"
+                                                        value="{{ old('name') }}"
+                                                        required
                                                         @input="checkProductName">
                                                 </div>
                                                 <script>
@@ -91,12 +110,12 @@
                                             </div>
                                             <x-admin.component.textinput title="Tagline"
                                                 placeholder="Masukkan Tagline..." :value="''"
-                                                name="subtitle" />
+                                                name="subtitle" required />
                                             <x-admin.component.numberinput title="No. Whatsapp"
                                                 placeholder="Masukkan Nomor..." :value="''"
-                                                name="no_tlp" />
+                                                name="no_tlp" required />
                                             <x-admin.component.textareainput title="Tentang Usaha Anda"
-                                                placeholder="Jelaskan Usaha Anda..." :value="''" name="desc" />
+                                                placeholder="Jelaskan Usaha Anda..." :value="''" name="desc" required />
                                             <div class="">
                                                 <button type="button" @click="activeTab = 'highlight'"
                                                     class=" text-sm sm:text-base font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-[#F8FAFC] rounded-md text-center">Next</button>
@@ -205,7 +224,15 @@
                                             <script>
                                                 function formManager() {
                                                     return {
-                                                        inputs: [],
+                                                        inputs: @json(collect(old('inputs', []))->map(function ($item) {
+                                                            return [
+                                                                'image' => '',
+                                                                'title' => $item['title'] ?? '',
+                                                                'price' => $item['price'] ?? '',
+                                                                'description' => $item['description'] ?? '',
+                                                                'saved' => false,
+                                                            ];
+                                                        })->values()),
 
                                                         // Menghapus input
                                                         removeInput(index) {
@@ -225,10 +252,17 @@
                                                             this.inputs.push({
                                                                 image: '',
                                                                 title: '',
+                                                                price: '',
                                                                 description: '',
                                                                 saved: false
                                                             });
-                                                        }
+                                                        },
+
+                                                        init() {
+                                                            if (this.inputs.length === 0) {
+                                                                this.addNewInput();
+                                                            }
+                                                        },
                                                     };
                                                 }
                                             </script>

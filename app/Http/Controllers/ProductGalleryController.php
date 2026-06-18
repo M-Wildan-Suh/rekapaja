@@ -105,7 +105,7 @@ class ProductGalleryController extends Controller
      */
     public function destroy($id)
     {
-        $productGallery = ProductGallery::find($id);
+        $productGallery = ProductGallery::findOrFail($id);
         $path = public_path('storage/images/product/gallery/' . $productGallery->image);
         if (file_exists($path)) {
             unlink($path);

@@ -53,11 +53,17 @@ class PremiumPackageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $premiumPackage = PremiumPackage::find($id);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'desc' => ['required', 'string'],
+        ]);
 
-        $premiumPackage->name = $request->name;
-        $premiumPackage->price = $request->price;
-        $premiumPackage->desc = $request->desc;
+        $premiumPackage = PremiumPackage::findOrFail($id);
+
+        $premiumPackage->name = $validated['name'];
+        $premiumPackage->price = $validated['price'];
+        $premiumPackage->desc = $validated['desc'];
 
         $premiumPackage->save();
 

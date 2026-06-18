@@ -32,7 +32,7 @@
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="desc_main_color">Background Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
-                                <input type="color" name="desc_main_color" id="desc_main_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{$template->desc_main_color ?? '#ffffff'}}">
+                                <input type="color" name="desc_main_color" id="desc_main_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('desc_main_color', $template->desc_main_color ?? '#ffffff') }}">
                             </div>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="desc_text_color">Text Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
-                                <input type="color" name="desc_text_color" id="desc_text_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{$template->desc_text_color ?? '#000000'}}">
+                                <input type="color" name="desc_text_color" id="desc_text_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('desc_text_color', $template->desc_text_color ?? '#000000') }}">
                             </div>
                         </div>
                     </div>

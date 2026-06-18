@@ -37,6 +37,8 @@
                                         name="name" 
                                         id="name"
                                         x-model="inputName"
+                                        value="{{ old('name') }}"
+                                        required
                                         @input="checkProductName"
                                     >
                                 </div>
@@ -58,26 +60,26 @@
                                 </script>
                             </div>
 
-                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
+                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" required />
                             
-                            <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
+                            <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" required />
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
-                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
+                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" required />
                             
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 
                             <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
 
-                            <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$tagposition ?? ''" name="home_button" />
+                            <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="old('home_button', $tagposition ?? '')" name="home_button" required />
 
                             <div class=" space-y-2">
                                 <label for="template" class=" text-sm sm:text-base font-semibold">Template</label>
                                 <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     @foreach ($template as $item)
                                         <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{$item->id}}" class="hidden peer" {{ $loop->first ? 'checked' : '' }}>
+                                            <input type="radio" name="template_id" value="{{$item->id}}" class="hidden peer" {{ (string) old('template_id', $loop->first ? $item->id : '') === (string) $item->id ? 'checked' : '' }} required>
                                             <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
                                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                             </div>

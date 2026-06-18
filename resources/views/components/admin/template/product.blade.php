@@ -1,3 +1,6 @@
+@php
+    $selectedProductType = old('product_type', $template->product_type ?? 'grid');
+@endphp
 <div x-data="{article: false}" class="">
     <button @click="article = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] rounded-tr-md z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
@@ -34,13 +37,13 @@
                             <div class=" w-full grid grid-cols-2 gap-2">
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>Grid</p>
-                                    <input type="radio" name="product_type" value="grid" class="hidden peer" checked>
+                                    <input type="radio" name="product_type" value="grid" class="hidden peer" {{ $selectedProductType === 'grid' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>List</p>
-                                    <input type="radio" name="product_type" value="list" class="hidden peer" {{isset($template) && $template->product_type === 'list' ? 'checked' : ''}}>
+                                    <input type="radio" name="product_type" value="list" class="hidden peer" {{ $selectedProductType === 'list' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
@@ -51,7 +54,7 @@
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="product_main_color">Background Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
-                                <input type="color" name="product_main_color" id="product_main_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{$template->product_main_color ?? '#000000'}}">
+                                <input type="color" name="product_main_color" id="product_main_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('product_main_color', $template->product_main_color ?? '#000000') }}">
                             </div>
                         </div>
                     </div>
@@ -59,7 +62,7 @@
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="product_second_color">Button Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
-                                <input type="color" name="product_second_color" id="product_second_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{$template->product_second_color ?? '#8E1616'}}">
+                                <input type="color" name="product_second_color" id="product_second_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('product_second_color', $template->product_second_color ?? '#8E1616') }}">
                             </div>
                         </div>
                     </div>
@@ -67,7 +70,7 @@
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="product_text_color">Text Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
-                                <input type="color" name="product_text_color" id="product_text_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{$template->product_text_color ?? '#ffffff'}}">
+                                <input type="color" name="product_text_color" id="product_text_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('product_text_color', $template->product_text_color ?? '#ffffff') }}">
                             </div>
                         </div>
                     </div>

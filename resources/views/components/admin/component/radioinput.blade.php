@@ -1,4 +1,7 @@
-@props(['title', 'name', 'value', 'defaultvalue', 'xModel'=> null])
+@props(['title', 'name', 'value', 'defaultvalue', 'xModel'=> null, 'required' => false])
+@php
+    $selectedValue = old($name, $defaultvalue);
+@endphp
 <div class="w-full">
     <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
         <label for="{{$name}}" class=" font-semibold">{{$title}}</label>
@@ -9,15 +12,16 @@
                         type="radio" 
                         class="text-[#ff7100] ring-0 focus:ring-[#ff7100] checked:ring-[#ff7100]" 
                         name="{{$name}}" 
-                        id="{{$name}}" 
-                        @if ($xModel)
+                        id="{{$name}}-{{$loop->index}}" 
+                        @if ($xModel && old($name) === null)
                             {{ $xModel ? 'x-model='.$xModel : '' }} 
-                            x-bind:value="{{ $xModel ? '' : $defaultvalue }}" 
+                            x-bind:value="{{ $xModel ? '' : $selectedValue }}" 
                         @endif
                         value="{{$item['value']}}" 
-                        @if ($item['value'] == $defaultvalue || $loop->first && !$defaultvalue) checked @endif
+                        @required($required && $loop->first)
+                        @checked($item['value'] == $selectedValue || ($loop->first && blank($selectedValue)))
                     >
-                    <label for="{{$name}}">{{$item['label']}}</label>
+                    <label for="{{$name}}-{{$loop->index}}">{{$item['label']}}</label>
                 </div>
             @endforeach
         </div>

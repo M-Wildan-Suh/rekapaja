@@ -41,10 +41,15 @@ class AccessController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'user' => ['required', 'exists:users,id'],
+            'product' => ['required', 'exists:products,id'],
+        ]);
+
         $newdata = new Access;
 
-        $newdata->user_id = $request->user;
-        $newdata->product_id = $request->product;
+        $newdata->user_id = $validated['user'];
+        $newdata->product_id = $validated['product'];
 
         $newdata->save();
 

@@ -26,7 +26,7 @@
                     </svg>
                 </button>
             </div>
-            <div x-data="{ tab: '{{$template->bg_type ?? 'normal'}}' }" class="space-y-4">
+            <div x-data="{ tab: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
                 <div class="w-full px-4 sm:px-6 grid grid-cols-3 gap-2">
                     <!-- Input hidden untuk menyimpan nilai tab yang aktif -->
                     <input type="hidden" name="bg_type" id="bg_type" x-model="tab">
@@ -56,16 +56,16 @@
                 <div class="w-full px-4 sm:px-6 h-[322px] overflow-auto">
                     <div x-show="tab === 'normal'" class=" space-y-4">
                         <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[322px]">
-                            <input type="color" name="bg_normal_color" id="bg_normal_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{$template->bg_main_color ?? '#F5F5F5'}}" id="bg_normal_color">
+                            <input type="color" name="bg_normal_color" id="bg_normal_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_normal_color', $template->bg_main_color ?? '#F5F5F5') }}" id="bg_normal_color">
                         </div>
                     </div>
                     <div x-show="tab === 'gradient'" class=" space-y-4">
                         <div class=" grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[153px] sm:h-[322px]">
-                                <input type="color" name="bg_main_color" id="bg_main_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{$template->bg_main_color ?? '#F5F5F5'}}" id="">
+                                <input type="color" name="bg_main_color" id="bg_main_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_main_color', $template->bg_main_color ?? '#F5F5F5') }}" id="">
                             </div>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[153px] sm:h-[322px]">
-                                <input type="color" name="bg_second_color" id="bg_second_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{$template->bg_second_color ?? '#F5F5F5'}}" id="">
+                                <input type="color" name="bg_second_color" id="bg_second_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_second_color', $template->bg_second_color ?? '#F5F5F5') }}" id="">
                             </div>
                         </div>
                     </div>

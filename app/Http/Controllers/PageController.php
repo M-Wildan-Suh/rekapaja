@@ -31,8 +31,7 @@ class PageController extends Controller
 {
     public function home(Request $request) {
         // dd($request->filter);
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
         $data = Product::where('status', 'active')->inRandomOrder()->get();
         return view('welcome', compact('data', 'no_tlp'));
     }
@@ -43,8 +42,7 @@ class PageController extends Controller
             return $request->route('page', 1); // default ke halaman 1
         });
     
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
     
         $seed = Carbon::now()->format('Ymd');
         $search = $request->search;
@@ -106,8 +104,7 @@ class PageController extends Controller
             return $request->route('page', 1); // default ke halaman 1
         });
 
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
 
         $filter = $category;
 
@@ -127,8 +124,7 @@ class PageController extends Controller
     }
 
     public function template(Request $request) {
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
         if ($request->search) {
             $data = Template::where('name', 'like', '%' . $request->search . '%')->get();
         } else {
@@ -159,15 +155,15 @@ class PageController extends Controller
                 if ($data->no_tlp) {
                     $no_tlp = $data->no_tlp;
                 } else {
-                    $no_tlp = NoHandphone::first()->no_tlp;
+                    $no_tlp = $this->getRawWhatsappNumber();
                 }
                 $role = $role->user->role;
             } else {
                 $role = 'user';
-                $no_tlp = NoHandphone::first()->no_tlp;
+                $no_tlp = $this->getRawWhatsappNumber();
             }
         } else {
-            $no_tlp = NoHandphone::first()->no_tlp;
+            $no_tlp = $this->getRawWhatsappNumber();
 
             $role = 'admin';
         }
@@ -188,7 +184,7 @@ class PageController extends Controller
             return redirect()->route('home');
         }
 
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->formatWhatsappNumber($no_tlp);
 
         // Url Youtube
         $url = $data->youtube;
@@ -233,10 +229,13 @@ class PageController extends Controller
             'desc' => 'required|string',
             'no_tlp' => 'required|string|max:20',
             'thumbnail' => 'required|image',
+            'image_gallery' => 'nullable|array|max:9',
+            'image_gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
 
             'inputs' => 'array|max:3',
             'inputs.*.image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             'inputs.*.title' => 'required|string|max:27',
+            'inputs.*.price' => 'nullable|numeric|min:0',
             'inputs.*.description' => 'required|string|max:64',
         ], [
             'inputs.max' => 'Maksimal hanya boleh 3 produk/layanan.',
@@ -247,6 +246,7 @@ class PageController extends Controller
             'inputs.*.title.max' => 'Nama produk/layanan maksimal 27 karakter.',
             'inputs.*.description.required' => 'Deskripsi produk/layanan wajib diisi.',
             'inputs.*.description.max' => 'Deskripsi maksimal 64 karakter.',
+            'image_gallery.max' => 'Maksimal hanya boleh 9 gambar galeri.',
         ]);
     
         // Jika validasi gagal, kirim alert dan kembali
@@ -367,8 +367,7 @@ class PageController extends Controller
             }
         }
 
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
 
         $text = urlencode("Halo, saya sudah mendaftarkan usaha Saya dengan nama usaha ".$newdata->name.". Saya tertarik dengan fitur-fitur yang ada dan ingin mengetahui lebih lanjut. Apakah bisa mendapatkan informasi lebih lengkap?");
 
@@ -376,8 +375,7 @@ class PageController extends Controller
     }
 
     public function join() {
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
 
         $text = urlencode("Halo, Saya tertarik dengan fitur-fitur yang ada di byoo.link dan ingin mengetahui lebih lanjut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
 
@@ -432,15 +430,13 @@ class PageController extends Controller
     }
 
     public function premiumPackage() {
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
         $data = PremiumPackage::all();
         return view('package', compact('data', 'no_tlp'));
     }
 
     public function buyPackage($id) {
-        $no_tlp = NoHandphone::first()->no_tlp;
-        $no_tlp = preg_replace('/^0/', '+62', $no_tlp);
+        $no_tlp = $this->getWhatsappNumber();
 
         $data = PremiumPackage::find($id);
 
@@ -452,5 +448,24 @@ class PageController extends Controller
     public function test() {
         $data = Product::where('status', 'active')->inRandomOrder()->get();
         return view('test', compact('data'));
+    }
+
+    private function getRawWhatsappNumber(): ?string
+    {
+        return NoHandphone::query()->value('no_tlp');
+    }
+
+    private function getWhatsappNumber(): string
+    {
+        return $this->formatWhatsappNumber($this->getRawWhatsappNumber());
+    }
+
+    private function formatWhatsappNumber(?string $no_tlp): string
+    {
+        if (!$no_tlp) {
+            return '';
+        }
+
+        return preg_replace('/^0/', '+62', $no_tlp);
     }
 }

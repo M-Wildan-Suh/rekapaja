@@ -12,7 +12,11 @@ use Intervention\Image\ImageManager;
 class TemplateController extends Controller
 {
     public function editimage($id, Request $request) {
-        $template = Template::find($id);
+        $request->validate([
+            'thumbnail' => ['required', 'image', 'max:5120'],
+        ]);
+
+        $template = Template::findOrFail($id);
         if ($request->hasFile('thumbnail')) {
             if ($template->image) {
                 $path = public_path('storage/images/template/' . $template->image);
@@ -62,27 +66,29 @@ class TemplateController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate($this->templateValidationRules(true));
+
         $newdata = new Template;
 
-        $newdata->name = $request->name;
-        $newdata->bg_type = $request->bg_type;
-        $newdata->head_type = $request->header;
-        $newdata->gallery_type = $request->gallery;
-        $newdata->desc_main_color = $request->desc_main_color;
-        $newdata->desc_text_color = $request->desc_text_color;
+        $newdata->name = $validated['name'];
+        $newdata->bg_type = $validated['bg_type'];
+        $newdata->head_type = $validated['header'];
+        $newdata->gallery_type = $validated['gallery'];
+        $newdata->desc_main_color = $validated['desc_main_color'];
+        $newdata->desc_text_color = $validated['desc_text_color'];
         
-        $newdata->product_type = $request->product_type;
-        $newdata->product_main_color = $request->product_main_color;
-        $newdata->product_second_color = $request->product_second_color;
-        $newdata->product_text_color = $request->product_text_color;
+        $newdata->product_type = $validated['product_type'];
+        $newdata->product_main_color = $validated['product_main_color'];
+        $newdata->product_second_color = $validated['product_second_color'];
+        $newdata->product_text_color = $validated['product_text_color'];
         
-        $newdata->contact_main_color = $request->contact_main_color;
-        $newdata->contact_second_color = $request->contact_second_color;
+        $newdata->contact_main_color = $validated['contact_main_color'];
+        $newdata->contact_second_color = $validated['contact_second_color'];
         if ($newdata->bg_type === "normal") {
-            $newdata->bg_main_color = $request->bg_normal_color;
+            $newdata->bg_main_color = $validated['bg_normal_color'];
         } elseif ($newdata->bg_type === "gradient") {
-            $newdata->bg_main_color = $request->bg_main_color;
-            $newdata->bg_second_color = $request->bg_second_color;
+            $newdata->bg_main_color = $validated['bg_main_color'];
+            $newdata->bg_second_color = $validated['bg_second_color'];
         } elseif ($newdata->bg_type === "image") {
             if ($request->hasFile('bg_image')) {
                 $imageFile = $request->file('bg_image');
@@ -124,25 +130,27 @@ class TemplateController extends Controller
      */
     public function update(Request $request, Template $template)
     {
-        $template->name = $request->name;
-        $template->bg_type = $request->bg_type;
-        $template->head_type = $request->header;
-        $template->gallery_type = $request->gallery;
-        $template->desc_main_color = $request->desc_main_color;
-        $template->desc_text_color = $request->desc_text_color;
+        $validated = $request->validate($this->templateValidationRules(false));
+
+        $template->name = $validated['name'];
+        $template->bg_type = $validated['bg_type'];
+        $template->head_type = $validated['header'];
+        $template->gallery_type = $validated['gallery'];
+        $template->desc_main_color = $validated['desc_main_color'];
+        $template->desc_text_color = $validated['desc_text_color'];
         
-        $template->product_type = $request->product_type;
-        $template->product_main_color = $request->product_main_color;
-        $template->product_second_color = $request->product_second_color;
-        $template->product_text_color = $request->product_text_color;
+        $template->product_type = $validated['product_type'];
+        $template->product_main_color = $validated['product_main_color'];
+        $template->product_second_color = $validated['product_second_color'];
+        $template->product_text_color = $validated['product_text_color'];
         
-        $template->contact_main_color = $request->contact_main_color;
-        $template->contact_second_color = $request->contact_second_color;
+        $template->contact_main_color = $validated['contact_main_color'];
+        $template->contact_second_color = $validated['contact_second_color'];
         if ($template->bg_type === "normal") {
-            $template->bg_main_color = $request->bg_normal_color;
+            $template->bg_main_color = $validated['bg_normal_color'];
         } elseif ($template->bg_type === "gradient") {
-            $template->bg_main_color = $request->bg_main_color;
-            $template->bg_second_color = $request->bg_second_color;
+            $template->bg_main_color = $validated['bg_main_color'];
+            $template->bg_second_color = $validated['bg_second_color'];
         } elseif ($template->bg_type === "image") {
             if ($request->hasFile('bg_image')) {
                 $imageFile = $request->file('bg_image');
@@ -194,13 +202,36 @@ class TemplateController extends Controller
             if (file_exists($galleryPath)) {
                 unlink($galleryPath);
             }
-            // Delete the gallery record from the database
-            $gallery->delete();
+            $item->delete();
         }
 
         // Finally, delete the template
         $template->delete();
 
         return redirect()->back()->with('success', 'template and its gallery images deleted successfully.');
+    }
+
+    private function templateValidationRules(bool $isStore): array
+    {
+        $colorRule = ['required', 'regex:/^#[A-Fa-f0-9]{6}$/'];
+
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'bg_type' => ['required', 'in:normal,gradient,image'],
+            'header' => ['required', 'in:one,two,three,four'],
+            'gallery' => ['required', 'in:square,potrait'],
+            'desc_main_color' => $colorRule,
+            'desc_text_color' => $colorRule,
+            'product_type' => ['required', 'in:grid,list'],
+            'product_main_color' => $colorRule,
+            'product_second_color' => $colorRule,
+            'product_text_color' => $colorRule,
+            'contact_main_color' => $colorRule,
+            'contact_second_color' => $colorRule,
+            'bg_normal_color' => ['nullable', 'regex:/^#[A-Fa-f0-9]{6}$/'],
+            'bg_main_color' => ['nullable', 'regex:/^#[A-Fa-f0-9]{6}$/'],
+            'bg_second_color' => ['nullable', 'regex:/^#[A-Fa-f0-9]{6}$/'],
+            'bg_image' => [$isStore ? 'required_if:bg_type,image' : 'nullable', 'image', 'max:5120'],
+        ];
     }
 }

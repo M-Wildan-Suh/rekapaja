@@ -28,16 +28,20 @@ class NoHandphoneController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'no_handphone' => ['required', 'string', 'max:20'],
+        ]);
+
         $data = NoHandphone::first();
         // dd($request);
         if ($data) {
-            $data->no_tlp = $request->no_handphone;
+            $data->no_tlp = $validated['no_handphone'];
 
             $data->save();
         } else {
             $newdata = new NoHandphone;
 
-            $newdata->no_tlp = $request->no_handphone;
+            $newdata->no_tlp = $validated['no_handphone'];
 
             $newdata->save();
         }

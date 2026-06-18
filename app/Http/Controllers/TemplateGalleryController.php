@@ -105,7 +105,7 @@ class TemplateGalleryController extends Controller
      */
     public function destroy($id)
     {
-        $templateGallery = TemplateGallery::find($id);
+        $templateGallery = TemplateGallery::findOrFail($id);
         $path = public_path('storage/images/template/gallery/' . $templateGallery->image);
         if (file_exists($path)) {
             unlink($path);

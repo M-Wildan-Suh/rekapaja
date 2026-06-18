@@ -37,7 +37,9 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'in:user,premium'],
+            'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
+            'expired' => ['nullable', 'required_if:role,premium', 'date'],
         ]);
 
         $user = User::create([
@@ -73,12 +75,19 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // dd($request);
+        $validated = $request->validate([
+            'role' => ['required', 'in:user,premium'],
+            'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
+            'expired' => ['nullable', 'required_if:role,premium', 'date'],
+        ]);
+
         $user = User::find($id);
 
-        $user->role = $request->role;
-        $user->premium_type = $request->premium_type;
-        $user->expired = $request->expired;
+        $user->role = $validated['role'];
+        $user->premium_type = $validated['role'] === 'premium' ? $validated['premium_type'] : null;
+        $user->expired = $validated['role'] === 'premium' && ($validated['premium_type'] ?? null) !== 'lifetime'
+            ? $validated['expired']
+            : null;
 
         $user->save();
 

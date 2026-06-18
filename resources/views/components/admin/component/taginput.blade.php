@@ -1,17 +1,23 @@
 @props(['title', 'name', 'value', 'tag' => null])
+@php
+    $selectedValues = collect(old(str_replace('[]', '', $name), isset($value) ? collect($value)->pluck('tag')->all() : []))
+        ->filter(fn ($item) => filled($item))
+        ->values()
+        ->all();
+@endphp
 <div class="flex flex-col gap-2">
     <label class=" text-sm sm:text-base font-semibold">{{$title}}</label>
     <select class="js-example-basic-single" name="{{$name}}" multiple="multiple">
-        @if(isset($value))
-            @foreach($value as $item)
-                <option value="{{ $item->tag }}" selected>{{ $item->tag }}</option>
-            @endforeach
-        @endif
         @if (isset($tag))
             @foreach($tag as $item)
-                <option value="{{ $item->tag }}">{{ $item->tag }}</option>
+                <option value="{{ $item->tag }}" @selected(in_array($item->tag, $selectedValues, true))>{{ $item->tag }}</option>
             @endforeach
         @endif
+        @foreach($selectedValues as $selectedValue)
+            @if (!isset($tag) || !$tag->contains('tag', $selectedValue))
+                <option value="{{ $selectedValue }}" selected>{{ $selectedValue }}</option>
+            @endif
+        @endforeach
     </select>
     <style>
         .select2 {
@@ -59,5 +65,6 @@
             tokenSeparators: [','],
             // maximumSelectionLength: 10,
         });
+        $j('.js-example-basic-single').trigger('change');
     });
 </script>

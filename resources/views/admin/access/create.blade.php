@@ -14,20 +14,20 @@
                         <div class=" w-full space-y-6">
                             <div class=" flex flex-col gap-2 text-sm sm:text-base font-medium">
                                 <label for="user">User</label>
-                                <select name="user" class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" id="user">
+                                <select name="user" class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" id="user" required>
                                     @foreach ($user as $item)
-                                        <option value="{{$item->id}}">{{$item->name}}</option>
+                                        <option value="{{$item->id}}" @selected((string) old('user') === (string) $item->id)>{{$item->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class=" flex flex-col gap-2 text-sm sm:text-base font-medium">
                                 <label for="product">Usaha</label>
-                                <select name="product" class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" id="productr">
+                                <select name="product" class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm" id="productr" required>
                                     @if (empty($product) || $product->isEmpty())
                                         <option value="" disabled selected>Data tidak tersedia</option>
                                     @endif
                                     @foreach ($product as $item)
-                                        <option value="{{$item->id}}">{{$item->name}}</option>
+                                        <option value="{{$item->id}}" @selected((string) old('product') === (string) $item->id)>{{$item->name}}</option>
                                     @endforeach
                                 </select>
                             </div>

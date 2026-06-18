@@ -1,3 +1,6 @@
+@php
+    $selectedGallery = old('gallery', $template->gallery_type ?? 'square');
+@endphp
 <div x-data="{gallery: false}" class="">
     <button @click="gallery = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
@@ -30,13 +33,13 @@
                 <div class="w-full px-4 sm:px-6 h-[309px] sm:h-[292px] overflow-auto">
                     <div class=" w-full grid grid-cols-2 gap-4">
                         <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
-                            <input type="radio" name="gallery" value="square" class="hidden peer" checked>
+                            <input type="radio" name="gallery" value="square" class="hidden peer" {{ $selectedGallery === 'square' ? 'checked' : '' }}>
                             <img src="{{asset('assets/images/template/gallery/square.png')}}" class=" w-full" alt="">
                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                             </div>
                         </label>
                         <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
-                            <input type="radio" name="gallery" value="potrait" class="hidden peer" {{isset($template) && $template->gallery_type === 'potrait' ? 'checked' : ''}}>
+                            <input type="radio" name="gallery" value="potrait" class="hidden peer" {{ $selectedGallery === 'potrait' ? 'checked' : '' }}>
                             <img src="{{asset('assets/images/template/gallery/potrait.png')}}" class=" w-full" alt="">
                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                             </div>
