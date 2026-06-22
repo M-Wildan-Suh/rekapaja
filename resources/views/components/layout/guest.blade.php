@@ -34,6 +34,7 @@
         <link href="{{ asset('build/assets/app.css') }}" rel="stylesheet" />
     </head>
     <body class="antialiased">
+        @include('components.page-loading')
         <div class=" min-h-screen">
             {{$slot}}
         </div>

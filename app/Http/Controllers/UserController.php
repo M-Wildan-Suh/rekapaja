@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
-
-use function PHPUnit\Framework\returnSelf;
 
 class UserController extends Controller
 {
@@ -39,7 +38,11 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:user,premium'],
             'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
-            'expired' => ['nullable', 'required_if:role,premium', 'date'],
+            'expired' => [
+                'nullable',
+                'date',
+                Rule::requiredIf(fn () => $request->role === 'premium' && $request->premium_type !== 'lifetime'),
+            ],
         ]);
 
         $user = User::create([
@@ -76,18 +79,29 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:user,premium'],
             'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
-            'expired' => ['nullable', 'required_if:role,premium', 'date'],
+            'expired' => [
+                'nullable',
+                'date',
+                Rule::requiredIf(fn () => $request->role === 'premium' && $request->premium_type !== 'lifetime'),
+            ],
         ]);
 
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
+        $user->name = $validated['name'];
         $user->role = $validated['role'];
         $user->premium_type = $validated['role'] === 'premium' ? $validated['premium_type'] : null;
         $user->expired = $validated['role'] === 'premium' && ($validated['premium_type'] ?? null) !== 'lifetime'
             ? $validated['expired']
             : null;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
 
         $user->save();
 

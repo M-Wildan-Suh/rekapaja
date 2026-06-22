@@ -84,7 +84,7 @@
                                     <td class=" px-1 sm:px-2">
                                         <div class="flex gap-2 justify-center">
                                             <!-- Edit -->
-                                            <a :href="`{{ route('product.show', '') }}/${item.id}`"
+                                            <a :href="`{{ route('product.show', '') }}/${item.id}?return_page=${currentPage}`"
                                                 class="w-5 h-5 hover:text-green-500 duration-300">
                                                 <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path
@@ -202,7 +202,7 @@
                     return {
                         data: @json($data), // Fetch data from the backend
                         search: '',
-                        currentPage: 1,
+                        currentPage: {{ max((int) request('return_page', 1), 1) }},
                         perPage: 15,
                         showModal: false,
                         confirmDeleteModal: false,

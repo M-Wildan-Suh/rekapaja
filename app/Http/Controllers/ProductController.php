@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductTag;
 use App\Models\Template;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,42 @@ use Intervention\Image\ImageManager;
 
 class ProductController extends Controller
 {
+    private function ensureAdmin()
+    {
+        abort_unless(Auth::user() && in_array(Auth::user()->role, ['admin', 'superadmin']), 403);
+    }
+
+    private function ensureProductAccess(Product $product)
+    {
+        $user = Auth::user();
+
+        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
+            return;
+        }
+
+        $hasAccess = Access::where('user_id', Auth::id())
+            ->where('product_id', $product->id)
+            ->exists();
+
+        abort_unless($hasAccess, 403);
+    }
+
+    private function storeProductImage($imageFile): string
+    {
+        $imageName = Str::uuid()->toString() . '.webp';
+        $imagePath = public_path('storage/images/product/');
+
+        if (!is_dir($imagePath)) {
+            mkdir($imagePath, 0755, true);
+        }
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($imageFile->getPathname());
+        $image->toWebp(85)->save($imagePath . $imageName);
+
+        return $imageName;
+    }
+
     public function dashboard ()
     {
         $no_tlp = NoHandphone::query()->value('no_tlp');
@@ -59,11 +96,15 @@ class ProductController extends Controller
      */
     public function create()
     {
+        $this->ensureAdmin();
+
         $tag = ProductTag::all();
         $category = Category::all();
         $template = Template::all();
         $product = Product::all();
-        return view('admin.product.create', compact('tag', 'template', 'product', 'category'));
+        $accessUsers = User::where('role', '!=', 'admin')->orderBy('name')->get();
+
+        return view('admin.product.create', compact('tag', 'template', 'product', 'category', 'accessUsers'));
     }
 
     /**
@@ -71,6 +112,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $this->ensureAdmin();
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
             'subtitle' => ['required', 'string', 'max:255'],
@@ -78,14 +121,16 @@ class ProductController extends Controller
             'template_id' => ['required', 'exists:templates,id'],
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
-            'no_tlp' => ['required', 'string', 'max:20'],
+            'no_tlp' => ['nullable', 'string', 'max:20'],
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['required', 'in:on,off'],
-            'thumbnail' => ['required', 'image', 'max:5120'],
+            'thumbnail' => ['required', 'image'],
             'category' => ['nullable', 'array'],
             'category.*' => ['nullable', 'string', 'max:255'],
             'tag' => ['nullable', 'array'],
             'tag.*' => ['nullable', 'string', 'max:255'],
+            'access' => ['nullable', 'array'],
+            'access.*' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         $newdata= new Product();
@@ -97,22 +142,13 @@ class ProductController extends Controller
         $newdata->template_id = $validated['template_id'];
         $newdata->description = $validated['description'];
         $newdata->address = $validated['address'] ?? null;
-        $newdata->no_tlp = $validated['no_tlp'];
+        $newdata->no_tlp = $validated['no_tlp'] ?? null;
         $newdata->youtube = $validated['link'] ?? null;
         $newdata->home_button = $validated['home_button'];
         $newdata->status = 'active';
 
         if ($request->hasFile('thumbnail')) {
-            $imageFile = $request->file('thumbnail');
-            $imageName = time() . '.' . $imageFile->getClientOriginalExtension();
-            $imagePath = public_path('storage/images/product/');
-
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($imageFile->getPathname());
-            $imageFullPath = $imagePath . $imageName . '.webp';
-            $image->save($imageFullPath);
-
-            $newdata->image = $imageName . '.webp';
+            $newdata->image = $this->storeProductImage($request->file('thumbnail'));
         }
 
         $newdata->save();
@@ -157,6 +193,19 @@ class ProductController extends Controller
                 
             }
         }
+
+        if (Auth::user()->role === 'admin') {
+            $userIds = User::where('role', '!=', 'admin')
+                ->whereIn('id', $validated['access'] ?? [])
+                ->pluck('id');
+
+            foreach ($userIds as $userId) {
+                Access::create([
+                    'user_id' => $userId,
+                    'product_id' => $newdata->id,
+                ]);
+            }
+        }
           
         return redirect()->route('product.index');
     }
@@ -166,13 +215,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $access = Access::where('user_id', Auth::id())->where('product_id', $product->id)->first();
+        $this->ensureProductAccess($product);
 
-        if (Auth::user()->role === 'admin') {
-            # code...
-        } elseif (!$access) {
-            return redirect()->back();
-        }
         $product->productTags->transform(function ($data) {
             $data->tag = $data->productTag->tag;
             return $data;
@@ -189,8 +233,9 @@ class ProductController extends Controller
 
         $template = Template::all();
         $data = Product::whereNotIn('id', [$product->id])->get();
+        $accessUsers = User::where('role', '!=', 'admin')->orderBy('name')->get();
         
-        return view('admin.product.edit', compact('product', 'tag', 'template', 'category', 'data'));
+        return view('admin.product.edit', compact('product', 'tag', 'template', 'category', 'data', 'accessUsers'));
         
     }
 
@@ -209,6 +254,7 @@ class ProductController extends Controller
         ]);
 
         $data = Product::findOrFail($id);
+        $this->ensureProductAccess($data);
 
         $data->order_title = $validated['order_title'];
 
@@ -225,6 +271,7 @@ class ProductController extends Controller
         ]);
 
         $data = Product::findOrFail($id);
+        $this->ensureProductAccess($data);
 
         $data->product_title = $validated['product_title'];
 
@@ -238,6 +285,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $this->ensureProductAccess($product);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'subtitle' => ['required', 'string', 'max:255'],
@@ -245,15 +294,17 @@ class ProductController extends Controller
             'template_id' => ['required', 'exists:templates,id'],
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
-            'no_tlp' => ['required', 'string', 'max:20'],
+            'no_tlp' => ['nullable', 'string', 'max:20'],
             'link' => ['nullable', 'url', 'max:255'],
-            'home_button' => ['required', 'in:on,off'],
-            'status' => ['nullable', 'in:active,inactive'],
-            'thumbnail' => ['nullable', 'image', 'max:5120'],
+            'home_button' => ['nullable', 'in:on,off'],
+            'status' => ['nullable', 'in:active,unactive'],
+            'thumbnail' => ['nullable', 'image'],
             'category' => ['nullable', 'array'],
             'category.*' => ['nullable', 'string', 'max:255'],
             'tag' => ['nullable', 'array'],
             'tag.*' => ['nullable', 'string', 'max:255'],
+            'access' => ['nullable', 'array'],
+            'access.*' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         $product->name = $validated['name'];
@@ -263,14 +314,20 @@ class ProductController extends Controller
         $product->template_id = $validated['template_id'];
         $product->description = $validated['description'];
         $product->address = $validated['address'] ?? null;
-        $product->no_tlp = $validated['no_tlp'];
-        $product->home_button = $validated['home_button'];
+        $product->no_tlp = $validated['no_tlp'] ?? null;
         $product->youtube = $validated['link'] ?? null;
+
+        if (array_key_exists('home_button', $validated)) {
+            $product->home_button = $validated['home_button'];
+        }
+
         if (!empty($validated['status'])) {
             $product->status = $validated['status'];
         }
 
         if ($request->hasFile('thumbnail')) {
+            $newImageName = $this->storeProductImage($request->file('thumbnail'));
+
             if ($product->image) {
                 $path = public_path('storage/images/product/' . $product->image);
 
@@ -278,16 +335,8 @@ class ProductController extends Controller
                     unlink($path);
                 }
             }
-            $imageFile = $request->file('thumbnail');
-            $imageName = time() . '.' . $imageFile->getClientOriginalExtension();
-            $imagePath = public_path('storage/images/product/');
 
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($imageFile->getPathname());
-            $imageFullPath = $imagePath . $imageName . '.webp';
-            $image->save($imageFullPath);
-
-            $product->image = $imageName . '.webp';
+            $product->image = $newImageName;
         }
 
         $product->save();
@@ -335,6 +384,22 @@ class ProductController extends Controller
                 }
             }
         }
+
+        if (Auth::user()->role === 'admin') {
+            $userIds = User::where('role', '!=', 'admin')
+                ->whereIn('id', $validated['access'] ?? [])
+                ->pluck('id')
+                ->all();
+
+            Access::where('product_id', $product->id)->delete();
+
+            foreach ($userIds as $userId) {
+                Access::create([
+                    'user_id' => $userId,
+                    'product_id' => $product->id,
+                ]);
+            }
+        }
         
 
         return redirect()->route('product.index');
@@ -345,6 +410,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        $this->ensureAdmin();
+
         // Delete the main product image if it exists
         $path = public_path('storage/images/product/' . $product->image);
         if (file_exists($path)) {

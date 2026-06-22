@@ -2,14 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Access;
+use App\Models\Product;
 use App\Models\ProductGallery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Intervention\Gif\Exceptions\NotReadableException;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 
 class ProductGalleryController extends Controller
 {
+    private function ensureProductAccess(Product $product)
+    {
+        $user = Auth::user();
+
+        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
+            return;
+        }
+
+        $hasAccess = Access::where('user_id', Auth::id())
+            ->where('product_id', $product->id)
+            ->exists();
+
+        abort_unless($hasAccess, 403);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,6 +49,9 @@ class ProductGalleryController extends Controller
      */
     public function store(Request $request)
     {
+        $product = Product::findOrFail($request->product_id);
+        $this->ensureProductAccess($product);
+
         // Handle the file upload
         if ($request->hasFile('image_gallery')) {
             $image = $request->file('image_gallery');
@@ -106,6 +127,8 @@ class ProductGalleryController extends Controller
     public function destroy($id)
     {
         $productGallery = ProductGallery::findOrFail($id);
+        $this->ensureProductAccess($productGallery->product);
+
         $path = public_path('storage/images/product/gallery/' . $productGallery->image);
         if (file_exists($path)) {
             unlink($path);

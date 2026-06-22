@@ -7,8 +7,16 @@
 
     <div class="py-4 px-4">
         <div class="max-w-xl mx-auto">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class=" p-4 md:p-6 text-gray-900">
+                    <div class="mb-6">
+                        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Kembali</span>
+                        </a>
+                    </div>
                     <form action="{{route('product.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class=" w-full space-y-6">
@@ -62,7 +70,7 @@
 
                             <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" required />
                             
-                            <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" required />
+                            <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
@@ -71,6 +79,10 @@
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 
                             <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
+
+                            @if (Auth::user()->role === 'admin')
+                                <x-admin.component.accessinput title="Access" :value="[]" :users="$accessUsers" name="access[]" />
+                            @endif
 
                             <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="old('home_button', $tagposition ?? '')" name="home_button" required />
 

@@ -72,7 +72,26 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', [ProductController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
+    Route::get('/check-profile', [ProfileController::class, 'check']);
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/admin/premium', [AdminController::class, 'premium'])->name('premium.index');
+
+    Route::resource('/admin/product', ProductController::class);
+    Route::put('/admin/product-order/{id}', [ProductController::class, 'productorder'])->name('product.order');
+    Route::put('/admin/product-title/{id}', [ProductController::class, 'producttitle'])->name('product.title');
+
+    Route::resource('/admin/product-gallery', ProductGalleryController::class);
+
+    Route::resource('/admin/highlight', HighlightController::class);
+    Route::post('/admin/highlight/multiple', [HighlightController::class, 'multiple'])->name('highlight.multiple');
+    Route::put('/admin/highlight-available/{id}', [HighlightController::class, 'available'])->name('highlight.available');
+
     Route::group(['middleware' => 'cekUser'], function () {
+        Route::resource('/admin/rekap', InvoiceController::class);
+
         Route::group(['middleware' => 'cekRole'], function () {
             Route::resource('/admin/user', UserController::class);
     
@@ -82,31 +101,12 @@ Route::middleware('auth')->group(function () {
             Route::resource('/admin/access', AccessController::class);
 
             Route::resource('/admin/package', PremiumPackageController::class);
+            Route::resource('/admin/no-handphone', NoHandphoneController::class);
+
+            Route::resource('/admin/template-highlight', TemplateHighlightController::class);
+    
+            Route::resource('/admin/template-gallery', TemplateGalleryController::class);
         });
-        Route::resource('/admin/rekap', InvoiceController::class);
-    
-        Route::get('/admin/premium', [AdminController::class, 'premium'])->name('premium.index');
-    
-        Route::resource('/admin/no-handphone', NoHandphoneController::class);
-    
-        Route::resource('/admin/product', ProductController::class);
-        Route::put('/admin/product-order/{id}', [ProductController::class, 'productorder'])->name('product.order');
-        Route::put('/admin/product-title/{id}', [ProductController::class, 'producttitle'])->name('product.title');
-    
-        Route::resource('/admin/product-gallery', ProductGalleryController::class);
-    
-        Route::resource('/admin/highlight', HighlightController::class);
-        Route::post('/admin/highlight/multiple', [HighlightController::class, 'multiple'])->name('highlight.multiple');
-        Route::put('/admin/highlight-available/{id}', [HighlightController::class, 'available'])->name('highlight.available');
-    
-        Route::resource('/admin/template-highlight', TemplateHighlightController::class);
-    
-        Route::resource('/admin/template-gallery', TemplateGalleryController::class);
-    
-        Route::get('/check-profile', [ProfileController::class, 'check']);
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 });
 
@@ -115,4 +115,3 @@ require __DIR__.'/auth.php';
 Route::get('/embed/event', [PageController::class, 'test'])->name('test');
 Route::get('/{slug}', [PageController::class, 'detail'])->name('detail');
 Route::get('/template/{slug}', [PageController::class, 'templatedetail'])->name('template.detail');
-

@@ -16,7 +16,7 @@
                        class="absolute bottom-0 left-0 z-0 w-40 opacity-0" 
                        id="{{$name}}-input" 
                        {{($status ?? '') != '' ? 'required' : ''}}
-                       oninput="handleImagePreview(this, '{{$name}}-preview')" />
+                       onchange="handleImagePreview(this, '{{$name}}-preview')" />
             </label>
         </div>
     </div>

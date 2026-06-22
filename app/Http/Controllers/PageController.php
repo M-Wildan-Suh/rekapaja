@@ -146,18 +146,22 @@ class PageController extends Controller
 
         $template = Template::find($data->template_id);
 
-        $role = Access::where('product_id', $data->id)->first();
+        $accesses = Access::with('user')->where('product_id', $data->id)->get();
 
         // Role Validation
-        if ($role) {
+        if ($accesses->isNotEmpty()) {
+            $premiumAccess = $accesses->first(function ($access) {
+                return $access->user && $access->user->canAccessPremiumFeatures();
+            });
+
             // No Telephone
-            if ($role->user->role === 'premium' && ($role->user->premium_type === 'lifetime' || Carbon::parse($role->user->expired)->isFuture())) {
+            if ($premiumAccess) {
                 if ($data->no_tlp) {
                     $no_tlp = $data->no_tlp;
                 } else {
                     $no_tlp = $this->getRawWhatsappNumber();
                 }
-                $role = $role->user->role;
+                $role = $premiumAccess->user->role === 'admin' ? 'admin' : 'premium';
             } else {
                 $role = 'user';
                 $no_tlp = $this->getRawWhatsappNumber();

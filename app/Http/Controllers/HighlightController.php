@@ -2,13 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Access;
 use App\Models\Highlight;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 
 class HighlightController extends Controller
 {
+    private function ensureProductAccess(Product $product)
+    {
+        $user = Auth::user();
+
+        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
+            return;
+        }
+
+        $hasAccess = Access::where('user_id', Auth::id())
+            ->where('product_id', $product->id)
+            ->exists();
+
+        abort_unless($hasAccess, 403);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -30,6 +48,9 @@ class HighlightController extends Controller
      */
     public function store(Request $request)
     {
+        $product = Product::findOrFail($request->product_id);
+        $this->ensureProductAccess($product);
+
         // dd($request);
         $newdata = new Highlight;
 
@@ -69,6 +90,9 @@ class HighlightController extends Controller
 
     public function multiple(Request $request)
     {
+        $product = Product::findOrFail($request->product_id);
+        $this->ensureProductAccess($product);
+
         $savedHighlights = [];
         $imageFiles = $request->file('images');
 
@@ -122,6 +146,7 @@ class HighlightController extends Controller
 
     public function available(Request $request, $id) {
         $highlight = Highlight::findOrFail($id);
+        $this->ensureProductAccess($highlight->product);
 
         $highlight->available = !$highlight->available;
 
@@ -133,6 +158,8 @@ class HighlightController extends Controller
      */
     public function update(Request $request, Highlight $highlight)
     {
+        $this->ensureProductAccess($highlight->product);
+
         // dd($request);
         if ($highlight) {
             $highlight->title = $request->title;
@@ -181,6 +208,8 @@ class HighlightController extends Controller
      */
     public function destroy(Highlight $highlight)
     {
+        $this->ensureProductAccess($highlight->product);
+
         // Delete the main product image if it exists
         $path = public_path('storage/images/product/highlight/' . $highlight->image);
         if (file_exists($path)) {

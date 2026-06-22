@@ -22,6 +22,7 @@
         <link href="{{ asset('build/assets/app.css') }}" rel="stylesheet" />
     </head>
     <body class="font-sans antialiased">
+        @include('components.page-loading')
         <div class="min-h-screen bg-neutral-100">
             @include('layouts.navigation')
 

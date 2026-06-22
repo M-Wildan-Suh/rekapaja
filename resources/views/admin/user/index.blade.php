@@ -249,7 +249,12 @@
                         },
                   
                         editForm(item) {
-                            this.editData = item;
+                            this.editData = {
+                                ...item,
+                                role: item.role ?? 'user',
+                                premium_type: item.premium_type ?? '',
+                                expired: item.expired ?? ''
+                            };
                             this.editModal = true;
                         },
 

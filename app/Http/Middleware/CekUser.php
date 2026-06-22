@@ -27,23 +27,10 @@ class CekUser
         // Cek role user
         if ($user && in_array($user->role, ['admin', 'superadmin'])) {
             return $next($request); // Lanjutkan ke URL tujuan
-        } elseif ($user->role === 'user') {
-            if ($user->premium_type === 'lifetime') {
-                // User dengan premium_type lifetime, izinkan akses
-                return $next($request);
-            }
-
-            // Cek apakah expired
-            $expiredDate = Carbon::parse($user->expired);
-            if (Carbon::now()->greaterThan($expiredDate)) {
-                // Jika expired
-                return redirect()->back();
-            }
-        } elseif ($user->role === 'premium') {
+        } elseif ($user->role === 'premium' && $user->hasActivePremium()) {
             return $next($request);
         }
 
-        // Izinkan akses jika tidak ada masalah
         return redirect()->back();
     }
 }

@@ -6,8 +6,23 @@
     </x-slot>
     <!-- Tab Contents -->
     <div class="mt-4">
+        <div class="sticky top-[76px] left-0 right-0 z-10 px-4">
+            <div class="max-w-xl mx-auto pointer-events-none">
+                <div class="pointer-events-auto rounded-md border border-[#ff7100]/20 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
+                    <div class="pr-10 sm:pr-0">
+                        <a href="{{ route('dashboard', ['return_page' => max((int) request('return_page', 1), 1)]) }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Kembali ke daftar usaha</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="py-4 px-4">
             <div class="max-w-xl mx-auto">
+                <div class="h-16"></div>
                 <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
@@ -38,12 +53,17 @@
                             @csrf
                             @method('PUT')
                             <div class=" w-full space-y-6">
+                                @if ($errors->any())
+                                    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                        {{ $errors->first() }}
+                                    </div>
+                                @endif
                                 <div class=" flex flex-col gap-2">
                                     <div class=" w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto">
                                         <x-admin.component.imageinput :value="asset('storage/images/product/' . $product->image . '')" name="thumbnail" />
                                     </div>
                                 </div>
-                                <div x-data="productChecker({{ json_encode($product->name) }})">
+                                <div x-data="productChecker({{ json_encode(old('name', $product->name)) }})">
                                     <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                                         <div class=" flex gap-2">
                                             <label for="name" class=" font-semibold">Nama Usaha Kamu</label>
@@ -61,6 +81,8 @@
                                             name="name" 
                                             id="name"
                                             x-model="inputName"
+                                            value="{{ old('name', $product->name) }}"
+                                            required
                                             @input="checkProductName"
                                         >
                                     </div>
@@ -82,7 +104,7 @@
                                     </script>
                                 </div>
                                 <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
-                                <x-admin.component.numberinput title="No. Whatsapp" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
+                                <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" />
 
                                 <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />
@@ -90,6 +112,9 @@
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <x-admin.component.categoryinput title="Category" :value="$product->category" :tag="$category" name="category[]" />
                                     <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]" :tag="$tag"></x-admin.component.taginput>
+                                    @if (Auth::user()->role === 'admin')
+                                        <x-admin.component.accessinput title="Access" :value="$product->access->pluck('user_id')->all()" :users="$accessUsers" name="access[]" />
+                                    @endif
                                     @if (Auth::user()->role === 'admin')
                                         <x-admin.component.radioinput title="Status" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->status" name="status" />
                                     @endif
@@ -139,15 +164,24 @@
                             </div>
                         @endif
                         @php
-                            if (Auth::user()->role === 'premium' && (Auth::user()->premium_type === 'lifetime') || Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))) {
-                                Auth::user()->role = 'premium';
-                            } else {
-                                Auth::user()->role = 'user';
-                            };
+                            $viewerRole = Auth::user()->role;
+
+                            if (
+                                $viewerRole !== 'admin' &&
+                                $viewerRole === 'premium' &&
+                                (
+                                    Auth::user()->premium_type === 'lifetime' ||
+                                    Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))
+                                )
+                            ) {
+                                $viewerRole = 'premium';
+                            } elseif ($viewerRole !== 'admin') {
+                                $viewerRole = 'user';
+                            }
                         @endphp
-                        <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ Auth::user()->role }}')" class=" space-y-4">
+                        <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ $viewerRole }}')" class=" space-y-4">
                             <div class=" space-y-2">
-                                <p class=" text-sm sm:text-base font-semibold">Produk / Layanan {{ in_array(Auth::user()->role, ['admin', 'premium']) ? 'Unlimited' : '( Max 3 )' }}
+                                <p class=" text-sm sm:text-base font-semibold">Produk / Layanan {{ in_array($viewerRole, ['admin', 'premium']) ? 'Unlimited' : '( Max 3 )' }}
                                 </p>
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <button type="button" @click="multiple = true"
@@ -289,8 +323,8 @@
             </div>
         </div>
     </div>
-    <a href="{{ route('detail', ['slug' => $product->slug]) }}" target="_blank">
-        <button class=" fixed rounded-l-full w-10 h-10 bg-[#ff7100] hover:opacity-60 duration-300 p-2 right-0 top-20">
+                        <a href="{{ route('detail', ['slug' => $product->slug]) }}" target="_blank">
+        <button class="fixed z-30 rounded-l-full w-10 h-10 bg-[#ff7100] hover:opacity-60 duration-300 p-2 right-0 top-20">
             <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 3a13 13 0 1 0 13 13A13 13 0 0 0 16 3Zm6.69 16.91A24.39 24.39 0 0 0 23 16a23.72 23.72 0 0 0-.32-3.91C25.37 13.08 27 14.58 27 16s-1.69 3-4.31 3.91ZM5 16c0-1.47 1.69-2.95 4.31-3.91A24.39 24.39 0 0 0 9 16a23.72 23.72 0 0 0 .32 3.91C6.63 18.92 5 17.42 5 16Zm6.5-10a14.2 14.2 0 0 0-1.68 3.82A14.19 14.19 0 0 0 6 11.49 11 11 0 0 1 11.5 6ZM6 20.5a14.63 14.63 0 0 0 4.32 1.8h.09A23.4 23.4 0 0 0 16 23c.6 0 1.19 0 1.76-.06a1 1 0 1 0-.14-2Q16.83 21 16 21a20.92 20.92 0 0 1-4.52-.47A21.33 21.33 0 0 1 11 16c0-6.48 2.64-11 5-11 1 0 2 .76 2.89 2.14a1 1 0 0 0 .84.47 1 1 0 0 0 .54-.15 1 1 0 0 0 .31-1.38.86.86 0 0 0-.07-.1A11 11 0 0 1 26 11.5a14.94 14.94 0 0 0-4.48-1.84A23.21 23.21 0 0 0 16 9c-.6 0-1.19 0-1.76.06a1 1 0 1 0 .14 2Q15.18 11 16 11a20.92 20.92 0 0 1 4.52.47A21.33 21.33 0 0 1 21 16c0 6.48-2.64 11-5 11-1 0-2-.76-2.89-2.14a1 1 0 1 0-1.69 1.06.86.86 0 0 0 .07.1A11 11 0 0 1 6 20.5ZM20.5 26a14.2 14.2 0 0 0 1.68-3.85A14.19 14.19 0 0 0 26 20.51 11 11 0 0 1 20.5 26Z" data-name="world www web website" fill="#ffffff" class="fill-000000"></path></svg>
         </button>
     </a>
