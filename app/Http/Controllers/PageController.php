@@ -219,6 +219,52 @@ class PageController extends Controller
 
     }
 
+    public function businessApi($slug)
+    {
+        $product = Product::with(['productHighlight', 'productGallery', 'productTags.productTag', 'category'])
+            ->where('slug', $slug)
+            ->first();
+
+        if (!$product) {
+            return response()->json([
+                'message' => 'Usaha tidak ditemukan.',
+            ], 404);
+        }
+
+        $rawWhatsapp = $product->no_tlp ?: $this->getRawWhatsappNumber();
+        $formattedWhatsapp = $this->formatWhatsappNumber($rawWhatsapp);
+
+        return response()->json([
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'subtitle' => $product->subtitle,
+            'description' => $product->description,
+            'image' => $product->image ? asset('storage/images/product/' . $product->image) : null,
+            'detail_url' => route('detail', ['slug' => $product->slug]),
+            'whatsapp_url' => $formattedWhatsapp ? 'https://wa.me/' . ltrim($formattedWhatsapp, '+') : null,
+            'order_title' => $product->order_title,
+            'categories' => $product->category->pluck('category')->values(),
+            'tags' => $product->productTags->map(function ($item) {
+                return optional($item->productTag)->tag;
+            })->filter()->values(),
+            'gallery' => $product->productGallery->map(function ($item) {
+                return [
+                    'image' => asset('storage/images/product/gallery/' . $item->image),
+                ];
+            })->values(),
+            'products' => $product->productHighlight->map(function ($item) {
+                return [
+                    'title' => $item->title,
+                    'price' => $item->price,
+                    'price_text' => $item->price ? 'Rp' . number_format($item->price, 0, ',', '.') : null,
+                    'description' => $item->description,
+                    'image' => $item->image ? asset('storage/images/product/highlight/' . $item->image) : null,
+                    'available' => (bool) $item->available,
+                ];
+            })->values(),
+        ]);
+    }
+
     public function createproduct() {
         $tag = ProductTag::all();
         $product = Product::all();

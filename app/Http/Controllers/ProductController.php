@@ -280,6 +280,119 @@ class ProductController extends Controller
         return redirect()->back()->with('highlight', 'highlight');
     }
 
+    public function downloadDomainFile(Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $appUrl = rtrim(config('app.url'), '/');
+        $apiUrl = $appUrl . '/api/business/' . $product->slug;
+        $title = addslashes($product->name);
+
+        $content = <<<PHP
+<?php
+\$apiUrl = '{$apiUrl}';
+
+function loadBusinessData(\$url) {
+    \$json = @file_get_contents(\$url);
+    if (\$json !== false) {
+        return json_decode(\$json, true);
+    }
+
+    if (!function_exists('curl_init')) {
+        return null;
+    }
+
+    \$ch = curl_init(\$url);
+    curl_setopt_array(\$ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => 15,
+    ]);
+    \$response = curl_exec(\$ch);
+    curl_close(\$ch);
+
+    return \$response ? json_decode(\$response, true) : null;
+}
+
+function e(\$value) {
+    return htmlspecialchars((string) \$value, ENT_QUOTES, 'UTF-8');
+}
+
+\$data = loadBusinessData(\$apiUrl);
+
+if (!is_array(\$data)) {
+    http_response_code(502);
+    echo 'Data usaha tidak dapat dimuat.';
+    exit;
+}
+?>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><?= e(\$data['name'] ?? '{$title}') ?></title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;background:#f6f6f6;color:#111}
+    .wrap{max-width:760px;margin:0 auto;padding:24px}
+    .card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    .hero{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:#eee}
+    .content{padding:24px}
+    h1{margin:0 0 8px;font-size:32px}
+    p{line-height:1.6}
+    .grid{display:grid;gap:12px;margin-top:20px}
+    .item{padding:14px 16px;border:1px solid #e8e8e8;border-radius:14px}
+    .price{font-weight:700;color:#ff7100}
+    .badge{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;font-size:12px;background:#dcfce7;color:#166534}
+    .badge.off{background:#fee2e2;color:#991b1b}
+    .btn{display:inline-block;margin-top:20px;background:#16a34a;color:#fff;text-decoration:none;padding:12px 18px;border-radius:12px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <?php if (!empty(\$data['image'])): ?>
+        <img class="hero" src="<?= e(\$data['image']) ?>" alt="<?= e(\$data['name'] ?? '') ?>">
+      <?php endif; ?>
+      <div class="content">
+        <h1><?= e(\$data['name'] ?? '') ?></h1>
+        <?php if (!empty(\$data['subtitle'])): ?><p><strong><?= e(\$data['subtitle']) ?></strong></p><?php endif; ?>
+        <?php if (!empty(\$data['description'])): ?><p><?= nl2br(e(\$data['description'])) ?></p><?php endif; ?>
+
+        <?php if (!empty(\$data['products'])): ?>
+          <div class="grid">
+            <?php foreach (\$data['products'] as \$item): ?>
+              <div class="item">
+                <strong><?= e(\$item['title'] ?? '') ?></strong><br>
+                <?php if (!empty(\$item['price_text'])): ?><span class="price"><?= e(\$item['price_text']) ?></span><br><?php endif; ?>
+                <?php if (!empty(\$item['description'])): ?><small><?= e(\$item['description']) ?></small><br><?php endif; ?>
+                <span class="badge<?= empty(\$item['available']) ? ' off' : '' ?>">
+                  <?= !empty(\$item['available']) ? 'Tersedia' : 'Kosong' ?>
+                </span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!empty(\$data['whatsapp_url'])): ?>
+          <a class="btn" href="<?= e(\$data['whatsapp_url']) ?>" target="_blank" rel="noopener">Order via WhatsApp</a>
+        <?php elseif (!empty(\$data['detail_url'])): ?>
+          <a class="btn" href="<?= e(\$data['detail_url']) ?>" target="_blank" rel="noopener">Lihat Detail</a>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+PHP;
+
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, 'index.php', [
+            'Content-Type' => 'application/octet-stream',
+        ]);
+    }
+
     /**
      * Update the specified resource in storage.
      */
