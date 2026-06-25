@@ -151,6 +151,11 @@ class HighlightController extends Controller
         $highlight->available = !$highlight->available;
 
         $highlight->save();
+
+        return response()->json([
+            'id' => $highlight->id,
+            'available' => (bool) $highlight->available,
+        ]);
     }
 
     /**

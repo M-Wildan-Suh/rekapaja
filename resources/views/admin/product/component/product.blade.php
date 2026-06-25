@@ -7,7 +7,7 @@
                 <div class=" absolute top-0 left-0 flex flex-col sm:flex-row gap-2 sm:items-center">
                     <p>Tersedia</p>
                     <div class=" flex items-center gap-2">
-                        <button @click="availableForm; item.available=!item.available" :disabled="loadingAvailable"
+                        <button type="button" @click="availableForm" :disabled="loadingAvailable"
                             :class="item.available ? 'justify-end border-[#ff7100]' : 'justify-start'"
                             class=" w-10 flex rounded-full p-1 border duration-300">
                             <div :class="item.available ? 'bg-[#ff7100]' : 'bg-gray-300'"
@@ -318,6 +318,8 @@
                                 body: formData
                             });
                         if (!response.ok) throw new Error("Gagal memperbarui data");
+                        const result = await response.json();
+                        item.available = !!result.available;
                     } catch (error) {
                         console.log("Terjadi kesalahan: " + error.message);
                     } finally {

@@ -3,7 +3,18 @@
         class=" p-4 w-full text-white rounded-md overflow-hidden">
         <p class=" w-full font-bold tracking-wide text-lg sm:text-xl">{{$data->product_title}}</p>
     </div>
-    <div x-data="{ checkedItems: [] }" class=" w-full">
+    <div x-data="{
+        checkedItems: [],
+        normalizeQuantity(item) {
+            item.quantity = Math.min(999, Math.max(1, parseInt(item.quantity || 1)));
+        },
+        decrementQuantity(item) {
+            item.quantity = Math.max(1, (parseInt(item.quantity || 1) - 1));
+        },
+        incrementQuantity(item) {
+            item.quantity = Math.min(999, (parseInt(item.quantity || 1) + 1));
+        }
+    }" class=" w-full">
         <form id="myForm" action="{{ route('order', ['no_tlp' => $no_tlp]) }}" method="post"
             enctype="multipart/form-data" target="_blank">
             @csrf
@@ -53,8 +64,8 @@
             </div>
         </form>
         <!-- Dropdown with Quantity Control -->
-        <div x-data="{ dropdownOpen: false }" x-show="checkedItems.length > 0" class="fixed top-6 left-1/2 -translate-x-1/2 pr-5 sm:pr-0 flex justify-end z-10 w-full max-w-[600px]">
-            <button @click="dropdownOpen = !dropdownOpen" :class="dropdownOpen ? 'bg-black rounded-b-none' : 'bg-black/60 rounded-b-full'" class="text-base flex flex-col items-center p-2 rounded-t-full duration-300 text-white relative">
+        <div x-data="{ dropdownOpen: false }" x-show="checkedItems.length > 0" class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-[600px]">
+            <button @click="dropdownOpen = !dropdownOpen" :class="dropdownOpen ? 'bg-black/85 rounded-b-none' : 'bg-black/70 rounded-b-full'" class="text-base flex flex-col items-center p-2.5 rounded-t-full duration-300 text-white relative backdrop-blur-sm shadow-lg shadow-black/25">
                 <div class="absolute -top-1 -right-1 bg-red-600 rounded-full w-5 h-5 text-xs flex items-center justify-center" x-text="checkedItems.length"></div>
                 <div class="w-6 aspect-square">
                     <svg data-name="Layer 1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -67,22 +78,23 @@
             <div x-show="dropdownOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95"
-                 class="absolute top-full mt-0 right-5 sm:right-0 py-3 px-3 bg-black text-white rounded-md rounded-tr-none w-72 flex flex-col gap-2">
+                 class="absolute top-full mt-0 right-4 md:right-0 py-3 px-3 bg-black/85 backdrop-blur-sm text-white rounded-2xl rounded-tr-none w-72 border border-white/10 shadow-xl shadow-black/30 flex flex-col gap-2">
                 <template x-for="item in checkedItems" :key="item.id">
-                    <div class="flex justify-between items-center py-1 px-2 border-2 border-white rounded-md">
-                        <p class="font-semibold" x-text="item.title"></p>
-                        <div class="flex flex-row items-center gap-1">
-                            <p>&times;</p>
-                            <!-- Quantity Input in Dropdown -->
-                            <input type="number" x-model="item.quantity" max="999" min="1" class="pl-1 p-0 resize-none w-full border-t-0 border-white bg-transparent border-l-0 border-r-0 ring-0 focus:border-white focus:ring-0">
-                            <label :for="'order-' + item.id" class="text-red-500 hover:text-red-700 text-xl duration-300 cursor-pointer">&times;</label>
-
+                    <div class="flex justify-between items-center gap-3 py-2 px-2.5 rounded-xl bg-white/5 border border-white/10">
+                        <p class="font-semibold text-sm leading-snug flex-1" x-text="item.title"></p>
+                        <div class="flex flex-row items-center gap-2">
+                            <div class="flex items-center rounded-full border border-white/15 bg-black/30 overflow-hidden">
+                                <button type="button" @click="decrementQuantity(item)" class="w-8 h-8 text-lg hover:bg-white/10 duration-200">-</button>
+                                <input type="number" x-model="item.quantity" @input="normalizeQuantity(item)" @blur="normalizeQuantity(item)" max="999" min="1" class="w-12 text-center text-sm p-0 border-0 bg-transparent ring-0 focus:ring-0 focus:border-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
+                                <button type="button" @click="incrementQuantity(item)" class="w-8 h-8 text-lg hover:bg-white/10 duration-200">+</button>
+                            </div>
+                            <label :for="'order-' + item.id" class="text-red-400 hover:text-red-300 text-xl leading-none duration-300 cursor-pointer">&times;</label>
                         </div>
                     </div>
                 </template>
                 <div class="w-full flex justify-end">
                     <button onclick="document.getElementById('myForm') ? document.getElementById('myForm').submit() : console.error('Form tidak ditemukan!')"
-                            class="py-1.5 px-3 flex items-center gap-2 text-sm rounded-md border border-white hover:bg-white/50 duration-300">
+                            class="py-2 px-3.5 flex items-center gap-2 text-sm rounded-xl bg-green-500 hover:bg-green-600 duration-300">
                         <div class="w-4 h-4">
                             <svg viewBox="0 0 56.693 56.693" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 56.693 56.693">
                                 <path d="M46.38 10.714C41.73 6.057 35.544 3.492 28.954 3.489c-13.579 0-24.63 11.05-24.636 24.633a24.589 24.589 0 0 0 3.289 12.316L4.112 53.204l13.06-3.426a24.614 24.614 0 0 0 11.772 2.999h.01c13.577 0 24.63-11.052 24.635-24.635.002-6.582-2.558-12.772-7.209-17.428zM28.954 48.616h-.009a20.445 20.445 0 0 1-10.421-2.854l-.748-.444-7.75 2.033 2.07-7.555-.488-.775a20.427 20.427 0 0 1-3.13-10.897c.004-11.29 9.19-20.474 20.484-20.474a20.336 20.336 0 0 1 14.476 6.005 20.352 20.352 0 0 1 5.991 14.485c-.004 11.29-9.19 20.476-20.475 20.476z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"></path>
@@ -96,4 +108,3 @@
         </div>
     </div>
 </div>
-
