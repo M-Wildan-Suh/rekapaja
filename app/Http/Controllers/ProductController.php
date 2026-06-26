@@ -286,6 +286,7 @@ class ProductController extends Controller
 
         $appUrl = rtrim(config('app.url'), '/');
         $detailUrl = $appUrl . '/' . $product->slug;
+        $orderApiUrl = $appUrl . '/api/business/' . $product->slug . '/order';
         $slug = $product->slug;
         $title = addslashes($product->name);
 
@@ -293,6 +294,7 @@ class ProductController extends Controller
 <?php
 \$sourceUrl = '{$detailUrl}';
 \$originUrl = '{$appUrl}';
+\$orderApiUrl = '{$orderApiUrl}';
 \$slug = '{$slug}';
 
 function loadRemoteHtml(\$url) {
@@ -350,6 +352,85 @@ function e(\$value) {
     return htmlspecialchars((string) \$value, ENT_QUOTES, 'UTF-8');
 }
 
+function postFormData(\$url, \$payload) {
+    \$body = http_build_query(\$payload);
+    \$headers = "Content-Type: application/x-www-form-urlencoded\r\n";
+    \$headers .= "Content-Length: " . strlen(\$body) . "\r\n";
+    \$headers .= "User-Agent: RekapAjaDomainClient/1.0\r\n";
+
+    \$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'timeout' => 20,
+            'header' => \$headers,
+            'content' => \$body,
+        ],
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
+    ]);
+
+    \$response = @file_get_contents(\$url, false, \$context);
+    if (\$response !== false) {
+        \$decoded = json_decode(\$response, true);
+        if (is_array(\$decoded)) {
+            return [\$decoded, null];
+        }
+    }
+
+    if (function_exists('curl_init')) {
+        \$ch = curl_init(\$url);
+        curl_setopt_array(\$ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_USERAGENT => 'RekapAjaDomainClient/1.0',
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => \$body,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+        ]);
+        \$result = curl_exec(\$ch);
+        \$error = curl_error(\$ch);
+        curl_close(\$ch);
+
+        if (\$result !== false) {
+            \$decoded = json_decode(\$result, true);
+            if (is_array(\$decoded)) {
+                return [\$decoded, null];
+            }
+        }
+
+        return [null, \$error ?: 'Gagal memproses order di server utama.'];
+    }
+
+    return [null, 'Hosting tidak mendukung request POST ke server utama.'];
+}
+
+if (\$_SERVER['REQUEST_METHOD'] === 'POST' && isset(\$_POST['__mirror_order'])) {
+    unset(\$_POST['__mirror_order'], \$_POST['_token']);
+    [\$orderResult, \$orderError] = postFormData(\$orderApiUrl, \$_POST);
+
+    if (!empty(\$orderResult['redirect_url'])) {
+        header('Location: ' . \$orderResult['redirect_url']);
+        exit;
+    }
+
+    http_response_code(502);
+    echo '<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gagal Memproses Order</title></head><body style="font-family:Arial,sans-serif;padding:24px;line-height:1.6">';
+    echo '<h1>Order tidak dapat diproses.</h1>';
+    if (!empty(\$orderResult['message'])) {
+        echo '<p><strong>Pesan:</strong> ' . e(\$orderResult['message']) . '</p>';
+    }
+    if (\$orderError) {
+        echo '<p><strong>Detail error:</strong> ' . e(\$orderError) . '</p>';
+    }
+    echo '</body></html>';
+    exit;
+}
+
 [ \$html, \$loadError ] = loadRemoteHtml(\$sourceUrl);
 
 if (!is_string(\$html) || trim(\$html) === '') {
@@ -377,6 +458,32 @@ if (stripos(\$html, '<base ') === false) {
 
 foreach (\$patterns as \$pattern => \$replacement) {
     \$html = preg_replace(\$pattern, \$replacement, \$html);
+}
+
+\$mirrorScript = <<<'SCRIPT'
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('form[action*="/order/"]').forEach(function (form) {
+    form.setAttribute('action', '');
+    form.setAttribute('method', 'post');
+    form.setAttribute('target', '_self');
+
+    if (!form.querySelector('input[name="__mirror_order"]')) {
+      var marker = document.createElement('input');
+      marker.type = 'hidden';
+      marker.name = '__mirror_order';
+      marker.value = '1';
+      form.appendChild(marker);
+    }
+  });
+});
+</script>
+SCRIPT;
+
+if (stripos(\$html, '</body>') !== false) {
+    \$html = preg_replace('/<\/body>/i', \$mirrorScript . '</body>', \$html, 1);
+} else {
+    \$html .= \$mirrorScript;
 }
 
 echo \$html;

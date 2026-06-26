@@ -265,6 +265,88 @@ class PageController extends Controller
         ]);
     }
 
+    public function businessOrderApi(Request $request, $slug)
+    {
+        $product = Product::with(['access.user'])->where('slug', $slug)->first();
+
+        if (!$product) {
+            return response()->json([
+                'message' => 'Usaha tidak ditemukan.',
+            ], 404);
+        }
+
+        $orders = $request->input('order', []);
+
+        if (!is_array($orders) || empty($orders)) {
+            return response()->json([
+                'message' => 'Produk yang dipilih tidak valid.',
+            ], 422);
+        }
+
+        $invoice = new Invoice;
+        $invoice->business_id = $product->id;
+        $invoice->invoice_code = strtoupper(Str::random(10));
+        $invoice->invoice_text = '';
+
+        $message = "Halo, saya ingin memesan produk/layanan Anda.\n";
+        $tanggal = Carbon::now('Asia/Jakarta')->locale('id')->format('d-m-Y');
+        $total = 0;
+        $invoiceText = '';
+
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
+        $invoiceText .= "<p>" . $tanggal . "</p>";
+        $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
+
+        foreach ($orders as $item) {
+            if (!isset($item['id'])) {
+                continue;
+            }
+
+            $highlight = Highlight::where('product_id', $product->id)
+                ->where('id', $item['id'])
+                ->first();
+
+            if (!$highlight) {
+                continue;
+            }
+
+            $quantity = max(1, (int) ($item['quantity'] ?? 1));
+            $price = (int) ($highlight->price ?? 0);
+            $subtotal = $price * $quantity;
+            $total += $subtotal;
+
+            $message .= "\n- " . $highlight->title . ", Jumlah: " . $quantity;
+
+            $invoiceText .= '<div style="font-size: 0.875rem;display: flex; justify-content: space-between;"><b>- '
+                . $highlight->title . '</b><p>'
+                . $quantity . ' x ' . number_format($price, 0, ',', '.')
+                . ' = ' . number_format($subtotal, 0, ',', '.') . '</p></div>';
+        }
+
+        if ($total === 0) {
+            return response()->json([
+                'message' => 'Tidak ada produk valid yang bisa diproses.',
+            ], 422);
+        }
+
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Total</p>';
+        $invoiceText .= "<b>Rp" . number_format($total, 0, ',', '.') . "</b>";
+        $invoice->invoice_text = $invoiceText;
+        $invoice->save();
+
+        $invoiceUrl = url("/rekap/{$invoice->invoice_code}");
+        $message .= "\n\nDetail Rekapan: {$invoiceUrl}";
+        $message .= "\nUntuk produk/layanan diatas apakah masih tersedia?";
+
+        $no_tlp = $this->resolveProductWhatsappNumber($product);
+        $whatsappUrl = "https://wa.me/{$no_tlp}?text=" . urlencode($message);
+
+        return response()->json([
+            'redirect_url' => $whatsappUrl,
+            'invoice_url' => $invoiceUrl,
+        ]);
+    }
+
     public function createproduct() {
         $tag = ProductTag::all();
         $product = Product::all();
@@ -503,6 +585,27 @@ class PageController extends Controller
     private function getRawWhatsappNumber(): ?string
     {
         return NoHandphone::query()->value('no_tlp');
+    }
+
+    private function resolveProductWhatsappNumber(Product $product): string
+    {
+        $accesses = Access::with('user')->where('product_id', $product->id)->get();
+
+        if ($accesses->isNotEmpty()) {
+            $premiumAccess = $accesses->first(function ($access) {
+                return $access->user && $access->user->canAccessPremiumFeatures();
+            });
+
+            if ($premiumAccess) {
+                $no_tlp = $product->no_tlp ?: $this->getRawWhatsappNumber();
+                return $this->formatWhatsappNumber($no_tlp);
+            }
+        } else {
+            $no_tlp = $product->no_tlp ?: $this->getRawWhatsappNumber();
+            return $this->formatWhatsappNumber($no_tlp);
+        }
+
+        return $this->formatWhatsappNumber($this->getRawWhatsappNumber());
     }
 
     private function getWhatsappNumber(): string
