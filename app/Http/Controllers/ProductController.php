@@ -285,17 +285,17 @@ class ProductController extends Controller
         $this->ensureProductAccess($product);
 
         $appUrl = rtrim(config('app.url'), '/');
-        $apiBaseUrl = $appUrl . '/api/business';
+        $detailUrl = $appUrl . '/' . $product->slug;
         $slug = $product->slug;
         $title = addslashes($product->name);
 
         $content = <<<PHP
 <?php
-\$apiBaseUrl = '{$apiBaseUrl}';
+\$sourceUrl = '{$detailUrl}';
+\$originUrl = '{$appUrl}';
 \$slug = '{$slug}';
-\$apiUrl = rtrim(\$apiBaseUrl, '/') . '/' . rawurlencode(\$slug);
 
-function loadBusinessData(\$url) {
+function loadRemoteHtml(\$url) {
     \$errors = [];
 
     \$context = stream_context_create([
@@ -309,13 +309,9 @@ function loadBusinessData(\$url) {
         ],
     ]);
 
-    \$json = @file_get_contents(\$url, false, \$context);
-    if (\$json !== false) {
-        \$decoded = json_decode(\$json, true);
-        if (is_array(\$decoded)) {
-            return [\$decoded, null];
-        }
-        \$errors[] = 'Respons API bukan JSON yang valid.';
+    \$html = @file_get_contents(\$url, false, \$context);
+    if (\$html !== false) {
+        return [\$html, null];
     } else {
         \$lastError = error_get_last();
         if (!empty(\$lastError['message'])) {
@@ -339,11 +335,7 @@ function loadBusinessData(\$url) {
         curl_close(\$ch);
 
         if (\$response !== false && \$statusCode >= 200 && \$statusCode < 300) {
-            \$decoded = json_decode(\$response, true);
-            if (is_array(\$decoded)) {
-                return [\$decoded, null];
-            }
-            \$errors[] = 'Curl menerima respons, tetapi JSON tidak valid.';
+            return [\$response, null];
         } else {
             \$errors[] = \$curlError ?: 'Curl gagal dengan HTTP status ' . \$statusCode . '.';
         }
@@ -358,79 +350,36 @@ function e(\$value) {
     return htmlspecialchars((string) \$value, ENT_QUOTES, 'UTF-8');
 }
 
-[\$data, \$loadError] = loadBusinessData(\$apiUrl);
+[ \$html, \$loadError ] = loadRemoteHtml(\$sourceUrl);
 
-if (!is_array(\$data)) {
+if (!is_string(\$html) || trim(\$html) === '') {
     http_response_code(502);
     echo '<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gagal Memuat Data</title></head><body style="font-family:Arial,sans-serif;padding:24px;line-height:1.6">';
-    echo '<h1>Data usaha tidak dapat dimuat.</h1>';
-    echo '<p>URL API yang dicoba: <code>' . e(\$apiUrl) . '</code></p>';
+    echo '<h1>Halaman usaha tidak dapat dimuat.</h1>';
+    echo '<p>URL sumber yang dicoba: <code>' . e(\$sourceUrl) . '</code></p>';
     if (\$loadError) {
         echo '<p><strong>Detail error:</strong> ' . e(\$loadError) . '</p>';
     }
-    echo '<p>Jika ini di hosting shared, biasanya penyebabnya adalah request keluar ke domain utama diblokir, SSL/cURL tidak aktif, atau URL API utama belum bisa diakses publik.</p>';
+    echo '<p>Jika ini di hosting shared, biasanya penyebabnya adalah request keluar ke domain utama diblokir, SSL/cURL tidak aktif, atau URL utama belum bisa diakses publik.</p>';
     echo '</body></html>';
     exit;
 }
-?>
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title><?= e(\$data['name'] ?? '{$title}') ?></title>
-  <style>
-    body{font-family:Arial,sans-serif;margin:0;background:#f6f6f6;color:#111}
-    .wrap{max-width:760px;margin:0 auto;padding:24px}
-    .card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-    .hero{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:#eee}
-    .content{padding:24px}
-    h1{margin:0 0 8px;font-size:32px}
-    p{line-height:1.6}
-    .grid{display:grid;gap:12px;margin-top:20px}
-    .item{padding:14px 16px;border:1px solid #e8e8e8;border-radius:14px}
-    .price{font-weight:700;color:#ff7100}
-    .badge{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;font-size:12px;background:#dcfce7;color:#166534}
-    .badge.off{background:#fee2e2;color:#991b1b}
-    .btn{display:inline-block;margin-top:20px;background:#16a34a;color:#fff;text-decoration:none;padding:12px 18px;border-radius:12px;font-weight:700}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <?php if (!empty(\$data['image'])): ?>
-        <img class="hero" src="<?= e(\$data['image']) ?>" alt="<?= e(\$data['name'] ?? '') ?>">
-      <?php endif; ?>
-      <div class="content">
-        <h1><?= e(\$data['name'] ?? '') ?></h1>
-        <?php if (!empty(\$data['subtitle'])): ?><p><strong><?= e(\$data['subtitle']) ?></strong></p><?php endif; ?>
-        <?php if (!empty(\$data['description'])): ?><p><?= nl2br(e(\$data['description'])) ?></p><?php endif; ?>
+if (stripos(\$html, '<base ') === false) {
+    \$html = preg_replace('/<head([^>]*)>/i', '<head$1><base href="' . e(rtrim(\$originUrl, '/') . '/') . '">', \$html, 1);
+}
 
-        <?php if (!empty(\$data['products'])): ?>
-          <div class="grid">
-            <?php foreach (\$data['products'] as \$item): ?>
-              <div class="item">
-                <strong><?= e(\$item['title'] ?? '') ?></strong><br>
-                <?php if (!empty(\$item['price_text'])): ?><span class="price"><?= e(\$item['price_text']) ?></span><br><?php endif; ?>
-                <?php if (!empty(\$item['description'])): ?><small><?= e(\$item['description']) ?></small><br><?php endif; ?>
-                <span class="badge<?= empty(\$item['available']) ? ' off' : '' ?>">
-                  <?= !empty(\$item['available']) ? 'Tersedia' : 'Kosong' ?>
-                </span>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+\$origin = rtrim(\$originUrl, '/');
+\$patterns = [
+    '/(href|src|action)=([\"\'])\\/(?!\\/)/i' => '$1=$2' . \$origin . '/',
+    '/(content)=([\"\'])\\/(?!\\/)/i' => '$1=$2' . \$origin . '/',
+    '/url\\(\\s*[\"\']?\\/(?!\\/)/i' => 'url(' . \$origin . '/',
+];
 
-        <?php if (!empty(\$data['whatsapp_url'])): ?>
-          <a class="btn" href="<?= e(\$data['whatsapp_url']) ?>" target="_blank" rel="noopener">Order via WhatsApp</a>
-        <?php elseif (!empty(\$data['detail_url'])): ?>
-          <a class="btn" href="<?= e(\$data['detail_url']) ?>" target="_blank" rel="noopener">Lihat Detail</a>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+foreach (\$patterns as \$pattern => \$replacement) {
+    \$html = preg_replace(\$pattern, \$replacement, \$html);
+}
+
+echo \$html;
 PHP;
 
         return response()->streamDownload(function () use ($content) {
