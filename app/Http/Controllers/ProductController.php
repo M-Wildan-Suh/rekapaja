@@ -285,44 +285,91 @@ class ProductController extends Controller
         $this->ensureProductAccess($product);
 
         $appUrl = rtrim(config('app.url'), '/');
-        $apiUrl = $appUrl . '/api/business/' . $product->slug;
+        $apiBaseUrl = $appUrl . '/api/business';
+        $slug = $product->slug;
         $title = addslashes($product->name);
 
         $content = <<<PHP
 <?php
-\$apiUrl = '{$apiUrl}';
+\$apiBaseUrl = '{$apiBaseUrl}';
+\$slug = '{$slug}';
+\$apiUrl = rtrim(\$apiBaseUrl, '/') . '/' . rawurlencode(\$slug);
 
 function loadBusinessData(\$url) {
-    \$json = @file_get_contents(\$url);
-    if (\$json !== false) {
-        return json_decode(\$json, true);
-    }
+    \$errors = [];
 
-    if (!function_exists('curl_init')) {
-        return null;
-    }
-
-    \$ch = curl_init(\$url);
-    curl_setopt_array(\$ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 15,
+    \$context = stream_context_create([
+        'http' => [
+            'timeout' => 20,
+            'header' => "User-Agent: RekapAjaDomainClient/1.0\r\n",
+        ],
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
     ]);
-    \$response = curl_exec(\$ch);
-    curl_close(\$ch);
 
-    return \$response ? json_decode(\$response, true) : null;
+    \$json = @file_get_contents(\$url, false, \$context);
+    if (\$json !== false) {
+        \$decoded = json_decode(\$json, true);
+        if (is_array(\$decoded)) {
+            return [\$decoded, null];
+        }
+        \$errors[] = 'Respons API bukan JSON yang valid.';
+    } else {
+        \$lastError = error_get_last();
+        if (!empty(\$lastError['message'])) {
+            \$errors[] = \$lastError['message'];
+        }
+    }
+
+    if (function_exists('curl_init')) {
+        \$ch = curl_init(\$url);
+        curl_setopt_array(\$ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_USERAGENT => 'RekapAjaDomainClient/1.0',
+        ]);
+        \$response = curl_exec(\$ch);
+        \$curlError = curl_error(\$ch);
+        \$statusCode = (int) curl_getinfo(\$ch, CURLINFO_HTTP_CODE);
+        curl_close(\$ch);
+
+        if (\$response !== false && \$statusCode >= 200 && \$statusCode < 300) {
+            \$decoded = json_decode(\$response, true);
+            if (is_array(\$decoded)) {
+                return [\$decoded, null];
+            }
+            \$errors[] = 'Curl menerima respons, tetapi JSON tidak valid.';
+        } else {
+            \$errors[] = \$curlError ?: 'Curl gagal dengan HTTP status ' . \$statusCode . '.';
+        }
+    } else {
+        \$errors[] = 'Curl tidak tersedia di hosting ini.';
+    }
+
+    return [null, implode(' | ', array_filter(array_unique(\$errors)))];
 }
 
 function e(\$value) {
     return htmlspecialchars((string) \$value, ENT_QUOTES, 'UTF-8');
 }
 
-\$data = loadBusinessData(\$apiUrl);
+[\$data, \$loadError] = loadBusinessData(\$apiUrl);
 
 if (!is_array(\$data)) {
     http_response_code(502);
-    echo 'Data usaha tidak dapat dimuat.';
+    echo '<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gagal Memuat Data</title></head><body style="font-family:Arial,sans-serif;padding:24px;line-height:1.6">';
+    echo '<h1>Data usaha tidak dapat dimuat.</h1>';
+    echo '<p>URL API yang dicoba: <code>' . e(\$apiUrl) . '</code></p>';
+    if (\$loadError) {
+        echo '<p><strong>Detail error:</strong> ' . e(\$loadError) . '</p>';
+    }
+    echo '<p>Jika ini di hosting shared, biasanya penyebabnya adalah request keluar ke domain utama diblokir, SSL/cURL tidak aktif, atau URL API utama belum bisa diakses publik.</p>';
+    echo '</body></html>';
     exit;
 }
 ?>
