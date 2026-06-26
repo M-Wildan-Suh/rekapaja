@@ -73,6 +73,15 @@
                                             </a>
 
                                             @if (Auth::user()->role === 'admin')
+                                                <a :href="`{{ route('product.download-domain', '') }}/${item.id}`"
+                                                    class="w-5 h-5 hover:text-[#16a34a] duration-300">
+                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 16a1 1 0 0 1-.707-.293l-4-4 1.414-1.414L11 12.586V4h2v8.586l2.293-2.293 1.414 1.414-4 4A1 1 0 0 1 12 16Z"
+                                                            fill="currentColor"></path>
+                                                        <path d="M5 18h14v2H5z" fill="currentColor"></path>
+                                                    </svg>
+                                                </a>
+
                                                 <!-- Delete -->
                                                 <button @click="confirmDelete(item)"
                                                     class="w-5 h-5 hover:text-red-500 duration-300">
