@@ -357,7 +357,7 @@ class ProductController extends Controller
         $this->ensureProductAccess($product);
 
         $appUrl = rtrim(config('app.url'), '/');
-        $detailUrl = $appUrl . '/' . $product->slug;
+        $detailUrl = $appUrl . '/' . $product->slug . '?domain_preview=1';
         $orderApiUrl = $appUrl . '/api/business/' . $product->slug . '/order';
         $slug = $product->slug;
         $title = addslashes($product->name);

@@ -177,7 +177,7 @@ class PageController extends Controller
         }
 
         $customDomain = $this->normalizeDomainUrl($data->domain);
-        if ($customDomain) {
+        if ($customDomain && !$request->boolean('domain_preview')) {
             $currentOrigin = rtrim($request->getSchemeAndHttpHost(), '/');
             if (strcasecmp($currentOrigin, $customDomain) !== 0) {
                 $queryString = $request->getQueryString();
