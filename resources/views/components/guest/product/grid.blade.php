@@ -5,6 +5,10 @@
     </div>
     <div x-data="{
         checkedItems: [],
+        showOrderModal: false,
+        customerName: '',
+        customerAddress: '',
+        qrisUrl: @js($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null),
         normalizeQuantity(item) {
             item.quantity = Math.min(999, Math.max(1, parseInt(item.quantity || 1)));
         },
@@ -13,11 +17,38 @@
         },
         incrementQuantity(item) {
             item.quantity = Math.min(999, (parseInt(item.quantity || 1) + 1));
+        },
+        openOrderModal() {
+            if (!this.checkedItems.length) {
+                return;
+            }
+
+            this.showOrderModal = true;
+        },
+        closeOrderModal() {
+            this.showOrderModal = false;
+        },
+        get totalPrice() {
+            return this.checkedItems.reduce((total, item) => {
+                return total + ((parseInt(item.price || 0)) * (parseInt(item.quantity || 1)));
+            }, 0);
+        },
+        formatCurrency(value) {
+            return new Intl.NumberFormat('id-ID').format(value || 0);
+        },
+        submitOrder() {
+            if (!this.customerName.trim() || !this.customerAddress.trim()) {
+                return;
+            }
+
+            this.$refs.orderForm.submit();
         }
     }" class=" w-full">
         <form id="myForm" action="{{ route('order', ['no_tlp' => $no_tlp]) }}" method="post"
-            enctype="multipart/form-data" target="_blank">
+            enctype="multipart/form-data" target="_blank" x-ref="orderForm">
             @csrf
+            <input type="hidden" name="customer_name" :value="customerName">
+            <input type="hidden" name="customer_address" :value="customerAddress">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 @foreach ($data->productHighlight as $item)
                     <div style="background-color: {{ $template->product_main_color }}"
@@ -42,7 +73,7 @@
                                             value="{{ $item->id }}" id="order-{{ $item->id }}"
                                             @input="checkedItems.some(data => data.id === {{ $item->id }}) 
                                                         ? checkedItems = checkedItems.filter(data => data.id !== {{ $item->id }}) 
-                                                        : checkedItems.push({ id: {{ $item->id }}, title: '{{ $item->title }}', quantity: 1 })">
+                                                        : checkedItems.push({ id: {{ $item->id }}, title: '{{ $item->title }}', quantity: 1, price: {{ (int) ($item->price ?? 0) }} })">
                                         <input type="number" class="hidden"
                                             name="order[{{ $item->id }}][quantity]"
                                             :value="checkedItems.find(item => item.id === {{ $item->id }})?.quantity || 1"
@@ -93,7 +124,7 @@
                     </div>
                 </template>
                 <div class="w-full flex justify-end">
-                    <button onclick="document.getElementById('myForm') ? document.getElementById('myForm').submit() : console.error('Form tidak ditemukan!')"
+                    <button type="button" @click="openOrderModal()"
                             class="py-2 px-3.5 flex items-center gap-2 text-sm rounded-xl bg-green-500 hover:bg-green-600 duration-300">
                         <div class="w-4 h-4">
                             <svg viewBox="0 0 56.693 56.693" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 56.693 56.693">
@@ -103,6 +134,49 @@
                         </div>
                         <p>Order via WhatsApp</p>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showOrderModal" x-transition.opacity class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm px-4 py-6" style="display: none;">
+            <div class="flex min-h-full items-center justify-center">
+                <div @click.outside="closeOrderModal()" class="w-full max-w-md max-h-[calc(100vh-3rem)] overflow-hidden rounded-2xl bg-white shadow-2xl">
+                    <div class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-gray-100 bg-white px-5 py-5">
+                        <div>
+                            <p class="text-lg font-bold text-gray-900">Lengkapi data pemesan</p>
+                        </div>
+                        <button type="button" @click="closeOrderModal()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+                    <div class="max-h-[calc(100vh-12rem)] overflow-y-auto px-5 py-4 space-y-4">
+                        <div>
+                            <label for="customer-name-grid" class="mb-1 block text-sm font-semibold text-gray-700">Nama Pemesan</label>
+                            <input id="customer-name-grid" type="text" x-model="customerName" class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-green-500" placeholder="Masukkan nama pemesan">
+                        </div>
+                        <div>
+                            <label for="customer-address-grid" class="mb-1 block text-sm font-semibold text-gray-700">Alamat</label>
+                            <textarea id="customer-address-grid" x-model="customerAddress" rows="3" class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-green-500" placeholder="Masukkan alamat lengkap"></textarea>
+                        </div>
+                        <div class="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-sm font-semibold text-gray-600">Total Harga</p>
+                                <p class="text-lg font-bold text-gray-900" x-text="'Rp' + formatCurrency(totalPrice)"></p>
+                            </div>
+                        </div>
+                        <div x-show="qrisUrl" x-cloak class="rounded-2xl border border-green-200 bg-green-50 px-4 py-4">
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-green-900">Pembayaran QRIS</p>
+                                </div>
+                                <div class="mx-auto w-full max-w-[220px] overflow-hidden rounded-2xl bg-white p-3 shadow-sm">
+                                    <img :src="qrisUrl" alt="QRIS" class="w-full rounded-xl object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-100 bg-white px-5 py-4">
+                        <button type="button" @click="closeOrderModal()" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Batal</button>
+                        <button type="button" @click="submitOrder()" :disabled="!customerName.trim() || !customerAddress.trim()" class="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-60">Lanjut ke WhatsApp</button>
+                    </div>
                 </div>
             </div>
         </div>

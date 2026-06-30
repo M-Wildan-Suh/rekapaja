@@ -27,6 +27,15 @@
                                 </div>
                             </div>
 
+                            @if (Auth::user()->canAccessPremiumFeatures())
+                                <div class=" flex flex-col gap-2">
+                                    <label class="text-sm sm:text-base font-semibold text-center" for="qris-input">QRIS (Optional)</label>
+                                    <div class="w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto border border-dashed border-gray-300">
+                                        <x-admin.component.imageinput :value="null" name="qris" />
+                                    </div>
+                                </div>
+                            @endif
+
                             <div x-data="productChecker()">
                                 <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                                     <div class=" flex gap-2">
@@ -71,6 +80,8 @@
                             <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" required />
                             
                             <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
+
+                            <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="''" name="domain" />
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 

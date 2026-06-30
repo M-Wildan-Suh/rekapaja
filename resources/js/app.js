@@ -42,6 +42,10 @@ const shouldHandleAnchor = (anchor) => {
         return false;
     }
 
+    if (anchor.hasAttribute('data-no-loader')) {
+        return false;
+    }
+
     if (anchor.getAttribute('href')?.startsWith('#') || anchor.getAttribute('href')?.startsWith('javascript:')) {
         return false;
     }

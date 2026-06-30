@@ -63,6 +63,14 @@
                                         <x-admin.component.imageinput :value="asset('storage/images/product/' . $product->image . '')" name="thumbnail" />
                                     </div>
                                 </div>
+                                @if (Auth::user()->canAccessPremiumFeatures())
+                                    <div class=" flex flex-col gap-2">
+                                        <label class="text-sm sm:text-base font-semibold text-center" for="qris-input">QRIS (Optional)</label>
+                                        <div class="w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto border border-dashed border-gray-300">
+                                            <x-admin.component.imageinput :value="$product->qris ? asset('storage/images/product/qris/' . $product->qris) : null" name="qris" />
+                                        </div>
+                                    </div>
+                                @endif
                                 <div x-data="productChecker({{ json_encode(old('name', $product->name)) }})">
                                     <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                                         <div class=" flex gap-2">
@@ -105,6 +113,7 @@
                                 </div>
                                 <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
                                 <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
+                                <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" />
 
                                 <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />

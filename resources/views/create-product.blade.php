@@ -114,6 +114,9 @@
                                             <x-admin.component.numberinput title="No. Whatsapp"
                                                 placeholder="Masukkan Nomor..." :value="''"
                                                 name="no_tlp" required />
+                                            <x-admin.component.textinput title="Domain (Optional)"
+                                                placeholder="contoh: tokoanda.com" :value="''"
+                                                name="domain" />
                                             <x-admin.component.textareainput title="Tentang Usaha Anda"
                                                 placeholder="Jelaskan Usaha Anda..." :value="''" name="desc" required />
                                             <div class="">

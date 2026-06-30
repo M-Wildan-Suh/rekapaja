@@ -21,6 +21,59 @@ use Intervention\Image\ImageManager;
 
 class ProductController extends Controller
 {
+    private function canManageQris(): bool
+    {
+        return Auth::user()?->canAccessPremiumFeatures() ?? false;
+    }
+
+    private function normalizeDomainUrl(?string $domain): ?string
+    {
+        $domain = trim((string) $domain);
+
+        if ($domain === '') {
+            return null;
+        }
+
+        if (!preg_match('~^https?://~i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
+        $parts = parse_url($domain);
+
+        if (!$parts || empty($parts['host'])) {
+            return null;
+        }
+
+        $scheme = strtolower($parts['scheme'] ?? 'https');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
+
+        $normalized = $scheme . '://' . strtolower($parts['host']);
+
+        if (!empty($parts['port'])) {
+            $normalized .= ':' . $parts['port'];
+        }
+
+        return rtrim($normalized, '/');
+    }
+
+    private function storeImageAsWebp($imageFile, string $directory): string
+    {
+        $imageName = Str::uuid()->toString() . '.webp';
+        $imagePath = public_path($directory);
+
+        if (!is_dir($imagePath)) {
+            mkdir($imagePath, 0755, true);
+        }
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($imageFile->getPathname());
+        $image->toWebp(85)->save($imagePath . DIRECTORY_SEPARATOR . $imageName);
+
+        return $imageName;
+    }
+
     private function ensureAdmin()
     {
         abort_unless(Auth::user() && in_array(Auth::user()->role, ['admin', 'superadmin']), 403);
@@ -43,18 +96,25 @@ class ProductController extends Controller
 
     private function storeProductImage($imageFile): string
     {
-        $imageName = Str::uuid()->toString() . '.webp';
-        $imagePath = public_path('storage/images/product/');
+        return $this->storeImageAsWebp($imageFile, 'storage/images/product');
+    }
 
-        if (!is_dir($imagePath)) {
-            mkdir($imagePath, 0755, true);
+    private function storeQrisImage($imageFile): string
+    {
+        return $this->storeImageAsWebp($imageFile, 'storage/images/product/qris');
+    }
+
+    private function deleteImageIfExists(?string $filename, string $directory): void
+    {
+        if (!$filename) {
+            return;
         }
 
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($imageFile->getPathname());
-        $image->toWebp(85)->save($imagePath . $imageName);
+        $path = public_path(trim($directory, '/\\') . DIRECTORY_SEPARATOR . $filename);
 
-        return $imageName;
+        if (is_file($path)) {
+            unlink($path);
+        }
     }
 
     public function dashboard ()
@@ -114,7 +174,7 @@ class ProductController extends Controller
     {
         $this->ensureAdmin();
 
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
             'subtitle' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'numeric', 'min:0'],
@@ -122,6 +182,11 @@ class ProductController extends Controller
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
+            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if ($value && !$this->normalizeDomainUrl($value)) {
+                    $fail('Domain tidak valid.');
+                }
+            }],
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['required', 'in:on,off'],
             'thumbnail' => ['required', 'image'],
@@ -131,7 +196,9 @@ class ProductController extends Controller
             'tag.*' => ['nullable', 'string', 'max:255'],
             'access' => ['nullable', 'array'],
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
-        ]);
+        ], $this->canManageQris() ? [
+            'qris' => ['nullable', 'image'],
+        ] : []));
 
         $newdata= new Product();
 
@@ -143,12 +210,17 @@ class ProductController extends Controller
         $newdata->description = $validated['description'];
         $newdata->address = $validated['address'] ?? null;
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
+        $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
         $newdata->youtube = $validated['link'] ?? null;
         $newdata->home_button = $validated['home_button'];
         $newdata->status = 'active';
 
         if ($request->hasFile('thumbnail')) {
             $newdata->image = $this->storeProductImage($request->file('thumbnail'));
+        }
+
+        if ($this->canManageQris() && $request->hasFile('qris')) {
+            $newdata->qris = $this->storeQrisImage($request->file('qris'));
         }
 
         $newdata->save();
@@ -496,6 +568,31 @@ PHP;
         ]);
     }
 
+    public function updateDomain(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if ($value && !$this->normalizeDomainUrl($value)) {
+                    $fail('Domain tidak valid.');
+                }
+            }],
+        ]);
+
+        $product->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
+        $product->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Domain berhasil disimpan.',
+                'domain' => $product->domain,
+            ]);
+        }
+
+        return redirect()->back();
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -503,7 +600,7 @@ PHP;
     {
         $this->ensureProductAccess($product);
 
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'subtitle' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'numeric', 'min:0'],
@@ -511,6 +608,11 @@ PHP;
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
+            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if ($value && !$this->normalizeDomainUrl($value)) {
+                    $fail('Domain tidak valid.');
+                }
+            }],
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['nullable', 'in:on,off'],
             'status' => ['nullable', 'in:active,unactive'],
@@ -521,7 +623,9 @@ PHP;
             'tag.*' => ['nullable', 'string', 'max:255'],
             'access' => ['nullable', 'array'],
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
-        ]);
+        ], $this->canManageQris() ? [
+            'qris' => ['nullable', 'image'],
+        ] : []));
 
         $product->name = $validated['name'];
         $product->slug = Str::slug($product->name);
@@ -531,6 +635,7 @@ PHP;
         $product->description = $validated['description'];
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
+        $product->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
         $product->youtube = $validated['link'] ?? null;
 
         if (array_key_exists('home_button', $validated)) {
@@ -544,15 +649,15 @@ PHP;
         if ($request->hasFile('thumbnail')) {
             $newImageName = $this->storeProductImage($request->file('thumbnail'));
 
-            if ($product->image) {
-                $path = public_path('storage/images/product/' . $product->image);
-
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-            }
+            $this->deleteImageIfExists($product->image, 'storage/images/product');
 
             $product->image = $newImageName;
+        }
+
+        if ($this->canManageQris() && $request->hasFile('qris')) {
+            $newQrisName = $this->storeQrisImage($request->file('qris'));
+            $this->deleteImageIfExists($product->qris, 'storage/images/product/qris');
+            $product->qris = $newQrisName;
         }
 
         $product->save();

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->integer('price')->nullable();
             $table->string('address')->nullable();
             $table->string('no_tlp')->nullable();
+            $table->string('qris')->nullable();
+            $table->string('domain')->nullable();
             $table->string('status')->default('unactive');
             $table->longText('description');
             $table->timestamps();

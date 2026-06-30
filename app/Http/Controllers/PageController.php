@@ -29,6 +29,38 @@ use Intervention\Image\ImageManager;
 
 class PageController extends Controller
 {
+    private function normalizeDomainUrl(?string $domain): ?string
+    {
+        $domain = trim((string) $domain);
+
+        if ($domain === '') {
+            return null;
+        }
+
+        if (!preg_match('~^https?://~i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
+        $parts = parse_url($domain);
+
+        if (!$parts || empty($parts['host'])) {
+            return null;
+        }
+
+        $scheme = strtolower($parts['scheme'] ?? 'https');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
+
+        $normalized = $scheme . '://' . strtolower($parts['host']);
+
+        if (!empty($parts['port'])) {
+            $normalized .= ':' . $parts['port'];
+        }
+
+        return rtrim($normalized, '/');
+    }
+
     public function home(Request $request) {
         // dd($request->filter);
         $no_tlp = $this->getWhatsappNumber();
@@ -137,11 +169,20 @@ class PageController extends Controller
         return view('template', compact('data', 'no_tlp'));
     }
 
-    public function detail($slug) {
+    public function detail(Request $request, $slug) {
         $data = Product::where('slug', $slug)->first();
         
         if (!$data) {
             return view('not-found');
+        }
+
+        $customDomain = $this->normalizeDomainUrl($data->domain);
+        if ($customDomain) {
+            $currentOrigin = rtrim($request->getSchemeAndHttpHost(), '/');
+            if (strcasecmp($currentOrigin, $customDomain) !== 0) {
+                $queryString = $request->getQueryString();
+                return redirect()->away($customDomain . ($queryString ? '?' . $queryString : ''), 301);
+            }
         }
 
         $template = Template::find($data->template_id);
@@ -240,7 +281,8 @@ class PageController extends Controller
             'subtitle' => $product->subtitle,
             'description' => $product->description,
             'image' => $product->image ? asset('storage/images/product/' . $product->image) : null,
-            'detail_url' => route('detail', ['slug' => $product->slug]),
+            'qris_image' => $product->qris ? asset('storage/images/product/qris/' . $product->qris) : null,
+            'detail_url' => $this->normalizeDomainUrl($product->domain) ?: route('detail', ['slug' => $product->slug]),
             'whatsapp_url' => $formattedWhatsapp ? 'https://wa.me/' . ltrim($formattedWhatsapp, '+') : null,
             'order_title' => $product->order_title,
             'categories' => $product->category->pluck('category')->values(),
@@ -275,11 +317,20 @@ class PageController extends Controller
             ], 404);
         }
 
+        $customerName = trim((string) $request->input('customer_name', ''));
+        $customerAddress = trim((string) $request->input('customer_address', ''));
+
         $orders = $request->input('order', []);
 
         if (!is_array($orders) || empty($orders)) {
             return response()->json([
                 'message' => 'Produk yang dipilih tidak valid.',
+            ], 422);
+        }
+
+        if ($customerName === '' || $customerAddress === '') {
+            return response()->json([
+                'message' => 'Nama pemesan dan alamat wajib diisi.',
             ], 422);
         }
 
@@ -295,7 +346,14 @@ class PageController extends Controller
 
         $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
         $invoiceText .= "<p>" . $tanggal . "</p>";
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
+        $invoiceText .= '<p>' . e($customerName) . '</p>';
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
+        $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
+
+        $message .= "Nama: {$customerName}\n";
+        $message .= "Alamat: {$customerAddress}\n";
 
         foreach ($orders as $item) {
             if (!isset($item['id'])) {
@@ -361,6 +419,11 @@ class PageController extends Controller
             'desc' => 'required|string',
             'no_tlp' => 'required|string|max:20',
             'thumbnail' => 'required|image',
+            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if ($value && !$this->normalizeDomainUrl($value)) {
+                    $fail('Domain tidak valid.');
+                }
+            }],
             'image_gallery' => 'nullable|array|max:9',
             'image_gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
 
@@ -400,6 +463,7 @@ class PageController extends Controller
         $newdata->template_id = 1;
         $newdata->description = $request->desc;
         $newdata->no_tlp = $request->no_tlp;
+        $newdata->domain = $this->normalizeDomainUrl($request->domain);
 
         if ($request->hasFile('thumbnail')) {
             $imageFile = $request->file('thumbnail');
@@ -515,6 +579,15 @@ class PageController extends Controller
     }
 
     public function order(Request $request, $no_tlp) {
+        $customerName = trim((string) $request->input('customer_name', ''));
+        $customerAddress = trim((string) $request->input('customer_address', ''));
+
+        $request->validate([
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_address' => ['required', 'string', 'max:1000'],
+            'order' => ['required', 'array'],
+        ]);
+
         $invoice = new Invoice;
 
         $invoice->business_id = $request->product_id;
@@ -532,8 +605,14 @@ class PageController extends Controller
 
         $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
         $invoiceText .= "<p>" . $tanggal . "</p>";
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
+        $invoiceText .= '<p>' . e($customerName) . '</p>';
+        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
+        $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
 
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
+        $message .= "Nama: {$customerName}\n";
+        $message .= "Alamat: {$customerAddress}\n";
         foreach ($request->order as $item) {
             // dd($item['id']);
             if (isset($item['id'])) {
@@ -572,7 +651,7 @@ class PageController extends Controller
 
         $data = PremiumPackage::find($id);
 
-        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di RekapAja.com dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
+        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di rekapaja.webzz.id dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
 
         return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . $text);
     }

@@ -73,14 +73,14 @@
                                             </a>
 
                                             @if (Auth::user()->role === 'admin')
-                                                <a :href="`{{ route('product.download-domain', '') }}/${item.id}`"
+                                                <button type="button" @click="openDomainModal(item)"
                                                     class="w-5 h-5 hover:text-[#16a34a] duration-300">
                                                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M12 16a1 1 0 0 1-.707-.293l-4-4 1.414-1.414L11 12.586V4h2v8.586l2.293-2.293 1.414 1.414-4 4A1 1 0 0 1 12 16Z"
                                                             fill="currentColor"></path>
                                                         <path d="M5 18h14v2H5z" fill="currentColor"></path>
                                                     </svg>
-                                                </a>
+                                                </button>
 
                                                 <!-- Delete -->
                                                 <button @click="confirmDelete(item)"
@@ -183,6 +183,49 @@
                         </div>
                     </div>
                 </div>
+                <div x-show="domainModalOpen"
+                    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40 px-4" style="display: none;">
+                    <div @click.outside="closeDomainModal()" class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-[#ff7100]">
+                        <button @click="closeDomainModal()"
+                            class=" absolute top-6 right-6 w-6 h-6 text-white hover:text-red-500 duration-300">
+                            <svg viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                                enable-background="new 0 0 512 512">
+                                <path
+                                    d="M437.5 386.6 306.9 256l130.6-130.6c14.1-14.1 14.1-36.8 0-50.9-14.1-14.1-36.8-14.1-50.9 0L256 205.1 125.4 74.5c-14.1-14.1-36.8-14.1-50.9 0-14.1 14.1-14.1 36.8 0 50.9L205.1 256 74.5 386.6c-14.1 14.1-14.1 36.8 0 50.9 14.1 14.1 36.8 14.1 50.9 0L256 306.9l130.6 130.6c14.1 14.1 36.8 14.1 50.9 0 14-14.1 14-36.9 0-50.9z"
+                                    fill="currentColor" class="fill-000000"></path>
+                            </svg>
+                        </button>
+                        <div class=" pt-6 pb-3 bg-[#ff7100] text-white">
+                            <h2 class=" px-6 text-2xl font-bold">Atur Domain Usaha</h2>
+                        </div>
+                        <div class="px-6 space-y-4">
+                            <p class="text-base">Domain untuk <span class="font-semibold" x-text="modalData.name"></span></p>
+                            <div class="space-y-2">
+                                <label for="product-domain-index" class="text-sm font-semibold">Domain (Optional)</label>
+                                <input id="product-domain-index" type="text" x-model="domainForm"
+                                    placeholder="contoh: tokoanda.com"
+                                    class="w-full rounded-md border border-[#ff7100] px-3 py-2 text-sm focus:border-[#b95300] focus:ring-[#b95300]">
+                                <p class="text-xs text-neutral-500">Boleh isi `tokoanda.com` atau `https://tokoanda.com`.</p>
+                                <p x-show="domainError" x-text="domainError" class="text-sm text-red-500"></p>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 px-6">
+                            <button type="button" @click="saveDomain()"
+                                :disabled="domainLoading"
+                                class="px-4 py-2 bg-neutral-200 text-neutral-800 rounded hover:bg-neutral-300 disabled:opacity-60">
+                                <span x-show="!domainLoading">Simpan</span>
+                                <span x-show="domainLoading">Menyimpan...</span>
+                            </button>
+                            <button type="button" @click="saveDomainAndDownload()"
+                                :disabled="domainLoading"
+                                class="px-4 py-2 bg-[#ff7100] text-white rounded hover:bg-[#b95300] disabled:opacity-60">
+                                <span x-show="!domainLoading">Simpan &amp; Download</span>
+                                <span x-show="domainLoading">Memproses...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <iframe x-ref="downloadFrame" class="hidden" title="download-frame"></iframe>
 
             </div>
             <script>
@@ -194,6 +237,10 @@
                         perPage: 15,
                         showModal: false,
                         confirmDeleteModal: false,
+                        domainModalOpen: false,
+                        domainLoading: false,
+                        domainError: '',
+                        domainForm: '',
                         modalData: {},
 
                         get paginatedData() {
@@ -243,6 +290,71 @@
                         confirmDelete(item) {
                             this.modalData = item;
                             this.confirmDeleteModal = true;
+                        },
+
+                        openDomainModal(item) {
+                            this.modalData = item;
+                            this.domainForm = item.domain ?? '';
+                            this.domainError = '';
+                            this.domainModalOpen = true;
+                        },
+
+                        closeDomainModal() {
+                            this.domainModalOpen = false;
+                            this.domainLoading = false;
+                            this.domainError = '';
+                        },
+
+                        async persistDomain() {
+                            this.domainLoading = true;
+                            this.domainError = '';
+
+                            const formData = new FormData();
+                            formData.append('_method', 'PUT');
+                            formData.append('domain', this.domainForm);
+
+                            const response = await fetch(`{{ route('product.domain', '') }}/${this.modalData.id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                },
+                                body: formData,
+                            });
+
+                            const result = await response.json().catch(() => ({}));
+
+                            if (!response.ok) {
+                                throw new Error(result.message || result.errors?.domain?.[0] || 'Gagal menyimpan domain.');
+                            }
+
+                            this.modalData.domain = result.domain ?? '';
+                            this.data = this.data.map(item => item.id === this.modalData.id
+                                ? { ...item, domain: this.modalData.domain }
+                                : item
+                            );
+                        },
+
+                        async saveDomain() {
+                            try {
+                                await this.persistDomain();
+                                this.closeDomainModal();
+                            } catch (error) {
+                                this.domainError = error.message;
+                                this.domainLoading = false;
+                            }
+                        },
+
+                        async saveDomainAndDownload() {
+                            try {
+                                await this.persistDomain();
+                                const downloadUrl = `{{ route('product.download-domain', '') }}/${this.modalData.id}?t=${Date.now()}`;
+                                this.$refs.downloadFrame.src = downloadUrl;
+                                this.closeDomainModal();
+                            } catch (error) {
+                                this.domainError = error.message;
+                                this.domainLoading = false;
+                            }
                         }
                     }
                 }
