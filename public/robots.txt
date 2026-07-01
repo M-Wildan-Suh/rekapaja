@@ -4,4 +4,4 @@ Disallow: /nogooglebot/
 User-agent: *
 Allow: /
 
-Sitemap: https://byoo.link/sitemap.xml
+Sitemap: https://rekapaja.webz.biz/sitemap.xml

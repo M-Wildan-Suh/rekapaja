@@ -58,7 +58,7 @@
         <div class=" w-full max-w-[1080px] mx-auto">
             <div class=" w-full space-y-16 px-6 sm:px-0">
                 <div class=" w-full flex flex-col items-center justify-center gap-4 sm:gap-6">
-                    <p class=" text-3xl font-black capitalize text-center">Kenapa rekapaja.webzz.id?</p>
+                    <p class=" text-3xl font-black capitalize text-center">Kenapa rekapaja.webz.biz?</p>
                     <div class=" rounded-xl bg-black h-1 w-20"></div>
                 </div>
                 <div class=" w-full grid grid-cols-1 sm:grid-cols-3 gap-16 sm:gap-8 py-8">

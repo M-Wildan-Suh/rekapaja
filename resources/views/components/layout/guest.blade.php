@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>rekapaja.webzz.id{{$title ? ' - '.$title : ''}}</title>
+        <title>rekapaja.webz.biz{{$title ? ' - '.$title : ''}}</title>
 
         <meta name="description" content="{{ $desc ?? '' }}">
         <meta name="keywords" content="{{ collect($tags)->pluck('productTag.tag')->implode(', ') }}">
