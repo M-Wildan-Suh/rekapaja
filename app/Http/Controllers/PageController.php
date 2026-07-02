@@ -337,6 +337,8 @@ class PageController extends Controller
         $invoice = new Invoice;
         $invoice->business_id = $product->id;
         $invoice->invoice_code = strtoupper(Str::random(10));
+        $invoice->customer_name = $customerName;
+        $invoice->customer_address = $customerAddress;
         $invoice->invoice_text = '';
 
         $message = "Halo, saya ingin memesan produk/layanan Anda.\n";
@@ -592,6 +594,8 @@ class PageController extends Controller
 
         $invoice->business_id = $request->product_id;
         $invoice->invoice_code = strtoupper(Str::random(10));
+        $invoice->customer_name = $customerName;
+        $invoice->customer_address = $customerAddress;
         $invoice->invoice_text = '';
         // $data = Highlight::whereIn('id', $request->order)->get();
 

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
             $table->string('invoice_code')->unique();
+            $table->string('customer_name')->nullable();
+            $table->text('customer_address')->nullable();
             $table->longText('invoice_text');
             $table->timestamps();
         });

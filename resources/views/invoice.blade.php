@@ -26,6 +26,14 @@
                         <span x-show="copied" class="absolute top-full right-0 mt-1 bg-gray-700 text-white text-xs py-1 px-2 rounded">Copied!</span>
                     </button>
                 </div>
+                <div>
+                    <p class=" text-sm text-neutral-600 font-semibold">Nama Pemesan</p>
+                    <p>{{ $invoice->customer_name ?: '-' }}</p>
+                </div>
+                <div>
+                    <p class=" text-sm text-neutral-600 font-semibold">Alamat</p>
+                    <p class=" whitespace-pre-line">{{ $invoice->customer_address ?: '-' }}</p>
+                </div>
                 <div class=" w-full"></div>
                 <div class=" w-full text-sm sm:text-base">
                     {!! nl2br($invoice->invoice_text) !!}

@@ -28,6 +28,8 @@
                                 @if (Auth::user()->role === 'admin')
                                     <th class=" px-1 sm:px-2 py-1 hidden sm:table-cell">Nama Usaha</th>
                                 @endif
+                                <th class=" px-1 sm:px-2 py-1 hidden md:table-cell">Nama</th>
+                                <th class=" px-1 sm:px-2 py-1 hidden lg:table-cell">Alamat</th>
                                 <th class=" px-1 sm:px-2 py-1">Tanggal</th>
                                 <th class=" px-1 sm:px-2 py-1">Opsi</th>
                             </tr>
@@ -40,6 +42,8 @@
                                     @if (Auth::user()->role === 'admin')
                                         <td class=" px-2 sm:px-4 py-2 hidden sm:table-cell" x-text="item.product.name"></td>
                                     @endif
+                                    <td class=" px-2 sm:px-4 py-2 hidden md:table-cell" x-text="item.customer_name || '-'"></td>
+                                    <td class=" px-2 sm:px-4 py-2 hidden lg:table-cell" x-text="item.customer_address || '-'"></td>
                                     <td class=" px-2 sm:px-4 py-2 " x-text="item.date"></td>
                                     <td class=" px-1 sm:px-2">
                                         <div class="flex gap-2 justify-center">
@@ -152,6 +156,10 @@
                                 <p class=" w-full text-lg font-bold">Rekap orderan</p>
                                 <p class=" text-sm text-neutral-600 font-semibold">Id Rekap</p>
                                 <p class="" x-text="modalData.invoice_code"></p>
+                                <p class=" mt-3 text-sm text-neutral-600 font-semibold">Nama Pemesan</p>
+                                <p x-text="modalData.customer_name || '-'"></p>
+                                <p class=" mt-3 text-sm text-neutral-600 font-semibold">Alamat</p>
+                                <p class="whitespace-pre-line" x-text="modalData.customer_address || '-'"></p>
                                 <div class=" w-full text-sm sm:text-base">
                                     <div x-html="modalData.invoice_text"></div>
                                     <p class=" text-sm text-neutral-600">*Belum termasuk ongkir</p>
@@ -218,7 +226,13 @@
                             if (this.search === '') {
                                 return this.data;
                             }
-                            return this.data.filter(item => item.invoice_code.toLowerCase().includes(this.search.toLowerCase()));
+                            const keyword = this.search.toLowerCase();
+                            return this.data.filter(item =>
+                                (item.invoice_code || '').toLowerCase().includes(keyword) ||
+                                (item.customer_name || '').toLowerCase().includes(keyword) ||
+                                (item.customer_address || '').toLowerCase().includes(keyword) ||
+                                (item.product?.name || '').toLowerCase().includes(keyword)
+                            );
                         },
 
                         get totalPages() {
