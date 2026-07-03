@@ -26,7 +26,7 @@
                 <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
-                        <div class=" grid grid-cols-3 gap-2 sm:gap-4 font-bold">
+                        <div class=" grid grid-cols-4 gap-2 sm:gap-4 font-bold">
                             <button 
                                 @click="activeTab = 'product'" 
                                 :class="activeTab === 'product' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
@@ -37,8 +37,13 @@
                                 @click="activeTab = 'highlight'" 
                                 :class="activeTab === 'highlight' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
                                 class="px-3 py-2 rounded-md">
-                                <span class=" sm:hidden">Produk</span>
-                                <span class=" hidden sm:block">Produk / Layanan</span>
+                                Produk
+                            </button>
+                            <button 
+                                @click="activeTab = 'feature'" 
+                                :class="activeTab === 'feature' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
+                                class="px-3 py-2 rounded-md">
+                                Fitur
                             </button>
                             <button 
                                 @click="activeTab = 'gallery'" 
@@ -124,30 +129,43 @@
                                     @if (Auth::user()->role === 'admin')
                                         <x-admin.component.accessinput title="Access" :value="$product->access->pluck('user_id')->all()" :users="$accessUsers" name="access[]" />
                                     @endif
-                                    @if (Auth::user()->role === 'admin')
-                                        <x-admin.component.radioinput title="Status" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->status" name="status" />
-                                    @endif
-                                    <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$product->home_button" name="home_button" />
                                 @endif
-                                <div class=" space-y-2">
-                                    <label for="template">Template</label>
-                                    <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                        @foreach ($template as $item)
-                                            <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                                <input type="radio" name="template_id" value="{{$item->id}}" class="hidden peer" {{ $product->template_id === $item->id ? 'checked' : '' }}>
-                                                <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
-                                                <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                                                </div>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
                                 
                                 <div class="">
                                     <button class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
                                 </div>
                             </div>
                         </form>
+                    </div>
+                    <div x-show="activeTab === 'feature'" class=" p-4 md:p-6 text-gray-900">
+                        <div class="space-y-6">
+                            @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
+                                @if (Auth::user()->role === 'admin')
+                                    <x-admin.component.radioinput title="Status" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->status" name="status" form="bussiness" />
+                                @endif
+                                <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$product->home_button" name="home_button" form="bussiness" />
+                                <x-admin.component.radioinput title="Customer Data" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->customer_data ?? 'active'" name="customer_data" form="bussiness" />
+                                <x-admin.component.radioinput title="QRIS" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->qris_status ?? 'active'" name="qris_status" form="bussiness" />
+                            @endif
+
+                            <div class="space-y-2">
+                                <label for="template" class="font-semibold">Template</label>
+                                <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    @foreach ($template as $item)
+                                        <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
+                                            <input type="radio" name="template_id" value="{{$item->id}}" form="bussiness" class="hidden peer" {{ $product->template_id === $item->id ? 'checked' : '' }}>
+                                            <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
+                                            <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="">
+                                <button @click="document.getElementById('bussiness').submit()" class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
+                            </div>
+                        </div>
                     </div>
                     <div x-show="activeTab === 'highlight'" class=" p-4 md:p-6 text-gray-900 space-y-4">
                         @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))

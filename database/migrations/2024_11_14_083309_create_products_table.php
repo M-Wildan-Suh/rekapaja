@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('qris')->nullable();
             $table->string('domain')->nullable();
             $table->string('status')->default('unactive');
+            $table->enum('customer_data', ['active', 'unactive'])->default('active');
+            $table->enum('qris_status', ['active', 'unactive'])->default('active');
             $table->longText('description');
             $table->timestamps();
         });

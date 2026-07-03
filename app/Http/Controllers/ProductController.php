@@ -196,6 +196,8 @@ class ProductController extends Controller
             'tag.*' => ['nullable', 'string', 'max:255'],
             'access' => ['nullable', 'array'],
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
+            'customer_data' => ['nullable', 'in:active,unactive'],
+            'qris_status' => ['nullable', 'in:active,unactive'],
         ], $this->canManageQris() ? [
             'qris' => ['nullable', 'image'],
         ] : []));
@@ -213,6 +215,8 @@ class ProductController extends Controller
         $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
         $newdata->youtube = $validated['link'] ?? null;
         $newdata->home_button = $validated['home_button'];
+        $newdata->customer_data = $validated['customer_data'] ?? 'active';
+        $newdata->qris_status = $validated['qris_status'] ?? 'active';
         $newdata->status = 'active';
 
         if ($request->hasFile('thumbnail')) {
@@ -616,6 +620,8 @@ PHP;
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['nullable', 'in:on,off'],
             'status' => ['nullable', 'in:active,unactive'],
+            'customer_data' => ['nullable', 'in:active,unactive'],
+            'qris_status' => ['nullable', 'in:active,unactive'],
             'thumbnail' => ['nullable', 'image'],
             'category' => ['nullable', 'array'],
             'category.*' => ['nullable', 'string', 'max:255'],
@@ -642,6 +648,14 @@ PHP;
             $product->home_button = $validated['home_button'];
         }
 
+        if (array_key_exists('customer_data', $validated)) {
+            $product->customer_data = $validated['customer_data'];
+        }
+
+        if (array_key_exists('qris_status', $validated)) {
+            $product->qris_status = $validated['qris_status'];
+        }
+
         if (!empty($validated['status'])) {
             $product->status = $validated['status'];
         }
@@ -658,6 +672,13 @@ PHP;
             $newQrisName = $this->storeQrisImage($request->file('qris'));
             $this->deleteImageIfExists($product->qris, 'storage/images/product/qris');
             $product->qris = $newQrisName;
+        }
+
+        if (($validated['qris_status'] ?? $product->qris_status) === 'active' && empty($product->qris)) {
+            return back()
+                ->withErrors(['qris' => 'Upload gambar QRIS sebelum mengaktifkan fitur QRIS.'])
+                ->withInput()
+                ->with('highlight', 'feature');
         }
 
         $product->save();

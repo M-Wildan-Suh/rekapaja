@@ -29,6 +29,37 @@ use Intervention\Image\ImageManager;
 
 class PageController extends Controller
 {
+    private function resolveProductPremiumContext(Product $product): array
+    {
+        $accesses = Access::with('user')->where('product_id', $product->id)->get();
+
+        if ($accesses->isEmpty()) {
+            return [
+                'is_premium' => true,
+                'role' => 'admin',
+                'no_tlp' => $product->no_tlp ?: $this->getRawWhatsappNumber(),
+            ];
+        }
+
+        $premiumAccess = $accesses->first(function ($access) {
+            return $access->user && $access->user->canAccessPremiumFeatures();
+        });
+
+        if ($premiumAccess) {
+            return [
+                'is_premium' => true,
+                'role' => $premiumAccess->user->role === 'admin' ? 'admin' : 'premium',
+                'no_tlp' => $product->no_tlp ?: $this->getRawWhatsappNumber(),
+            ];
+        }
+
+        return [
+            'is_premium' => false,
+            'role' => 'user',
+            'no_tlp' => $this->getRawWhatsappNumber(),
+        ];
+    }
+
     private function normalizeDomainUrl(?string $domain): ?string
     {
         $domain = trim((string) $domain);
@@ -187,31 +218,9 @@ class PageController extends Controller
 
         $template = Template::find($data->template_id);
 
-        $accesses = Access::with('user')->where('product_id', $data->id)->get();
-
-        // Role Validation
-        if ($accesses->isNotEmpty()) {
-            $premiumAccess = $accesses->first(function ($access) {
-                return $access->user && $access->user->canAccessPremiumFeatures();
-            });
-
-            // No Telephone
-            if ($premiumAccess) {
-                if ($data->no_tlp) {
-                    $no_tlp = $data->no_tlp;
-                } else {
-                    $no_tlp = $this->getRawWhatsappNumber();
-                }
-                $role = $premiumAccess->user->role === 'admin' ? 'admin' : 'premium';
-            } else {
-                $role = 'user';
-                $no_tlp = $this->getRawWhatsappNumber();
-            }
-        } else {
-            $no_tlp = $this->getRawWhatsappNumber();
-
-            $role = 'admin';
-        }
+        $premiumContext = $this->resolveProductPremiumContext($data);
+        $no_tlp = $premiumContext['no_tlp'];
+        $role = $premiumContext['role'];
 
         $data->image = asset('storage/images/product/'. $data->image);
 
@@ -282,6 +291,8 @@ class PageController extends Controller
             'description' => $product->description,
             'image' => $product->image ? asset('storage/images/product/' . $product->image) : null,
             'qris_image' => $product->qris ? asset('storage/images/product/qris/' . $product->qris) : null,
+            'customer_data' => $product->customer_data,
+            'qris_status' => $product->qris_status,
             'detail_url' => $this->normalizeDomainUrl($product->domain) ?: route('detail', ['slug' => $product->slug]),
             'whatsapp_url' => $formattedWhatsapp ? 'https://wa.me/' . ltrim($formattedWhatsapp, '+') : null,
             'order_title' => $product->order_title,
@@ -317,6 +328,8 @@ class PageController extends Controller
             ], 404);
         }
 
+        $premiumContext = $this->resolveProductPremiumContext($product);
+        $requiresCustomerData = $premiumContext['is_premium'] && $product->customer_data === 'active';
         $customerName = trim((string) $request->input('customer_name', ''));
         $customerAddress = trim((string) $request->input('customer_address', ''));
 
@@ -328,7 +341,7 @@ class PageController extends Controller
             ], 422);
         }
 
-        if ($customerName === '' || $customerAddress === '') {
+        if ($requiresCustomerData && ($customerName === '' || $customerAddress === '')) {
             return response()->json([
                 'message' => 'Nama pemesan dan alamat wajib diisi.',
             ], 422);
@@ -348,14 +361,18 @@ class PageController extends Controller
 
         $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
         $invoiceText .= "<p>" . $tanggal . "</p>";
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
-        $invoiceText .= '<p>' . e($customerName) . '</p>';
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
-        $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+        if ($requiresCustomerData) {
+            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
+            $invoiceText .= '<p>' . e($customerName) . '</p>';
+            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
+            $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+        }
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
 
-        $message .= "Nama: {$customerName}\n";
-        $message .= "Alamat: {$customerAddress}\n";
+        if ($requiresCustomerData) {
+            $message .= "Nama: {$customerName}\n";
+            $message .= "Alamat: {$customerAddress}\n";
+        }
 
         foreach ($orders as $item) {
             if (!isset($item['id'])) {
@@ -581,18 +598,22 @@ class PageController extends Controller
     }
 
     public function order(Request $request, $no_tlp) {
+        $product = Product::findOrFail($request->input('product_id'));
+        $premiumContext = $this->resolveProductPremiumContext($product);
+        $requiresCustomerData = $premiumContext['is_premium'] && $product->customer_data === 'active';
         $customerName = trim((string) $request->input('customer_name', ''));
         $customerAddress = trim((string) $request->input('customer_address', ''));
 
         $request->validate([
-            'customer_name' => ['required', 'string', 'max:255'],
-            'customer_address' => ['required', 'string', 'max:1000'],
+            'customer_name' => [$requiresCustomerData ? 'required' : 'nullable', 'string', 'max:255'],
+            'customer_address' => [$requiresCustomerData ? 'required' : 'nullable', 'string', 'max:1000'],
             'order' => ['required', 'array'],
+            'product_id' => ['required', 'integer', 'exists:products,id'],
         ]);
 
         $invoice = new Invoice;
 
-        $invoice->business_id = $request->product_id;
+        $invoice->business_id = $product->id;
         $invoice->invoice_code = strtoupper(Str::random(10));
         $invoice->customer_name = $customerName;
         $invoice->customer_address = $customerAddress;
@@ -609,14 +630,18 @@ class PageController extends Controller
 
         $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
         $invoiceText .= "<p>" . $tanggal . "</p>";
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
-        $invoiceText .= '<p>' . e($customerName) . '</p>';
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
-        $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+        if ($requiresCustomerData) {
+            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
+            $invoiceText .= '<p>' . e($customerName) . '</p>';
+            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
+            $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+        }
 
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
-        $message .= "Nama: {$customerName}\n";
-        $message .= "Alamat: {$customerAddress}\n";
+        if ($requiresCustomerData) {
+            $message .= "Nama: {$customerName}\n";
+            $message .= "Alamat: {$customerAddress}\n";
+        }
         foreach ($request->order as $item) {
             // dd($item['id']);
             if (isset($item['id'])) {

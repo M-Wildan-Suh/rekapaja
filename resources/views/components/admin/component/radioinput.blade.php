@@ -1,4 +1,4 @@
-@props(['title', 'name', 'value', 'defaultvalue', 'xModel'=> null, 'required' => false])
+@props(['title', 'name', 'value', 'defaultvalue', 'xModel'=> null, 'required' => false, 'form' => null])
 @php
     $selectedValue = old($name, $defaultvalue);
 @endphp
@@ -13,6 +13,9 @@
                         class="text-[#ff7100] ring-0 focus:ring-[#ff7100] checked:ring-[#ff7100]" 
                         name="{{$name}}" 
                         id="{{$name}}-{{$loop->index}}" 
+                        @if ($form)
+                            form="{{$form}}"
+                        @endif
                         @if ($xModel && old($name) === null)
                             {{ $xModel ? 'x-model='.$xModel : '' }} 
                             x-bind:value="{{ $xModel ? '' : $selectedValue }}" 

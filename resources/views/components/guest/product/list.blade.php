@@ -8,7 +8,13 @@
         showOrderModal: false,
         customerName: '',
         customerAddress: '',
+        isPremiumBusiness: @js(in_array($role, ['admin', 'premium'])),
+        requiresCustomerData: @js(($data->customer_data ?? 'active') === 'active'),
+        showQrisSection: @js(($data->qris_status ?? 'active') === 'active'),
         qrisUrl: @js($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null),
+        get shouldShowOrderModal() {
+            return this.isPremiumBusiness && (this.requiresCustomerData || this.showQrisSection);
+        },
         normalizeQuantity(item) {
             item.quantity = Math.min(999, Math.max(1, parseInt(item.quantity || 1)));
         },
@@ -20,6 +26,11 @@
         },
         openOrderModal() {
             if (!this.checkedItems.length) {
+                return;
+            }
+
+            if (!this.shouldShowOrderModal) {
+                this.$nextTick(() => this.$refs.orderForm.submit());
                 return;
             }
 
@@ -37,7 +48,7 @@
             return new Intl.NumberFormat('id-ID').format(value || 0);
         },
         submitOrder() {
-            if (!this.customerName.trim() || !this.customerAddress.trim()) {
+            if (this.requiresCustomerData && (!this.customerName.trim() || !this.customerAddress.trim())) {
                 return;
             }
 
@@ -148,11 +159,11 @@
                         <button type="button" @click="closeOrderModal()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
                     </div>
                     <div class="max-h-[calc(100vh-12rem)] overflow-y-auto px-5 py-4 space-y-4">
-                        <div>
+                        <div x-show="requiresCustomerData" x-cloak>
                             <label for="customer-name-list" class="mb-1 block text-sm font-semibold text-gray-700">Nama Pemesan</label>
                             <input id="customer-name-list" type="text" x-model="customerName" class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-green-500" placeholder="Masukkan nama pemesan">
                         </div>
-                        <div>
+                        <div x-show="requiresCustomerData" x-cloak>
                             <label for="customer-address-list" class="mb-1 block text-sm font-semibold text-gray-700">Alamat</label>
                             <textarea id="customer-address-list" x-model="customerAddress" rows="3" class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-green-500" placeholder="Masukkan alamat lengkap"></textarea>
                         </div>
@@ -162,20 +173,21 @@
                                 <p class="text-lg font-bold text-gray-900" x-text="'Rp' + formatCurrency(totalPrice)"></p>
                             </div>
                         </div>
-                        <div x-show="qrisUrl" x-cloak class="rounded-2xl border border-green-200 bg-green-50 px-4 py-4">
+                        <div x-show="showQrisSection" x-cloak class="rounded-2xl border border-green-200 bg-green-50 px-4 py-4">
                             <div class="space-y-3">
                                 <div>
                                     <p class="text-sm font-semibold text-green-900">Pembayaran QRIS</p>
                                 </div>
-                                <div class="mx-auto w-full max-w-[220px] overflow-hidden rounded-2xl bg-white p-3 shadow-sm">
+                                <div x-show="qrisUrl" class="mx-auto w-full max-w-[220px] overflow-hidden rounded-2xl bg-white p-3 shadow-sm">
                                     <img :src="qrisUrl" alt="QRIS" class="w-full rounded-xl object-cover">
                                 </div>
+                                <p x-show="!qrisUrl" class="text-sm text-green-900">QRIS belum tersedia untuk usaha ini.</p>
                             </div>
                         </div>
                     </div>
                     <div class="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-100 bg-white px-5 py-4">
                         <button type="button" @click="closeOrderModal()" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Batal</button>
-                        <button type="button" @click="submitOrder()" :disabled="!customerName.trim() || !customerAddress.trim()" class="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-60">Lanjut ke WhatsApp</button>
+                        <button type="button" @click="submitOrder()" :disabled="requiresCustomerData && (!customerName.trim() || !customerAddress.trim())" class="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-60">Lanjut ke WhatsApp</button>
                     </div>
                 </div>
             </div>
