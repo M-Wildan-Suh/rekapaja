@@ -6,6 +6,7 @@
     <div x-data="{
         checkedItems: [],
         showOrderModal: false,
+        showQrisPreviewModal: false,
         customerName: '',
         customerAddress: '',
         isPremiumBusiness: @js(in_array($role, ['admin', 'premium'])),
@@ -39,6 +40,16 @@
         closeOrderModal() {
             this.showOrderModal = false;
         },
+        openQrisPreview() {
+            if (!this.qrisUrl) {
+                return;
+            }
+
+            this.showQrisPreviewModal = true;
+        },
+        closeQrisPreview() {
+            this.showQrisPreviewModal = false;
+        },
         get totalPrice() {
             return this.checkedItems.reduce((total, item) => {
                 return total + ((parseInt(item.price || 0)) * (parseInt(item.quantity || 1)));
@@ -46,6 +57,18 @@
         },
         formatCurrency(value) {
             return new Intl.NumberFormat('id-ID').format(value || 0);
+        },
+        downloadQris() {
+            if (!this.qrisUrl) {
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = this.qrisUrl;
+            link.download = 'qris';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         },
         submitOrder() {
             if (this.requiresCustomerData && (!this.customerName.trim() || !this.customerAddress.trim())) {
@@ -55,6 +78,31 @@
             this.$refs.orderForm.submit();
         }
     }" class=" w-full">
+        <div style="background-color: {{ $template->desc_main_color }}; color: {{ $template->desc_text_color ?? '#ffffff' }}"
+            class="mb-4 rounded-md overflow-hidden p-4 shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+                <p class="w-full font-bold tracking-wide text-lg sm:text-xl">Qris</p>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="openQrisPreview()" :disabled="!qrisUrl"
+                    style="background-color: {{ $template->desc_text_color ?? '#ffffff' }}; color: {{ $template->desc_main_color }}"
+                    class="flex h-10 w-10 items-center justify-center rounded-md text-xs font-semibold duration-300 hover:opacity-80 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12S5.63636 5 12 5s10 7 10 7-3.6364 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+                    </svg>
+                </button>
+                <button type="button" @click="downloadQris()" :disabled="!qrisUrl"
+                    style="background-color: {{ $template->desc_text_color ?? '#ffffff' }}; color: {{ $template->desc_main_color }}"
+                    class="flex h-10 w-10 items-center justify-center rounded-md text-xs font-semibold duration-300 hover:opacity-80 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M8 10L12 14L16 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 17H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            </div>
+        </div>
         <form id="myForm" action="{{ route('order', ['no_tlp' => $no_tlp]) }}" method="post"
             enctype="multipart/form-data" target="_blank" x-ref="orderForm">
             @csrf
@@ -156,7 +204,17 @@
                         <div>
                             <p class="text-lg font-bold text-gray-900">Lengkapi data pemesan</p>
                         </div>
-                        <button type="button" @click="closeOrderModal()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="downloadQris()" x-show="qrisUrl"
+                                class="text-gray-400 duration-300 hover:text-gray-600">
+                                <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    <path d="M8 10L12 14L16 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5 17H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <button type="button" @click="closeOrderModal()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+                        </div>
                     </div>
                     <div class="max-h-[calc(100vh-12rem)] overflow-y-auto px-5 py-4 space-y-4">
                         <div x-show="requiresCustomerData" x-cloak>
@@ -181,6 +239,12 @@
                                 <div x-show="qrisUrl" class="mx-auto w-full max-w-[220px] overflow-hidden rounded-2xl bg-white p-3 shadow-sm">
                                     <img :src="qrisUrl" alt="QRIS" class="w-full rounded-xl object-cover">
                                 </div>
+                                <div x-show="qrisUrl" class="flex justify-center">
+                                    <button type="button" @click="downloadQris()"
+                                        class="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                                        Download QRIS
+                                    </button>
+                                </div>
                                 <p x-show="!qrisUrl" class="text-sm text-green-900">QRIS belum tersedia untuk usaha ini.</p>
                             </div>
                         </div>
@@ -188,6 +252,23 @@
                     <div class="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-100 bg-white px-5 py-4">
                         <button type="button" @click="closeOrderModal()" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Batal</button>
                         <button type="button" @click="submitOrder()" :disabled="requiresCustomerData && (!customerName.trim() || !customerAddress.trim())" class="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-60">Lanjut ke WhatsApp</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showQrisPreviewModal" x-transition.opacity class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm px-4 py-6" style="display: none;">
+            <div class="flex min-h-full items-center justify-center">
+                <div @click.outside="closeQrisPreview()" class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+                    <div class="flex items-start justify-between gap-4 border-b border-gray-100 bg-white px-5 py-5">
+                        <div>
+                            <p class="text-lg font-bold text-gray-900">Preview QRIS</p>
+                        </div>
+                        <button type="button" @click="closeQrisPreview()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+                    <div class="px-5 py-5">
+                        <img x-show="qrisUrl" :src="qrisUrl" alt="QRIS" class="mx-auto w-full max-w-[280px] rounded-2xl border border-gray-200">
+                        <p x-show="!qrisUrl" class="text-center text-sm text-gray-500">QRIS belum tersedia untuk usaha ini.</p>
                     </div>
                 </div>
             </div>
