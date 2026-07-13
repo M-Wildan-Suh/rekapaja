@@ -26,7 +26,7 @@
                 <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
-                        <div class=" grid grid-cols-4 gap-2 sm:gap-4 font-bold">
+                        <div class=" grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 font-bold">
                             <button 
                                 @click="activeTab = 'product'" 
                                 :class="activeTab === 'product' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
@@ -37,13 +37,13 @@
                                 @click="activeTab = 'highlight'" 
                                 :class="activeTab === 'highlight' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
                                 class="px-3 py-2 rounded-md">
-                                Produk
+                                Produk/Jasa
                             </button>
                             <button 
                                 @click="activeTab = 'feature'" 
                                 :class="activeTab === 'feature' ? ' bg-[#ff7100] text-white' : 'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
                                 class="px-3 py-2 rounded-md">
-                                Fitur
+                                Fitur/Template
                             </button>
                             <button 
                                 @click="activeTab = 'gallery'" 
@@ -148,12 +148,28 @@
                                 <x-admin.component.radioinput title="QRIS" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->qris_status ?? 'active'" name="qris_status" form="bussiness" />
                             @endif
 
+                            @php
+                                $availableTemplateIds = $template->pluck('id')->map(fn ($id) => (string) $id);
+                                $selectedTemplateId = old('template_id');
+
+                                if ($selectedTemplateId === null) {
+                                    $selectedTemplateId = $product->template_id;
+                                }
+
+                                $selectedTemplateId = $selectedTemplateId !== null ? (string) $selectedTemplateId : null;
+
+                                if (!$selectedTemplateId || !$availableTemplateIds->contains($selectedTemplateId)) {
+                                    $selectedTemplateId = optional($template->first())->id;
+                                    $selectedTemplateId = $selectedTemplateId !== null ? (string) $selectedTemplateId : null;
+                                }
+                            @endphp
+
                             <div class="space-y-2">
                                 <label for="template" class="font-semibold">Template</label>
                                 <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     @foreach ($template as $item)
                                         <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{$item->id}}" form="bussiness" class="hidden peer" {{ $product->template_id === $item->id ? 'checked' : '' }}>
+                                            <input type="radio" name="template_id" value="{{$item->id}}" form="bussiness" class="hidden peer" {{ $selectedTemplateId === (string) $item->id ? 'checked' : '' }}>
                                             <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
                                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                             </div>
