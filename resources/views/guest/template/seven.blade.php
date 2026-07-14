@@ -19,6 +19,7 @@
             </div>
 
             <x-guest.description color="#E73879" :data="$data" />
+            @include('components.guest.qris-section')
             
             <div class="w-full relative bg-[#E73879]">
                 <div class=" w-full h-10 mb-4">

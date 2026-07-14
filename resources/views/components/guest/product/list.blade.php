@@ -1,8 +1,4 @@
 <div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative space-y-4">
-    <div style="background-color: {{ $template->desc_main_color }}"
-        class=" p-4 w-full text-white rounded-md overflow-hidden">
-        <p class=" w-full font-bold tracking-wide text-lg sm:text-xl">{{$data->product_title}}</p>
-    </div>
     <div x-data="{
         checkedItems: [],
         showOrderModal: false,
@@ -78,7 +74,8 @@
             this.$refs.orderForm.submit();
         }
     }" class="w-full">
-        <div style="background-color: {{ $template->desc_main_color }}; color: {{ $template->desc_text_color ?? '#ffffff' }}"
+        <div x-show="showQrisSection" x-cloak
+            style="background-color: {{ $template->desc_main_color }}; color: {{ $template->desc_text_color ?? '#ffffff' }}"
             class="mb-4 rounded-md overflow-hidden p-4 shadow-sm">
             <div class="flex items-center justify-between gap-3">
                 <p class="w-full font-bold tracking-wide text-lg sm:text-xl">Qris</p>
@@ -102,6 +99,10 @@
                 </button>
             </div>
             </div>
+        </div>
+        <div style="background-color: {{ $template->desc_main_color }}"
+            class="mb-4 p-4 w-full text-white rounded-md overflow-hidden">
+            <p class=" w-full font-bold tracking-wide text-lg sm:text-xl">{{$data->product_title}}</p>
         </div>
         <form id="myForm" action="{{ route('order', ['no_tlp' => $no_tlp]) }}" method="post" enctype="multipart/form-data" target="_blank" x-ref="orderForm">
             @csrf

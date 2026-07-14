@@ -79,6 +79,7 @@
             </div>
 
             <x-guest.description color="#1D1616" :data="$data" />
+            @include('components.guest.qris-section')
 
             <div class="w-full max-w-[640px] mx-auto px-4 md:px-0 relative">
                 <div x-data="{ checkedItems: [] }" class=" w-full">
