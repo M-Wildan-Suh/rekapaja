@@ -92,7 +92,8 @@
                                     </div>
                                     <div class=" flex-grow w-full p-3 flex flex-col justify-between gap-2 text-center">
                                         <p class="line-clamp-2 text-sm font-semibold">{{$item->title}}</p>
-                                        <div class="w-full flex items-end justify-center">
+                                        <div class="w-full flex flex-row flex-wrap items-center justify-center gap-2">
+                                            <x-guest.product.detail-button :item="$item" class="duration-300 rounded-md py-1 px-3 text-sm bg-[#f05a28] cursor-pointer border-2 border-white hover:opacity-80" />
                                             @if ($role === "admin" || $role === "premium")
                                                 <div class="rounded-md">
                                                     <input 

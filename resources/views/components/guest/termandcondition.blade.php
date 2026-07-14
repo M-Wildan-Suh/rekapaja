@@ -20,13 +20,13 @@
                 </div>
             </div>
             <div class=" text-sm sm:text-base text-neutral-600 pt-6 space-y-4 overflow-auto max-h-96">
-                <p>Selamat datang di rekapaja.webz.biz. Dengan mengakses atau menggunakan website ini, Anda setuju untuk terikat
+                <p>Selamat datang di RekapAja.com. Dengan mengakses atau menggunakan website ini, Anda setuju untuk terikat
                     oleh Syarat dan Ketentuan berikut. Jika Anda tidak menyetujui, harap hentikan penggunaan website
                     ini.</p>
                 <div class=" space-y-2">
                     <p class=" text-black font-semibold text-lg">1. Pendahuluan</p>
                     <p>
-                        Website rekapaja.webz.biz adalah platform online yang memungkinkan pengguna untuk memposting, membeli,
+                        Website RekapAja.com adalah platform online yang memungkinkan pengguna untuk memposting, membeli,
                         dan menjual produk atau jasa secara mandiri.
                         <br>
                         Kami hanya menyediakan sarana teknologi untuk menghubungkan pembeli dan penjual. Kami tidak
@@ -49,7 +49,7 @@
                     <ul class=" list-disc pl-4">
                         <li>Pengguna setuju untuk menggunakan layanan hanya untuk tujuan yang sah dan sesuai dengan
                             hukum yang berlaku.</li>
-                        <li>Website rekapaja.webz.biz hanya berfungsi sebagai perantara dan tidak menjamin kualitas, keaslian,
+                        <li>Website RekapAja.com hanya berfungsi sebagai perantara dan tidak menjamin kualitas, keaslian,
                             atau kelayakan barang/jasa yang dijual oleh pengguna.</li>
                         <li>Pengguna bertanggung jawab sepenuhnya atas komunikasi, negosiasi, dan pelaksanaan transaksi
                             dengan pihak lain.Transaksi: Kegiatan jual-beli yang dilakukan oleh pengguna melalui
@@ -129,7 +129,7 @@
                     <p>Dengan menggunakan layanan ini, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh
                         Syarat dan Ketentuan yang berlaku.</p>
                     <ul class="">
-                        <li>rekapaja.webz.biz</li>
+                        <li>RekapAja.com</li>
                         <li>[Alamat Perusahaan]</li>
                     </ul>
                 </div>

@@ -116,13 +116,14 @@
                         @endif
                         <div class="w-full flex flex-col justify-between gap-1.5 sm:gap-2">
                             <p class="line-clamp-1 sm:text-lg font-semibold">{{ $item->title }}</p>
-                            <div class="w-full flex flex-grow gap-1.5 justify-between">
-                                @if ($item->price)
-                                    <p class="line-clamp-2 text-sm sm:text-base">Rp{{ number_format($item->price, 0, ',', '.') }}<p>
-                                @else
-                                    <p class="line-clamp-2 text-sm sm:text-base">{{ $item->description }}</p>
-                                @endif
-                                <div class="flex items-end">
+                            <div class="w-full flex flex-grow items-end gap-2 justify-between">
+                                <div>
+                                    @if ($item->price)
+                                        <p class="line-clamp-2 text-sm sm:text-base">Rp{{ number_format($item->price, 0, ',', '.') }}</p>
+                                    @endif
+                                </div>
+                                <div class="flex items-end gap-2">
+                                    <x-guest.product.detail-button :item="$item" :style="'background-color: ' . $template->product_second_color" class="duration-300 rounded-md py-1 px-3 text-sm cursor-pointer hover:opacity-80" />
                                     @if ($role === 'admin' || $role === 'premium')
                                         <div class="flex rounded-md overflow-hidden">
                                             <input type="text" class="hidden" name="product_id" value="{{$data->id}}">

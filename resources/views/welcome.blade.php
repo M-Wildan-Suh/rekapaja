@@ -4,7 +4,7 @@
         <div class=" w-full h-full max-w-xl mx-auto text-white">
             <div class=" w-full h-full grid pb-16 grid-cols-2">
                 <div class=" w-full h-full flex flex-col justify-center gap-4">
-                    <p class=" text-2xl sm:text-3xl font-semibold">rekapaja.webz.biz</p>
+                    <p class=" text-2xl sm:text-3xl font-semibold">RekapAja.com</p>
                     <p class=" text-xs sm:text-base font-semibold capitalize">Bangun usaha online dengan sistem rekap otomatis</p>
                     <a href="{{ route('allproduct') }}">
                         <button
@@ -25,7 +25,7 @@
             <div class=" w-full space-y-6">
                 <div class=" w-full max-w-xl bg-white p-4 sm:p-6 rounded-xl mx-auto shadow-md shadow-black/20 space-y-6">
                     {{-- <div class=" w-full flex justify-between">
-                        <p class="flex items-center font-semibold gap-1 text-xl">Kenapa rekapaja.webz.biz ?</p>
+                        <p class="flex items-center font-semibold gap-1 text-xl">Kenapa RekapAja.com ?</p>
                     </div> --}}
                     <div class=" grid grid-cols-3 gap-4">
                         <div class=" w-full rounded-xl flex flex-col items-center gap-2">

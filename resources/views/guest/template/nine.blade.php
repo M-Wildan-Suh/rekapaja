@@ -35,9 +35,7 @@
                             </div>
                             <div class=" flex flex-col justify-between gap-2">
                                 <p class=" line-clamp-1 sm:text-lg font-semibold">{{$item->title}}</p>
-                                <p class=" line-clamp-2 text-sm sm:text-base">
-                                    {{$item->description}}
-                                </p>
+                                <x-guest.product.detail-button :item="$item" class="py-1.5 px-3 flex items-center gap-2 text-sm border-2 border-white rounded-md hover:bg-white/50 duration-300 self-start" />
                                 <div class="flex gap-1 {{ $loop->index % 2 == 0 ? '' : 'justify-end' }}">
                                     @for ($i = 0; $i < 5; $i++)
                                         <div class=" w-4 sm:w-5 aspect-square text-yellow-400">

@@ -593,7 +593,7 @@ class PageController extends Controller
     public function join() {
         $no_tlp = $this->getWhatsappNumber();
 
-        $text = urlencode("Halo, Saya tertarik dengan fitur-fitur yang ada di rekapaja.webz.biz dan ingin mengetahui lebih lanjut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
+        $text = urlencode("Halo, Saya tertarik dengan fitur-fitur yang ada di RekapAja.com dan ingin mengetahui lebih lanjut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
 
         return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . $text);
     }
@@ -681,7 +681,7 @@ class PageController extends Controller
 
         $data = PremiumPackage::find($id);
 
-        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di rekapaja.webz.biz dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
+        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di RekapAja.com dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
 
         return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . $text);
     }

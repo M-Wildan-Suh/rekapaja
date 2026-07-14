@@ -336,7 +336,10 @@ class ProductController extends Controller
 
         $data->save();
 
-        return redirect()->back()->with('highlight', 'highlight');
+        return redirect()
+            ->route('product.show', $data)
+            ->with('highlight', 'highlight')
+            ->with('success', 'Tombol order berhasil diperbarui.');
     }
     
     
@@ -353,7 +356,10 @@ class ProductController extends Controller
 
         $data->save();
 
-        return redirect()->back()->with('highlight', 'highlight');
+        return redirect()
+            ->route('product.show', $data)
+            ->with('highlight', 'highlight')
+            ->with('success', 'Judul produk berhasil diperbarui.');
     }
 
     public function downloadDomainFile(Product $product)
@@ -604,6 +610,8 @@ PHP;
     {
         $this->ensureProductAccess($product);
 
+        $activeTab = $request->input('active_tab', 'product');
+
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'subtitle' => ['required', 'string', 'max:255'],
@@ -744,7 +752,10 @@ PHP;
         }
         
 
-        return redirect()->route('product.index');
+        return redirect()
+            ->route('product.show', $product)
+            ->with('highlight', $activeTab)
+            ->with('success', 'Data usaha berhasil disimpan.');
     }
 
     /**

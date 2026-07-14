@@ -25,7 +25,7 @@
                                     </div>
                                     <div class="w-full flex flex-col justify-between gap-2">
                                         <p class="line-clamp-1 font-semibold">{{ $item->title }}</p>
-                                        <p class="line-clamp-2 text-sm">{{ $item->description }}</p>
+                                        <x-guest.product.detail-button :item="$item" class="duration-300 rounded-md py-1 px-3 text-sm cursor-pointer border-2 border-white hover:bg-white/50 self-start" />
                                         <div class="w-full flex items-end justify-end">
                                             @if ($role === "admin" || $role === "premium")
                                                 <div class="rounded-md">

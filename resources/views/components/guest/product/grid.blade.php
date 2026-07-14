@@ -124,7 +124,8 @@
                                     </p>
                                 @endif
                             </div>
-                            <div class="w-full flex items-end justify-center">
+                            <div class="w-full flex flex-row flex-wrap items-center justify-center gap-2">
+                                <x-guest.product.detail-button :item="$item" :style="'background-color: ' . $template->product_second_color" class="duration-300 rounded-md py-1 px-3 text-sm cursor-pointer hover:opacity-80" />
                                 @if ($role === 'admin' || $role === 'premium')
                                     <div class="rounded-md">
                                         <input type="text" class="hidden" name="product_id" value="{{$data->id}}">

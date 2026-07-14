@@ -6,6 +6,32 @@
     </x-slot>
     <!-- Tab Contents -->
     <div class="mt-4">
+        @if (session('success') || $errors->any())
+            <div class="fixed top-24 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col items-end gap-3 sm:right-6">
+                @if (session('success'))
+                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
+                        <div class="flex items-start gap-3">
+                            <p class="flex-1 font-medium">{{ session('success') }}</p>
+                            <button type="button" @click="show = false" class="text-green-700 transition hover:text-green-900">&times;</button>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <p>{{ $error }}</p>
+                                @endforeach
+                            </div>
+                            <button type="button" @click="show = false" class="text-red-700 transition hover:text-red-900">&times;</button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <div class="sticky top-[76px] left-0 right-0 z-10 px-4">
             <div class="max-w-xl mx-auto pointer-events-none">
                 <div class="pointer-events-auto rounded-md border border-[#ff7100]/20 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
@@ -23,7 +49,7 @@
         <div class="py-4 px-4">
             <div class="max-w-xl mx-auto">
                 <div class="h-16"></div>
-                <div x-data="{ activeTab: '{{ session('highlight', 'product') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
+                <div x-data="{ activeTab: '{{ old('active_tab', session('highlight', 'product')) }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
                         <div class=" grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 font-bold">
@@ -57,12 +83,8 @@
                         <form id="bussiness" action="{{route('product.update', ['product' => $product->id])}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
+                            <input type="hidden" name="active_tab" x-model="activeTab">
                             <div class=" w-full space-y-6">
-                                @if ($errors->any())
-                                    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                                        {{ $errors->first() }}
-                                    </div>
-                                @endif
                                 <div class=" flex flex-col gap-2">
                                     <div class=" w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto">
                                         <x-admin.component.imageinput :value="asset('storage/images/product/' . $product->image . '')" name="thumbnail" />

@@ -34,3 +34,4 @@
         </a>
     </div>
 </div>
+<x-guest.product.detail-modal />

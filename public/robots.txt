@@ -4,4 +4,4 @@ Disallow: /nogooglebot/
 User-agent: *
 Allow: /
 
-Sitemap: https://rekapaja.webz.biz/sitemap.xml
+Sitemap: https://rekapaja.com/sitemap.xml
