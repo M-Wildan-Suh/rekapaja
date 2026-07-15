@@ -1,3 +1,11 @@
+@php
+    $whatsappNumber = preg_replace('/\D+/', '', $no_tlp ?? '');
+    $joinMessage = rawurlencode('Halo, saya tertarik untuk join ke RekapAja.com.');
+    $joinWhatsappUrl = $whatsappNumber
+        ? "https://wa.me/{$whatsappNumber}?text={$joinMessage}"
+        : '#';
+@endphp
+
 <div x-data="{ isOpen: false }" class=" flex sticky bottom-0 z-40">
     <div class=" w-full mb-2 sm:mb-4 left-0 px-4 ">
         <div class=" w-full max-w-xl rounded-full bg-[#F8FAFC] shadow-md shadow-black/20 py-2 text-xs sm:text-sm grid grid-cols-3 mx-auto">
@@ -19,7 +27,7 @@
                 </button>
                 <p>Template</p>
             </a> --}}
-            <a href="{{ route('premium.package') }}" class=" flex flex-col items-center gap-1 text-[#ff7100]">
+            <a href="{{ $joinWhatsappUrl }}" class=" flex flex-col items-center gap-1 text-[#ff7100]">
                 <button type="button" aria-label="Join" class=" w-[18px] sm:w-6 aspect-square">
                     <svg aria-hidden="true" class="e-font-icon-svg e-far-arrow-alt-circle-right" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M504 256C504 119 393 8 256 8S8 119 8 256s111 248 248 248 248-111 248-248zm-448 0c0-110.5 89.5-200 200-200s200 89.5 200 200-89.5 200-200 200S56 366.5 56 256zm72 20v-40c0-6.6 5.4-12 12-12h116v-67c0-10.7 12.9-16 20.5-8.5l99 99c4.7 4.7 4.7 12.3 0 17l-99 99c-7.6 7.6-20.5 2.2-20.5-8.5v-67H140c-6.6 0-12-5.4-12-12z"></path></svg>
                 </button>

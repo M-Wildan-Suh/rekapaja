@@ -22,7 +22,7 @@
                     @endif
                 </div>
             @else
-                <a href="{{route('premium.index')}}">
+                <a href="{{ route('join') }}">
                     <button class=" font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Dapatkan Akun Premium</button>
                 </a>
             @endif

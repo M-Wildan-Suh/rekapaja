@@ -671,19 +671,11 @@ class PageController extends Controller
     }
 
     public function premiumPackage() {
-        $no_tlp = $this->getWhatsappNumber();
-        $data = PremiumPackage::all();
-        return view('package', compact('data', 'no_tlp'));
+        abort(404);
     }
 
     public function buyPackage($id) {
-        $no_tlp = $this->getWhatsappNumber();
-
-        $data = PremiumPackage::find($id);
-
-        $text = urlencode("Halo, Saya tertarik dengan paket ".$data->name." di RekapAja.com dan ingin membeli paket tersebut.\n Apakah saya bisa mendapatkan informasi lebih lengkap?");
-
-        return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . $text);
+        abort(404);
     }
 
     public function test() {
