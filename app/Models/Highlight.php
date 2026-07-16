@@ -9,6 +9,11 @@ class Highlight extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'available' => 'boolean',
+        'price' => 'integer',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

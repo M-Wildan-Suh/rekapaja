@@ -169,7 +169,12 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('highlightManager', (initialData, userRole) => ({
-                highlights: Array.isArray(initialData) ? initialData : [],
+                highlights: Array.isArray(initialData)
+                    ? initialData.map((item) => ({
+                        ...item,
+                        available: item.available === true || item.available === 1 || item.available === '1',
+                    }))
+                    : [],
                 userRole: userRole,
                 multiple: false,
                 form: {
@@ -191,7 +196,10 @@
                         console.log("Data sebelum update:", this.highlights);
 
                         if (event.detail && event.detail.id) {
-                            this.highlights.push(event.detail);
+                            this.highlights.push({
+                                ...event.detail,
+                                available: event.detail.available === true || event.detail.available === 1 || event.detail.available === '1',
+                            });
                             console.log("Data setelah update:", this.highlights);
                         } else {
                             console.error("Data highlight baru tidak valid!", event.detail);
