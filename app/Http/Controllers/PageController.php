@@ -450,7 +450,7 @@ class PageController extends Controller
             'inputs' => 'array|max:3',
             'inputs.*.image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             'inputs.*.title' => 'required|string|max:27',
-            'inputs.*.price' => 'nullable|numeric|min:0',
+            'inputs.*.price' => ['nullable', 'regex:/^\d+$/'],
             'inputs.*.description' => 'required|string|max:64',
         ], [
             'inputs.max' => 'Maksimal hanya boleh 3 produk/layanan.',
@@ -535,7 +535,9 @@ class PageController extends Controller
 
                 $newhighlight->product_id = $newdata->id;
                 $newhighlight->title = $item['title'];
-                $newhighlight->price = $item['price'];
+                $newhighlight->price = isset($item['price']) && $item['price'] !== ''
+                    ? (int) str_replace('.', '', (string) $item['price'])
+                    : null;
                 $newhighlight->description = $item['description'];
 
                 if ($request->hasFile('inputs.'.$index.'.image')) {

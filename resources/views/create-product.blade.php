@@ -212,10 +212,10 @@
                                                                     </svg>
                                                                 </button>
                                                             </div>
-                                                            <input type="number" x-model="input.price"
+                                                            <input type="text" x-model="input.price" inputmode="numeric" pattern="[0-9]*"
                                                                     :name="'inputs[' + index + '][price]'"
                                                                     class="min-w-0 p-0 resize-none w-full border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
-                                                                    placeholder="Harga (opsional)">
+                                                                    placeholder="Harga (opsional)" @input="input.price = (input.price ?? '').replace(/[^0-9]/g, '')">
                                                             <textarea x-model="input.description" :name="'inputs[' + index + '][description]'"
                                                                 class="min-w-0 w-full p-0 resize-none border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
                                                                 placeholder="Deskripsi" maxlength="64" cols="40"></textarea>

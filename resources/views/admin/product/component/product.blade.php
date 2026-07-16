@@ -63,9 +63,9 @@
                             <input type="text" x-model="form.title"
                                 class=" text-sm sm:text-base min-w-0 p-0 w-full border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0"
                                 placeholder="Nama Product" maxlength="27" required>
-                            <input type="number" x-model="form.price"
+                            <input type="text" x-model="form.price" inputmode="numeric" pattern="[0-9]*"
                                 class="min-w-0 p-0 w-full border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
-                                placeholder="Harga (opsional)">
+                                placeholder="Harga (opsional)" @input="form.price = (form.price ?? '').replace(/[^0-9]/g, '')">
                             <textarea x-model="form.description"
                                 class="min-w-0 w-full p-0 border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm resize-none"
                                 placeholder="Deskripsi (opsional)" maxlength="64"></textarea>
@@ -138,9 +138,9 @@
                         <input type="text" x-model="form.title"
                             class="min-w-0 p-0 w-full border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-sm sm:text-base"
                             placeholder="Nama Product" maxlength="27" required>
-                        <input type="number" x-model="form.price"
+                        <input type="text" x-model="form.price" inputmode="numeric" pattern="[0-9]*"
                             class="min-w-0 p-0 w-full border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
-                            placeholder="Harga (opsional)">
+                            placeholder="Harga (opsional)" @input="form.price = (form.price ?? '').replace(/[^0-9]/g, '')">
                         <textarea x-model="form.description"
                             class="min-w-0 w-full p-0 border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
                             placeholder="Deskripsi (opsional)" maxlength="64"></textarea>
@@ -298,9 +298,15 @@
                                 method: "POST",
                                 body: formData
                             });
-                        if (!response.ok) throw new Error("Gagal memperbarui data");
+                        const result = await response.json().catch(() => null);
+                        if (!response.ok) {
+                            throw new Error(result?.message || "Gagal memperbarui data");
+                        }
+                        if (result && Object.prototype.hasOwnProperty.call(result, 'available')) {
+                            item.available = !!result.available;
+                        }
                     } catch (error) {
-                        console.log("Terjadi kesalahan: " + error.message);
+                        alert(error.message);
                     } finally {
                         this.loadingEdit = false;
                     }
@@ -317,11 +323,13 @@
                                 method: "POST",
                                 body: formData
                             });
-                        if (!response.ok) throw new Error("Gagal memperbarui data");
-                        const result = await response.json();
+                        const result = await response.json().catch(() => null);
+                        if (!response.ok) {
+                            throw new Error(result?.message || "Gagal memperbarui data");
+                        }
                         item.available = !!result.available;
                     } catch (error) {
-                        console.log("Terjadi kesalahan: " + error.message);
+                        alert(error.message);
                     } finally {
                         this.loadingAvailable = false;
                     }

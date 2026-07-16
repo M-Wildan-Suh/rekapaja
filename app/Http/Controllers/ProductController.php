@@ -21,6 +21,31 @@ use Intervention\Image\ImageManager;
 
 class ProductController extends Controller
 {
+    private function normalizeWholeNumberPrice(mixed $price): ?int
+    {
+        if ($price === null || $price === '') {
+            return null;
+        }
+
+        if (is_string($price)) {
+            $price = str_replace('.', '', $price);
+        }
+
+        return (int) $price;
+    }
+
+    private function syncIncompleteHighlightAvailability(Product $product): void
+    {
+        foreach ($product->productHighlight as $highlight) {
+            $isValid = filled(trim((string) $highlight->title)) && filled($highlight->image);
+
+            if (!$isValid && $highlight->available) {
+                $highlight->available = false;
+                $highlight->save();
+            }
+        }
+    }
+
     private function canManageQris(): bool
     {
         return Auth::user()?->canAccessPremiumFeatures() ?? false;
@@ -177,7 +202,7 @@ class ProductController extends Controller
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
             'subtitle' => ['required', 'string', 'max:255'],
-            'price' => ['nullable', 'numeric', 'min:0'],
+            'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -207,7 +232,7 @@ class ProductController extends Controller
         $newdata->name = $validated['name'];
         $newdata->slug = Str::slug($newdata->name);
         $newdata->subtitle = $validated['subtitle'];
-        $newdata->price = $validated['price'] ?? null;
+        $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $newdata->template_id = $validated['template_id'];
         $newdata->description = $validated['description'];
         $newdata->address = $validated['address'] ?? null;
@@ -292,6 +317,8 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $this->ensureProductAccess($product);
+        $this->syncIncompleteHighlightAvailability($product);
+        $product->load('productHighlight');
 
         $product->productTags->transform(function ($data) {
             $data->tag = $data->productTag->tag;
@@ -615,7 +642,7 @@ PHP;
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'subtitle' => ['required', 'string', 'max:255'],
-            'price' => ['nullable', 'numeric', 'min:0'],
+            'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
             'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -644,7 +671,7 @@ PHP;
         $product->name = $validated['name'];
         $product->slug = Str::slug($product->name);
         $product->subtitle = $validated['subtitle'];
-        $product->price = $validated['price'] ?? null;
+        $product->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $product->template_id = $validated['template_id'];
         $product->description = $validated['description'];
         $product->address = $validated['address'] ?? null;

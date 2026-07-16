@@ -12,6 +12,24 @@ use Intervention\Image\ImageManager;
 
 class HighlightController extends Controller
 {
+    private function normalizeWholeNumberPrice(mixed $price): ?int
+    {
+        if ($price === null || $price === '' || $price === 'null') {
+            return null;
+        }
+
+        if (is_string($price)) {
+            $price = str_replace('.', '', $price);
+        }
+
+        return (int) $price;
+    }
+
+    private function canBeMarkedAvailable(Highlight $highlight): bool
+    {
+        return filled(trim((string) $highlight->title)) && filled($highlight->image);
+    }
+
     private function ensureProductAccess(Product $product)
     {
         $user = Auth::user();
@@ -51,14 +69,21 @@ class HighlightController extends Controller
         $product = Product::findOrFail($request->product_id);
         $this->ensureProductAccess($product);
 
-        // dd($request);
+        $validated = $request->validate([
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'title' => ['required', 'string', 'max:27'],
+            'price' => ['nullable', 'regex:/^\d+$/'],
+            'description' => ['nullable', 'string', 'max:64'],
+            'highlightimage' => ['required', 'image'],
+        ]);
+
         $newdata = new Highlight;
 
-        $newdata->product_id = $request->product_id;
-        $newdata->title = $request->title;
-        $newdata->price = $request->price;
+        $newdata->product_id = $validated['product_id'];
+        $newdata->title = $validated['title'];
+        $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $newdata->available = false;
-        $newdata->description = $request->description;
+        $newdata->description = $validated['description'] ?? null;
 
         if ($request->hasFile('highlightimage')) {
             $image = $request->file('highlightimage');
@@ -92,6 +117,12 @@ class HighlightController extends Controller
     {
         $product = Product::findOrFail($request->product_id);
         $this->ensureProductAccess($product);
+
+        $request->validate([
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'images' => ['required', 'array'],
+            'images.*' => ['required', 'image'],
+        ]);
 
         $savedHighlights = [];
         $imageFiles = $request->file('images');
@@ -148,6 +179,13 @@ class HighlightController extends Controller
         $highlight = Highlight::findOrFail($id);
         $this->ensureProductAccess($highlight->product);
 
+        if (!$highlight->available && !$this->canBeMarkedAvailable($highlight)) {
+            return response()->json([
+                'message' => 'Produk/jasa belum lengkap, jadi belum bisa ditandai tersedia.',
+                'available' => false,
+            ], 422);
+        }
+
         $highlight->available = !$highlight->available;
 
         $highlight->save();
@@ -165,11 +203,17 @@ class HighlightController extends Controller
     {
         $this->ensureProductAccess($highlight->product);
 
-        // dd($request);
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:27'],
+            'price' => ['nullable', 'regex:/^\d+$/'],
+            'description' => ['nullable', 'string', 'max:64'],
+            'highlightimage' => ['nullable', 'image'],
+        ]);
+
         if ($highlight) {
-            $highlight->title = $request->title;
-            $highlight->price = $request->price === 'null' ? null : $request->price;
-            $highlight->description = $request->description === 'null' ? null : $request->description;
+            $highlight->title = $validated['title'];
+            $highlight->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
+            $highlight->description = $validated['description'] ?? null;
     
             if ($request->hasFile('highlightimage')) {
                 if ($highlight->image) {
@@ -199,7 +243,17 @@ class HighlightController extends Controller
     
                 $highlight->image = $imageName . '.webp';
             }
+
+            if (!$this->canBeMarkedAvailable($highlight)) {
+                $highlight->available = false;
+            }
+
             $highlight->save();
+
+            return response()->json([
+                'id' => $highlight->id,
+                'available' => (bool) $highlight->available,
+            ]);
 
         } else {
             return response()->json([

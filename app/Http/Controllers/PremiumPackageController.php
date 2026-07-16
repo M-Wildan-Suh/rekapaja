@@ -55,14 +55,14 @@ class PremiumPackageController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price' => ['required', 'regex:/^\d+$/'],
             'desc' => ['required', 'string'],
         ]);
 
         $premiumPackage = PremiumPackage::findOrFail($id);
 
         $premiumPackage->name = $validated['name'];
-        $premiumPackage->price = $validated['price'];
+        $premiumPackage->price = (int) $validated['price'];
         $premiumPackage->desc = $validated['desc'];
 
         $premiumPackage->save();
