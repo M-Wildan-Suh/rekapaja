@@ -54,17 +54,33 @@
         formatCurrency(value) {
             return new Intl.NumberFormat('id-ID').format(value || 0);
         },
-        downloadQris() {
+        async downloadQris() {
             if (!this.qrisUrl) {
                 return;
             }
 
-            const link = document.createElement('a');
-            link.href = this.qrisUrl;
-            link.download = 'qris';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            try {
+                const response = await fetch(this.qrisUrl);
+
+                if (!response.ok) {
+                    throw new Error('Gagal mengunduh QRIS.');
+                }
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const extension = blob.type.split('/')[1] || 'png';
+                const link = document.createElement('a');
+
+                link.href = blobUrl;
+                link.download = `qris.${extension}`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                console.error(error);
+                window.open(this.qrisUrl, '_blank', 'noopener');
+            }
         },
         submitOrder() {
             if (this.requiresCustomerData && (!this.customerName.trim() || !this.customerAddress.trim())) {
