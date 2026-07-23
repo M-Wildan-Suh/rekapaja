@@ -74,6 +74,8 @@ class TemplateController extends Controller
         $newdata->bg_type = $validated['bg_type'];
         $newdata->head_type = $validated['header'];
         $newdata->gallery_type = $validated['gallery'];
+        $newdata->accent_color = $validated['accent_color'];
+        $newdata->desc_type = $validated['desc_type'];
         $newdata->desc_main_color = $validated['desc_main_color'];
         $newdata->desc_text_color = $validated['desc_text_color'];
         
@@ -136,6 +138,8 @@ class TemplateController extends Controller
         $template->bg_type = $validated['bg_type'];
         $template->head_type = $validated['header'];
         $template->gallery_type = $validated['gallery'];
+        $template->accent_color = $validated['accent_color'];
+        $template->desc_type = $validated['desc_type'];
         $template->desc_main_color = $validated['desc_main_color'];
         $template->desc_text_color = $validated['desc_text_color'];
         
@@ -218,11 +222,13 @@ class TemplateController extends Controller
         return [
             'name' => ['required', 'string', 'max:255'],
             'bg_type' => ['required', 'in:normal,gradient,image'],
-            'header' => ['required', 'in:one,two,three,four'],
+            'header' => ['required', 'in:one,two,three,four,ramen'],
             'gallery' => ['required', 'in:square,potrait'],
+            'accent_color' => $colorRule,
+            'desc_type' => ['required', 'in:default,ramen'],
             'desc_main_color' => $colorRule,
             'desc_text_color' => $colorRule,
-            'product_type' => ['required', 'in:grid,list'],
+            'product_type' => ['required', 'in:grid,list,ramen'],
             'product_main_color' => $colorRule,
             'product_second_color' => $colorRule,
             'product_text_color' => $colorRule,

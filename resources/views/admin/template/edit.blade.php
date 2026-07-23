@@ -22,6 +22,11 @@
             <form action="{{ route('template.update', ['template' => $template->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('put')
+                @if ($errors->any())
+                    <div class="relative border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
                 @include('components.admin.template.background')
                 <div class=" bg-white p-4 sm:p-6 relative">
                     <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="$template->name" name="name" />
@@ -32,8 +37,16 @@
                         <div class="w-full flex items-center justify-center">
                             <div class=" w-[400px] aspect-[2/1] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
                                 @include('components.admin.template.header')
-                                <div class=" w-full">
-                                    <img id="header" src="{{asset('assets/images/template/header/'.$template->head_type.'.jpg')}}" class=" w-full" alt="">
+                                <div class=" w-full relative">
+                                    <img id="header" src="{{asset('assets/images/template/header/'.($template->head_type === 'ramen' ? 'one' : $template->head_type).'.jpg')}}" class=" w-full duration-300 {{ $template->head_type === 'ramen' ? 'opacity-0' : '' }}" alt="">
+                                    <div id="header-ramen-preview" class="{{ $template->head_type === 'ramen' ? '' : 'hidden' }} absolute inset-0 bg-gradient-to-br from-[#F7EFE5] to-[#E7B79A] text-[#8F110E]">
+                                        <div class="flex h-full items-center justify-center">
+                                            <div class="space-y-1 text-center">
+                                                <p id="header-ramen-title-preview" style="color: {{ old('accent_color', $template->accent_color ?? '#A72018') }}" class="text-3xl font-black">Ramen</p>
+                                                <p id="header-ramen-subtitle-preview" class="text-sm font-semibold uppercase tracking-[0.24em] text-neutral-700">Custom Header</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -50,15 +63,34 @@
                     </div>
                     <div class=" w-full">
                         <div class=" w-full flex items-center justify-center">
-                            <div id="desc" style="background-color: {{$template->desc_main_color ?? 'white'}};color: {{$template->desc_text_color ?? 'black'}}" class=" max-w-[400px] w-full rounded-md shadow-md p-4 space-y-2 overflow-hidden relative">
+                            <div x-data="{desctype: '{{$template->desc_type ?? 'default'}}'}"
+                                x-init="window.addEventListener('updateDescType', (e) => desctype = e.detail)"
+                                class="max-w-[400px] w-full relative">
                                 @include('components.admin.template.article')
-                                <p class="w-full font-bold tracking-wide text-lg">Tentang Kami</p>
-        
-                                @include('components.guest.termandcondition')
+                                <div x-show="desctype === 'default'" id="desc-default-preview" style="background-color: {{$template->desc_main_color ?? 'white'}};color: {{$template->desc_text_color ?? 'black'}}" class="w-full rounded-md shadow-md p-4 space-y-2 overflow-hidden relative">
+                                    <p class="w-full font-bold tracking-wide text-lg">Tentang Kami</p>
+            
+                                    @include('components.guest.termandcondition')
 
-                                <div
-                                    class=" text-sm rounded-md">
-                                    <p class="">Tahu bulat adalah camilan khas Indonesia yang terbuat dari tahu berbentuk bulat, digoreng hingga renyah di luar dan lembut di dalam. Dijual keliling dengan panggilan khas, camilan ini sering disajikan dengan bumbu tabur seperti balado atau keju. Harganya terjangkau, menjadikannya favorit banyak orang.</p>
+                                    <div class=" text-sm rounded-md">
+                                        <p class="">Tahu bulat adalah camilan khas Indonesia yang terbuat dari tahu berbentuk bulat, digoreng hingga renyah di luar dan lembut di dalam. Dijual keliling dengan panggilan khas, camilan ini sering disajikan dengan bumbu tabur seperti balado atau keju. Harganya terjangkau, menjadikannya favorit banyak orang.</p>
+                                    </div>
+                                </div>
+                                <div x-show="desctype === 'ramen'" id="desc-ramen-preview" class="w-full rounded-[1.8rem] px-5 py-6 sm:px-6 shadow-lg overflow-hidden relative" style="background-color: {{$template->desc_main_color ?? '#B12719'}}; color: {{$template->desc_text_color ?? '#FFF7F0'}};">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex h-14 w-14 flex-none items-center justify-center rounded-full bg-white/10">
+                                                <div class="w-8 h-8">
+                                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 13.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 7.5h.01M5 7.5h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-xl font-black leading-tight">Nama Usaha</p>
+                                                <p class="mt-1 text-sm font-medium uppercase tracking-[0.18em] opacity-70">Tentang Usaha</p>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm leading-7 opacity-85">Deskripsi usaha akan tampil dengan layout highlight seperti template ramen.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -149,6 +181,43 @@
                                                         class="duration-300 rounded-md py-1 px-3 text-sm cursor-pointer">
                                                         Order
                                                     </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div x-show="producttype === 'ramen'" class="w-full space-y-3">
+                                    <div class="rounded-xl border border-[#EAD8C7] bg-[#FFF8F1] p-4 shadow-md">
+                                        <div class="flex items-center justify-center gap-3 text-center">
+                                            <span class="h-px w-8 bg-[#E0B56D]"></span>
+                                            <p class="text-lg font-black text-[#231914]">Menu Favorit</p>
+                                            <span class="h-px w-8 bg-[#E0B56D]"></span>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="overflow-hidden rounded-[1.25rem] border border-[#EAD8C7] bg-white">
+                                            <div class="aspect-[1.1/1] bg-white">
+                                                <img src="{{asset('assets/images/placeholder.webp')}}" class="w-full h-full object-cover" alt="">
+                                            </div>
+                                            <div class="space-y-2 p-3">
+                                                <p class="text-sm font-black text-[#231914]">Produk 1</p>
+                                                <p class="ramen-accent-text text-sm font-black" style="color: {{ old('accent_color', $template->accent_color ?? '#A72018') }}">Rp 20.000</p>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button type="button" class="ramen-accent-border rounded-full border border-[#EAD8C7] px-2 py-1 text-xs font-semibold text-[#231914]">Detail</button>
+                                                    <button id="probutton" type="button" style="background-color: {{$template->product_second_color}}" class="rounded-full px-2 py-1 text-xs font-semibold text-white">Order</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="overflow-hidden rounded-[1.25rem] border border-[#EAD8C7] bg-white">
+                                            <div class="aspect-[1.1/1] bg-white">
+                                                <img src="{{asset('assets/images/placeholder.webp')}}" class="w-full h-full object-cover" alt="">
+                                            </div>
+                                            <div class="space-y-2 p-3">
+                                                <p class="text-sm font-black text-[#231914]">Produk 2</p>
+                                                <p class="ramen-accent-text text-sm font-black" style="color: {{ old('accent_color', $template->accent_color ?? '#A72018') }}">Rp 24.000</p>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button type="button" class="ramen-accent-border rounded-full border border-[#EAD8C7] px-2 py-1 text-xs font-semibold text-[#231914]">Detail</button>
+                                                    <button id="probutton" type="button" style="background-color: {{$template->product_second_color}}" class="rounded-full px-2 py-1 text-xs font-semibold text-white">Order</button>
                                                 </div>
                                             </div>
                                         </div>

@@ -2,19 +2,20 @@
     <div class=" mx-auto rounded-md bg-white min-h-screen relative">
         <div class=" space-y-6">
             <div class=" background min-h-screen pt-6 relative space-y-4 bg-gradient-to-b">
-                @include('components.guest.banner.'.$template->head_type)
-    
-                @include('components.guest.gallery.'.$template->gallery_type)
-    
+                @includeFirst(['components.guest.banner.' . $template->head_type, 'components.guest.banner.one'])
+
+                @if ($data->productGallery->isNotEmpty())
+                    @includeFirst(['components.guest.gallery.' . $template->gallery_type, 'components.guest.gallery.square'])
+                @endif
+
                 @include('components.guest.youtube')
 
-                {{-- <x-guest.description color="#81BFDA" :data="$data" /> --}}
-                @include('components.guest.description')
-    
-                @include('components.guest.product.'.$template->product_type)
+                @includeFirst(['components.guest.description-' . ($template->desc_type ?? 'default'), 'components.guest.description'])
 
-                @include('components.guest.tags')
-    
+                @includeFirst(['components.guest.product.' . $template->product_type, 'components.guest.product.grid'])
+
+                @includeFirst(['components.guest.tags-' . $template->product_type, 'components.guest.tags'])
+
                 @include('components.guest.contact')
             </div>
         </div>

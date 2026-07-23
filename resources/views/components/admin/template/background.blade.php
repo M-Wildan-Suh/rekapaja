@@ -26,30 +26,37 @@
                     </svg>
                 </button>
             </div>
-            <div x-data="{ tab: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
-                <div class="w-full px-4 sm:px-6 grid grid-cols-3 gap-2">
+            <div x-data="{ bgType: '{{ old('bg_type', $template->bg_type ?? 'normal') }}', tab: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
+                <div class="w-full px-4 sm:px-6 grid grid-cols-4 gap-2">
                     <!-- Input hidden untuk menyimpan nilai tab yang aktif -->
-                    <input type="hidden" name="bg_type" id="bg_type" x-model="tab">
+                    <input type="hidden" name="bg_type" id="bg_type" x-model="bgType">
                     <button 
                         type="button" 
-                        @click="tab = 'normal'" 
+                        @click="tab = 'normal'; bgType = 'normal'" 
                         :class="tab === 'normal' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
                         class="border-b-2 w-full pb-2 font-bold duration-300">
                         Normal
                     </button>
                     <button 
                         type="button" 
-                        @click="tab = 'gradient'" 
+                        @click="tab = 'gradient'; bgType = 'gradient'" 
                         :class="tab === 'gradient' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
                         class="border-b-2 w-full pb-2 font-bold duration-300">
                         Gradient
                     </button>
                     <button 
                         type="button" 
-                        @click="tab = 'image'" 
+                        @click="tab = 'image'; bgType = 'image'" 
                         :class="tab === 'image' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
                         class="border-b-2 w-full pb-2 font-bold duration-300">
                         Image
+                    </button>
+                    <button 
+                        type="button" 
+                        @click="tab = 'accent'" 
+                        :class="tab === 'accent' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
+                        class="border-b-2 w-full pb-2 font-bold duration-300">
+                        Accent
                     </button>
                 </div>
             
@@ -74,6 +81,11 @@
                             <x-admin.component.imageinput value="{{ isset($template) && $template->bg_image ? asset('storage/images/template/background/'.$template->bg_image) : '' }}" name="bg_image" />
                         </div>
                     </div>
+                    <div x-show="tab === 'accent'" class=" space-y-4">
+                        <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[322px]">
+                            <input type="color" name="accent_color" id="accent_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('accent_color', $template->accent_color ?? '#A72018') }}">
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -89,6 +101,29 @@
                     </button>
 
                     <script>
+                        function applyAccentPreview(color) {
+                            const headerRamenTitle = document.getElementById("header-ramen-title-preview");
+                            const headerRamenPreview = document.getElementById("header-ramen-preview");
+                            const accentTexts = document.querySelectorAll(".ramen-accent-text");
+                            const accentBorders = document.querySelectorAll(".ramen-accent-border");
+
+                            if (headerRamenTitle) {
+                                headerRamenTitle.style.color = color;
+                            }
+
+                            if (headerRamenPreview) {
+                                headerRamenPreview.style.background = `linear-gradient(135deg, #F7EFE5 0%, ${color}22 100%)`;
+                            }
+
+                            accentTexts.forEach((element) => {
+                                element.style.color = color;
+                            });
+
+                            accentBorders.forEach((element) => {
+                                element.style.borderColor = color;
+                            });
+                        }
+
                         function changebg() {
                             const bgType = document.getElementById("bg_type");
                             const bgImageNow = document.getElementById("bg_image-now");
@@ -109,6 +144,12 @@
                                 const bgImage = document.getElementById("bg_image-preview");
                                 bgImageNow.style.display = "block";
                                 bgImageNow.src = bgImage.src;
+                            }
+
+                            const accentColor = document.getElementById("accent_color");
+                            if (accentColor) {
+                                applyAccentPreview(accentColor.value);
+                                window.dispatchEvent(new CustomEvent('updateAccentColor', { detail: accentColor.value }));
                             }
                         }
                     </script>

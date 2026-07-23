@@ -34,7 +34,7 @@
                     <div class="w-full">
                         <div class=" flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="">Type</label>
-                            <div class=" w-full grid grid-cols-2 gap-2">
+                            <div class=" w-full grid grid-cols-3 gap-2">
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>Grid</p>
                                     <input type="radio" name="product_type" value="grid" class="hidden peer" {{ $selectedProductType === 'grid' ? 'checked' : '' }}>
@@ -44,6 +44,12 @@
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>List</p>
                                     <input type="radio" name="product_type" value="list" class="hidden peer" {{ $selectedProductType === 'list' ? 'checked' : '' }}>
+                                    <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                                    </div>
+                                </label>
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Ramen</p>
+                                    <input type="radio" name="product_type" value="ramen" class="hidden peer" {{ $selectedProductType === 'ramen' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>

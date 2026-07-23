@@ -1,3 +1,6 @@
+@php
+    $selectedDescType = old('desc_type', $template->desc_type ?? 'default');
+@endphp
 <div x-data="{article: false}" class="">
     <button @click="article = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
@@ -30,6 +33,23 @@
                 <div class=" space-y-4 sm:space-y-6 text-black">
                     <div class="w-full">
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
+                            <label for="">Type</label>
+                            <div class="w-full grid grid-cols-2 gap-2">
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Default</p>
+                                    <input type="radio" name="desc_type" value="default" class="hidden peer" {{ $selectedDescType === 'default' ? 'checked' : '' }}>
+                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                                </label>
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Ramen</p>
+                                    <input type="radio" name="desc_type" value="ramen" class="hidden peer" {{ $selectedDescType === 'ramen' ? 'checked' : '' }}>
+                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full">
+                        <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="desc_main_color">Background Color</label>
                             <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-10">
                                 <input type="color" name="desc_main_color" id="desc_main_color" class=" min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('desc_main_color', $template->desc_main_color ?? '#ffffff') }}">
@@ -58,14 +78,23 @@
                     </button>
                     <script>
                         function changedesc() {
+                            const desctype = document.querySelector('input[name="desc_type"]:checked');
                             const descmain = document.getElementById('desc_main_color');
                             const desctext = document.getElementById('desc_text_color');
-                            const desc = document.getElementById("desc");
-                            const tagdesc = document.getElementById("tagdesc");
-                            const bgdesc = document.querySelectorAll("#descicon")
+                            const defaultPreview = document.getElementById('desc-default-preview');
+                            const ramenPreview = document.getElementById('desc-ramen-preview');
 
-                            desc.style.backgroundColor = descmain.value;
-                            desc.style.color = desctext.value
+                            if (defaultPreview) {
+                                defaultPreview.style.backgroundColor = descmain.value;
+                                defaultPreview.style.color = desctext.value;
+                            }
+
+                            if (ramenPreview) {
+                                ramenPreview.style.backgroundColor = descmain.value;
+                                ramenPreview.style.color = desctext.value;
+                            }
+
+                            window.dispatchEvent(new CustomEvent('updateDescType', { detail: desctype.value }));
                         }
                     </script>
                 </div>

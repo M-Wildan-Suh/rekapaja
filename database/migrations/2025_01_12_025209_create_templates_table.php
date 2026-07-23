@@ -21,11 +21,13 @@ return new class extends Migration
             $table->string('bg_image')->nullable();
             $table->string('bg_main_color')->nullable();
             $table->string('bg_second_color')->nullable();
+            $table->string('accent_color')->default('#A72018');
             // Header
             $table->string('head_type');
             // Gallery
             $table->string('gallery_type');
             // Description
+            $table->string('desc_type')->default('default');
             $table->string('desc_main_color');
             $table->string('desc_text_color');
             // Product
