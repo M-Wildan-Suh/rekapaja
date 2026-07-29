@@ -38,7 +38,7 @@
                             <div class=" w-[400px] aspect-[2/1] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
                                 @include('components.admin.template.header')
                                 <div class=" w-full relative">
-                                    <img id="header" src="{{asset('assets/images/template/header/'.($template->head_type === 'ramen' ? 'one' : $template->head_type).'.jpg')}}" class=" w-full duration-300 {{ $template->head_type === 'ramen' ? 'opacity-0' : '' }}" alt="">
+                                    <img id="header" src="{{asset('assets/images/template/header/'.($template->head_type === 'ramen' ? 'one'  : $template->head_type).'.jpg')}}" class=" w-full duration-300 {{ $template->head_type === 'ramen' ? 'opacity-0' : '' }}" alt="">
                                     <div id="header-ramen-preview" class="{{ $template->head_type === 'ramen' ? '' : 'hidden' }} absolute inset-0 bg-gradient-to-br from-[#F7EFE5] to-[#E7B79A] text-[#8F110E]">
                                         <div class="flex h-full items-center justify-center">
                                             <div class="space-y-1 text-center">
@@ -91,6 +91,104 @@
                                         </div>
                                         <p class="text-sm leading-7 opacity-85">Deskripsi usaha akan tampil dengan layout highlight seperti template ramen.</p>
                                     </div>
+                                </div>
+                                 <div
+                                    x-show="desctype === 'network'"
+                                    id="desc-network-preview"
+                                    style="
+                                        background: {{ $template->desc_main_color ?? '#ffffff' }};
+                                        color: {{ $template->desc_text_color ?? '#1E293B' }};
+                                    "
+                                    class="relative overflow-hidden rounded-[32px] shadow-xl p-10"
+                                >
+
+                                    <!-- Background Blur -->
+                                    <div
+                                        class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-100 opacity-50 blur-3xl">
+                                    </div>
+
+                                    <div class="relative z-10">
+
+                                        <!-- Header -->
+                                        <div class="flex items-start gap-6">
+
+                                            <!-- Icon -->
+                                            <div
+                                                class="w-[82px] h-[82px] rounded-[22px] bg-gradient-to-br from-blue-500 to-blue-700 shadow-xl flex items-center justify-center flex-shrink-0">
+
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="w-10 h-10 text-white"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    stroke-width="2">
+
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M4 6h16v12H4z"/>
+
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M8 10h8v6H8z"/>
+
+                                                </svg>
+
+                                            </div>
+
+                                            <!-- Text -->
+                                            <div class="pt-1">
+
+                                                <span
+                                                    class="inline-flex items-center rounded-full bg-blue-100 text-blue-600 font-semibold uppercase tracking-wide text-[13px] px-5 py-2">
+
+                                                    COMPANY PROFILE
+
+                                                </span>
+
+                                                <h2
+                                                    class="mt-4 text-[48px] font-bold leading-none text-slate-900">
+
+                                                    Tentang Kami
+
+                                                </h2>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Line -->
+                                        <div class="mt-9 mb-8">
+
+                                            <div class="w-28 h-1.5 rounded-full bg-blue-600"></div>
+
+                                        </div>
+
+                                        <!-- Description -->
+                                        <div
+                                            class="text-[18px] leading-[2.3] text-slate-700">
+
+                                            {!! $template->description ?? 'Deskripsi...' !!}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                    <div class="space-y-3">
+
+                                        <div class="h-3 bg-gray-300 rounded w-full"></div>
+
+                                        <div class="h-3 bg-gray-300 rounded w-11/12"></div>
+
+                                        <div class="h-3 bg-gray-300 rounded w-10/12"></div>
+
+                                        <div class="h-3 bg-gray-300 rounded w-full"></div>
+
+                                        <div class="h-3 bg-gray-300 rounded w-9/12"></div>
+
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -221,7 +319,51 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div> 
+                                </div>
+                                <div
+                                    x-show="producttype === 'network'"
+                                    class="w-full rounded-xl bg-white shadow-md overflow-hidden">
+
+                                    <div class="grid grid-cols-2 gap-3 p-3">
+
+                                        <template x-for="i in 4">
+
+                                            <div class="rounded-xl border overflow-hidden">
+
+                                                <div class="aspect-square bg-gray-200">
+                                                    <img
+                                                        src="{{ asset('assets/images/placeholder.webp') }}"
+                                                        class="w-full h-full object-cover">
+                                                </div>
+                                                <div
+                                                    id="product"
+                                                    style="
+                                                        background: {{ $template->product_main_color }};
+                                                        color: {{ $template->product_text_color }};
+                                                    "
+                                                    class="p-3 space-y-2">
+
+                                                    <p class="font-semibold text-sm">
+                                                        Produk
+                                                    </p>
+                                                    <button
+                                                        id="probutton"
+                                                        style="background: {{ $template->product_second_color }}"
+                                                        class="w-full py-2 rounded-lg text-white text-xs">
+
+                                                        order via whatsup
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+                                        </template>
+
                                     </div>
+
                                 </div>
                             </div>
                         </div>

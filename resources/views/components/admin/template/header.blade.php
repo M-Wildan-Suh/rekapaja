@@ -63,6 +63,26 @@
                         </div>
                         <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                     </label>
+                    <label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative"><label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative">
+                        <input type="radio" name="header" value="network" class="hidden peer" {{ $selectedHeader === 'network' ? 'checked' : '' }}>
+                        <img src="{{asset('/assets/images/template/header/network.jpg')}}" class=" w-full h-full object-cover object-center" alt="">
+                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                        </div>
+                    </label><label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative">
+    <input
+        type="radio"
+        name="header"
+        value="network"
+        class="hidden peer"
+        {{ $selectedHeader === 'network' ? 'checked' : '' }}>
+
+    <img
+        src="{{ asset('assets/images/template/header/network.png') }}"
+        class="w-full h-full object-cover object-center"
+        alt="">
+
+    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+</label>   
                 </div>
             </div>
 
@@ -91,6 +111,8 @@
                             headerShow.src = `/assets/images/template/header/${headerInput.value}.jpg`;
                             headerShow.classList.remove('opacity-0');
                             headerRamenPreview?.classList.add('hidden');
+
+                            window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value}));
                         }
                     </script>
                 </div>

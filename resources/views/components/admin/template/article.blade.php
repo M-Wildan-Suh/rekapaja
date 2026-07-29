@@ -34,7 +34,7 @@
                     <div class="w-full">
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="">Type</label>
-                            <div class="w-full grid grid-cols-2 gap-2">
+                            <div class="w-full grid grid-cols-3 gap-2">
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>Default</p>
                                     <input type="radio" name="desc_type" value="default" class="hidden peer" {{ $selectedDescType === 'default' ? 'checked' : '' }}>
@@ -43,6 +43,11 @@
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>Ramen</p>
                                     <input type="radio" name="desc_type" value="ramen" class="hidden peer" {{ $selectedDescType === 'ramen' ? 'checked' : '' }}>
+                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                                </label>
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>network</p>
+                                    <input type="radio" name="desc_type" value="network" class="hidden peer" {{ $selectedDescType === 'network' ? 'checked' : '' }}>
                                     <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                                 </label>
                             </div>
@@ -83,6 +88,7 @@
                             const desctext = document.getElementById('desc_text_color');
                             const defaultPreview = document.getElementById('desc-default-preview');
                             const ramenPreview = document.getElementById('desc-ramen-preview');
+                            const networkPreview = document.getElementById('desc-network-preview');
 
                             if (defaultPreview) {
                                 defaultPreview.style.backgroundColor = descmain.value;
@@ -92,6 +98,10 @@
                             if (ramenPreview) {
                                 ramenPreview.style.backgroundColor = descmain.value;
                                 ramenPreview.style.color = desctext.value;
+                            }
+                            if (networkPreview) {
+                                networkPreview.style.backgroundColor = descmain.value;
+                                networkPreview.style.color = desctext.value;
                             }
 
                             window.dispatchEvent(new CustomEvent('updateDescType', { detail: desctype.value }));
