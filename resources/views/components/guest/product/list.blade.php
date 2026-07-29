@@ -6,10 +6,17 @@
         customerName: '',
         customerAddress: '',
         isPremiumBusiness: @js(in_array($role, ['admin', 'premium'])),
+        orderViaWhatsapp: @js($data->order_via_whatsapp ?? 'instan_rekap'),
+        askBaseMessage: @js("Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com"),
+        askWhatsappUrl: @js('https://wa.me/' . $no_tlp . '?text=' . urlencode("Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com")),
         requiresCustomerData: @js(($data->customer_data ?? 'active') === 'active'),
         showQrisSection: @js(($data->qris_status ?? 'active') === 'active'),
         qrisUrl: @js($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null),
         get shouldShowOrderModal() {
+            if (this.orderViaWhatsapp === 'tanya') {
+                return false;
+            }
+
             return this.isPremiumBusiness && (this.requiresCustomerData || this.showQrisSection);
         },
         normalizeQuantity(item) {
@@ -23,6 +30,11 @@
         },
         openOrderModal() {
             if (!this.checkedItems.length) {
+                return;
+            }
+
+            if (this.orderViaWhatsapp === 'tanya') {
+                window.open(this.askWhatsappUrl, '_blank', 'noopener');
                 return;
             }
 
@@ -136,7 +148,12 @@
                             <div class="w-full flex flex-grow items-end gap-2 justify-between">
                                 <div>
                                     @if ($item->price)
-                                        <p class="line-clamp-2 text-sm sm:text-base">Rp{{ number_format($item->price, 0, ',', '.') }}</p>
+                                        <p class="line-clamp-2 text-sm sm:text-base">
+                                            @if (($data->order_via_whatsapp ?? 'instan_rekap') === 'tanya' && filled($data->price_prefix))
+                                                {{ $data->price_prefix }}
+                                            @endif
+                                            Rp{{ number_format($item->price, 0, ',', '.') }}
+                                        </p>
                                     @endif
                                 </div>
                                 <div class="flex items-end gap-2">
@@ -155,7 +172,9 @@
                                                    :value="checkedItems.find(item => item.id === {{ $item->id }})?.quantity || 1" 
                                                    x-model="checkedItems.find(item => item.id === {{ $item->id }})?.quantity"
                                                    id="order-quantity-{{ $item->id }}">
-                                            <label @if($item->available) for="order-{{ $item->id }}" @endif style="background-color: {{ $template->product_second_color }}"
+                                        <label @if($item->available) for="order-{{ $item->id }}" @endif
+                                                   @click="if (orderViaWhatsapp === 'tanya' && {{ $item->available ? 'true' : 'false' }}) { $event.preventDefault(); window.open('https://wa.me/{{ $no_tlp }}?text=' + encodeURIComponent('Halo, saya ingin bertanya mengenai produk {{ addslashes($item->title) }}.\nAsal chat: RekapAja.com'), '_blank', 'noopener'); return; }"
+                                                   style="background-color: {{ $template->product_second_color }}"
                                                    class="duration-300 rounded-md py-1 px-3 text-sm cursor-pointer relative overflow-hidden">
                                                 {{ $data->order_title }}
                                                 <div :class="checkedItems.some(data => data.id === {{ $item->id }}) ? 'bg-black opacity-50' : ''"

@@ -17,10 +17,17 @@
             customerName: '',
             customerAddress: '',
             isPremiumBusiness: @js(in_array($role, ['admin', 'premium'])),
+            orderViaWhatsapp: @js($data->order_via_whatsapp ?? 'instan_rekap'),
+            askBaseMessage: @js("Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com"),
+            askWhatsappUrl: @js('https://wa.me/' . $no_tlp . '?text=' . urlencode("Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com")),
             requiresCustomerData: @js(($data->customer_data ?? 'active') === 'active'),
             showQrisSection: @js(($data->qris_status ?? 'active') === 'active'),
             qrisUrl: @js($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null),
             get shouldShowOrderModal() {
+                if (this.orderViaWhatsapp === 'tanya') {
+                    return false;
+                }
+
                 return this.isPremiumBusiness && (this.requiresCustomerData || this.showQrisSection);
             },
             normalizeQuantity(item) {
@@ -34,6 +41,11 @@
             },
             openOrderModal() {
                 if (!this.checkedItems.length) {
+                    return;
+                }
+
+                if (this.orderViaWhatsapp === 'tanya') {
+                    window.open(this.askWhatsappUrl, '_blank', 'noopener');
                     return;
                 }
 
@@ -154,7 +166,12 @@
                                 <p class="text-lg sm:text-xl font-black leading-snug" style="color: {{ $ramenText }};">{{ $item->title }}</p>
                             </div>
                             @if ($item->price)
-                                <p class="text-[1.35rem] sm:text-[1.8rem] font-black" style="color: {{ $ramenAccent }};">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                                <p class="text-[1.35rem] sm:text-[1.8rem] font-black" style="color: {{ $ramenAccent }};">
+                                    @if (($data->order_via_whatsapp ?? 'instan_rekap') === 'tanya' && filled($data->price_prefix))
+                                        {{ $data->price_prefix }}
+                                    @endif
+                                    Rp {{ number_format($item->price, 0, ',', '.') }}
+                                </p>
                             @endif
                             <div class="grid grid-cols-2 gap-2">
                                 <x-guest.product.detail-button
@@ -172,6 +189,7 @@
                                         :value="checkedItems.find(item => item.id === {{ $item->id }})?.quantity || 1"
                                         x-model="checkedItems.find(item => item.id === {{ $item->id }})?.quantity">
                                     <label @if ($item->available) for="order-{{ $item->id }}" @endif
+                                        @click="if (orderViaWhatsapp === 'tanya' && {{ $item->available ? 'true' : 'false' }}) { $event.preventDefault(); window.open('https://wa.me/{{ $no_tlp }}?text=' + encodeURIComponent('Halo, saya ingin bertanya mengenai produk {{ addslashes($item->title) }}.\nAsal chat: RekapAja.com'), '_blank', 'noopener'); return; }"
                                         class="inline-flex w-full cursor-pointer items-center justify-center rounded-full px-5 py-1 text-sm font-bold text-white transition hover:opacity-90"
                                         style="background-color: {{ $ramenWhatsapp }};"
                                         :class="checkedItems.some(data => data.id === {{ $item->id }}) ? 'opacity-60' : ''">

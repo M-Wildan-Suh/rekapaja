@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('template')->default('one');
             $table->string('product_title')->default('Produk Kami');
             $table->string('order_title')->default('beli');
+            $table->string('price_prefix')->nullable();
             $table->integer('price')->nullable();
             $table->string('address')->nullable();
             $table->string('no_tlp')->nullable();
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->string('status')->default('unactive');
             $table->enum('customer_data', ['active', 'unactive'])->default('active');
             $table->enum('qris_status', ['active', 'unactive'])->default('active');
+            $table->enum('order_via_whatsapp', ['instan_rekap', 'tanya'])->default('instan_rekap');
             $table->longText('description');
             $table->timestamps();
         });

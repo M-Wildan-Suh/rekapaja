@@ -73,7 +73,7 @@ class HighlightController extends Controller
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'title' => ['required', 'string', 'max:27'],
             'price' => ['nullable', 'regex:/^\d+$/'],
-            'description' => ['nullable', 'string', 'max:64'],
+            'description' => ['nullable', 'string'],
             'highlightimage' => ['required', 'image'],
         ]);
 
@@ -206,7 +206,7 @@ class HighlightController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:27'],
             'price' => ['nullable', 'regex:/^\d+$/'],
-            'description' => ['nullable', 'string', 'max:64'],
+            'description' => ['nullable', 'string'],
             'highlightimage' => ['nullable', 'image'],
         ]);
 

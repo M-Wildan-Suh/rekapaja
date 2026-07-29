@@ -212,6 +212,7 @@ class ProductController extends Controller
                     $fail('Domain tidak valid.');
                 }
             }],
+            'price_prefix' => ['nullable', 'string', 'max:255'],
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['required', 'in:on,off'],
             'thumbnail' => ['required', 'image'],
@@ -223,6 +224,7 @@ class ProductController extends Controller
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'qris_status' => ['nullable', 'in:active,unactive'],
+            'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
         ], $this->canManageQris() ? [
             'qris' => ['nullable', 'image'],
         ] : []));
@@ -235,6 +237,7 @@ class ProductController extends Controller
         $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $newdata->template_id = $validated['template_id'];
         $newdata->description = $validated['description'];
+        $newdata->price_prefix = $validated['price_prefix'] ?? null;
         $newdata->address = $validated['address'] ?? null;
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
         $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
@@ -242,6 +245,7 @@ class ProductController extends Controller
         $newdata->home_button = $validated['home_button'];
         $newdata->customer_data = $validated['customer_data'] ?? 'active';
         $newdata->qris_status = $validated['qris_status'] ?? 'active';
+        $newdata->order_via_whatsapp = $validated['order_via_whatsapp'] ?? 'instan_rekap';
         $newdata->status = 'active';
 
         if ($request->hasFile('thumbnail')) {
@@ -387,6 +391,24 @@ class ProductController extends Controller
             ->route('product.show', $data)
             ->with('highlight', 'highlight')
             ->with('success', 'Judul produk berhasil diperbarui.');
+    }
+
+    public function productpriceprefix($id, Request $request)
+    {
+        $validated = $request->validate([
+            'price_prefix' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $data = Product::findOrFail($id);
+        $this->ensureProductAccess($data);
+
+        $data->price_prefix = $validated['price_prefix'] ?? null;
+        $data->save();
+
+        return redirect()
+            ->route('product.show', $data)
+            ->with('highlight', 'highlight')
+            ->with('success', 'Teks sebelum harga berhasil diperbarui.');
     }
 
     public function downloadDomainFile(Product $product)
@@ -652,11 +674,13 @@ PHP;
                     $fail('Domain tidak valid.');
                 }
             }],
+            'price_prefix' => ['nullable', 'string', 'max:255'],
             'link' => ['nullable', 'url', 'max:255'],
             'home_button' => ['nullable', 'in:on,off'],
             'status' => ['nullable', 'in:active,unactive'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'qris_status' => ['nullable', 'in:active,unactive'],
+            'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
             'thumbnail' => ['nullable', 'image'],
             'category' => ['nullable', 'array'],
             'category.*' => ['nullable', 'string', 'max:255'],
@@ -674,6 +698,7 @@ PHP;
         $product->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $product->template_id = $validated['template_id'];
         $product->description = $validated['description'];
+        $product->price_prefix = $validated['price_prefix'] ?? null;
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
         $product->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
@@ -689,6 +714,10 @@ PHP;
 
         if (array_key_exists('qris_status', $validated)) {
             $product->qris_status = $validated['qris_status'];
+        }
+
+        if (array_key_exists('order_via_whatsapp', $validated)) {
+            $product->order_via_whatsapp = $validated['order_via_whatsapp'];
         }
 
         if (!empty($validated['status'])) {

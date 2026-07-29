@@ -48,8 +48,7 @@
         </div>
         <div class="py-4 px-4">
             <div class="max-w-xl mx-auto">
-                <div class="h-16"></div>
-                <div x-data="{ activeTab: '{{ old('active_tab', session('highlight', 'product')) }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
+                <div x-data="{ activeTab: '{{ old('active_tab', session('highlight', 'product')) }}', orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
                         <div class=" grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 font-bold">
@@ -166,6 +165,7 @@
                                     <x-admin.component.radioinput title="Status" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->status" name="status" form="bussiness" />
                                 @endif
                                 <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$product->home_button" name="home_button" form="bussiness" />
+                                <x-admin.component.radioinput title="Order via WhatsApp" :value="[['label'=>'Instan Rekap', 'value'=>'instan_rekap'], ['label'=>'Tanya', 'value'=>'tanya']]" :defaultvalue="$product->order_via_whatsapp ?? 'instan_rekap'" name="order_via_whatsapp" form="bussiness" xModel="orderViaWhatsapp" />
                                 <x-admin.component.radioinput title="Customer Data" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->customer_data ?? 'active'" name="customer_data" form="bussiness" />
                                 <x-admin.component.radioinput title="QRIS" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->qris_status ?? 'active'" name="qris_status" form="bussiness" />
                             @endif
@@ -224,6 +224,16 @@
                                         @csrf
                                         @method('put')
                                         <x-admin.component.sectiontitleinput placeholder="Masukkan nama Title Produk..." value="{{$product->product_title}}" name="product_title"></x-admin.component.sectiontitleinput>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class=" space-y-2">
+                                <label for="price_prefix" class=" text-sm sm:text-base font-semibold">Teks Sebelum Harga</label>
+                                <div class=" w-full">
+                                    <form action="{{route('product.price-prefix', ['id' => $product->id])}}" method="post">
+                                        @csrf
+                                        @method('put')
+                                        <x-admin.component.sectiontitleinput placeholder="Contoh: Mulai dari" value="{{$product->price_prefix}}" name="price_prefix"></x-admin.component.sectiontitleinput>
                                     </form>
                                 </div>
                             </div>

@@ -294,6 +294,8 @@ class PageController extends Controller
             'qris_image' => $product->qris ? asset('storage/images/product/qris/' . $product->qris) : null,
             'customer_data' => $product->customer_data,
             'qris_status' => $product->qris_status,
+            'order_via_whatsapp' => $product->order_via_whatsapp ?? 'instan_rekap',
+            'price_prefix' => $product->price_prefix,
             'detail_url' => $this->normalizeDomainUrl($product->domain) ?: route('detail', ['slug' => $product->slug]),
             'whatsapp_url' => $formattedWhatsapp ? 'https://wa.me/' . ltrim($formattedWhatsapp, '+') : null,
             'order_title' => $product->order_title,
@@ -330,6 +332,17 @@ class PageController extends Controller
         }
 
         $premiumContext = $this->resolveProductPremiumContext($product);
+        $orderViaWhatsapp = $product->order_via_whatsapp ?? 'instan_rekap';
+        $no_tlp = $this->resolveProductWhatsappNumber($product);
+
+        if ($orderViaWhatsapp === 'tanya') {
+            $message = "Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com";
+
+            return response()->json([
+                'redirect_url' => "https://wa.me/{$no_tlp}?text=" . urlencode($message),
+            ]);
+        }
+
         $requiresCustomerData = $premiumContext['is_premium'] && $product->customer_data === 'active';
         $customerName = trim((string) $request->input('customer_name', ''));
         $customerAddress = trim((string) $request->input('customer_address', ''));
@@ -416,7 +429,6 @@ class PageController extends Controller
         $message .= "\n\nDetail Rekapan: {$invoiceUrl}";
         $message .= "\nUntuk produk/layanan diatas apakah masih tersedia?";
 
-        $no_tlp = $this->resolveProductWhatsappNumber($product);
         $whatsappUrl = "https://wa.me/{$no_tlp}?text=" . urlencode($message);
 
         return response()->json([
@@ -602,6 +614,26 @@ class PageController extends Controller
 
     public function order(Request $request, $no_tlp) {
         $product = Product::findOrFail($request->input('product_id'));
+        $orderViaWhatsapp = $product->order_via_whatsapp ?? 'instan_rekap';
+
+        if ($orderViaWhatsapp === 'tanya') {
+            $firstOrderItem = collect($request->input('order', []))
+                ->pluck('id')
+                ->filter()
+                ->first();
+
+            $highlight = $firstOrderItem ? Highlight::find($firstOrderItem) : null;
+            $message = 'Halo, saya ingin bertanya mengenai produk';
+
+            if ($highlight) {
+                $message .= ' ' . $highlight->title;
+            }
+
+            $message .= ".\nAsal chat: RekapAja.com";
+
+            return redirect()->away('https://wa.me/'.$no_tlp.'?text=' . urlencode($message));
+        }
+
         $premiumContext = $this->resolveProductPremiumContext($product);
         $requiresCustomerData = $premiumContext['is_premium'] && $product->customer_data === 'active';
         $customerName = trim((string) $request->input('customer_name', ''));

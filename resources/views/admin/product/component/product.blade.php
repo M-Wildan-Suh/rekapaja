@@ -68,7 +68,7 @@
                                 placeholder="Harga (opsional)" @input="form.price = (form.price ?? '').replace(/[^0-9]/g, '')">
                             <textarea x-model="form.description"
                                 class="min-w-0 w-full p-0 border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm resize-none"
-                                placeholder="Deskripsi (opsional)" maxlength="64"></textarea>
+                                placeholder="Deskripsi (opsional)"></textarea>
                         </div>
                         <!-- Tombol Aksi -->
                         <div x-data="{ loadingDelete : false }" class="min-w-[50px] grid grid-cols-1 grid-rows-2 gap-1">
@@ -143,7 +143,7 @@
                             placeholder="Harga (opsional)" @input="form.price = (form.price ?? '').replace(/[^0-9]/g, '')">
                         <textarea x-model="form.description"
                             class="min-w-0 w-full p-0 border-t-0 border-l-0 border-r-0 ring-0 focus:ring-0 text-xs sm:text-sm"
-                            placeholder="Deskripsi (opsional)" maxlength="64"></textarea>
+                            placeholder="Deskripsi (opsional)"></textarea>
                     </div>
 
                     <!-- Submit Button -->

@@ -97,6 +97,8 @@
 
                             <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="old('home_button', $tagposition ?? '')" name="home_button" required />
 
+                            <x-admin.component.radioinput title="Order via WhatsApp" :value="[['label'=>'Instan Rekap', 'value'=>'instan_rekap'], ['label'=>'Tanya', 'value'=>'tanya']]" :defaultvalue="old('order_via_whatsapp', 'instan_rekap')" name="order_via_whatsapp" required />
+
                             <div class=" space-y-2">
                                 <label for="template" class=" text-sm sm:text-base font-semibold">Template</label>
                                 <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
