@@ -172,7 +172,9 @@ class TemplateController extends Controller
 
         $template->save();
           
-        return redirect()->route('template.index');
+        return redirect()
+            ->route('template.show', $template)
+            ->with('success', 'Template berhasil diperbarui.');
     }
 
     /**

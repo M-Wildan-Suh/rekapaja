@@ -2,19 +2,6 @@
 
 <section class="w-full max-w-[600px] mx-auto px-4 md:px-0 py-8">
 
-    {{-- Judul --}}
-    <div class="mb-6">
-
-        <h2 class="text-3xl font-bold text-slate-800">
-             Produk
-        </h2>
-
-        <p class="mt-1 text-gray-500">
-            Dokumentasi Produk Kami
-        </p>
-
-    </div>
-
     {{-- Gallery --}}
     <div class="relative">
 
@@ -94,8 +81,8 @@ window.addEventListener('load', function () {
 
     new Swiper('.networkGallery', {
 
-        slidesPerView: 1,
-        spaceBetween: 12,
+        slidesPerView: 2,
+        spaceBetween: 10,
         loop: true,
         speed: 600,
 

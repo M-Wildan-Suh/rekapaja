@@ -118,7 +118,7 @@
         @elseif ($template->bg_type === 'gradient')
             background: linear-gradient(to bottom, {{ $template->bg_main_color }}, {{ $template->bg_second_color }});
         @elseif ($template->bg_type === 'image')
-            background-image: url('{{ asset('storage/images/template/'.$template->bg_image) }}');
+            background-image: url('{{ asset('storage/images/template/background/'.$template->bg_image) }}');
             background-size: cover;
             background-position: center;
         @endif

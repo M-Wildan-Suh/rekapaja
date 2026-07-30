@@ -14,8 +14,11 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <link href="{{ asset('build/assets/app.css') }}" rel="stylesheet" />
+        @if (config('app.deploy', true))
+            <link href="{{ Vite::asset('resources/css/app.css') }}" rel="stylesheet" />
+        @else
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @endif
     </head>
     <body class="font-sans text-gray-900 antialiased">
         @include('components.page-loading')
@@ -33,5 +36,7 @@
             </div>
         </div>
     </body>
-    <script src="{{ asset('build/assets/app.js') }}"></script>
+    @if (config('app.deploy', true))
+        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
+    @endif
 </html>

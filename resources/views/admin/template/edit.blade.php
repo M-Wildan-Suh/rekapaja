@@ -5,6 +5,32 @@
         </h2>
     </x-slot>
 
+    @if (session('success') || $errors->any())
+        <div class="fixed top-24 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col items-end gap-3 sm:right-6">
+            @if (session('success'))
+                <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
+                    <div class="flex items-start gap-3">
+                        <p class="flex-1 font-medium">{{ session('success') }}</p>
+                        <button type="button" @click="show = false" class="text-green-700 transition hover:text-green-900">&times;</button>
+                    </div>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-1 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                        <button type="button" @click="show = false" class="text-red-700 transition hover:text-red-900">&times;</button>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="py-4 px-4">
         <div class="w-full max-w-xl mx-auto bg-neutral-100 rounded-md shadow-md shadow-black/20 relative overflow-hidden">
             <div id="background" class=" absolute inset-0 flex items-center justify-center">
@@ -22,11 +48,6 @@
             <form action="{{ route('template.update', ['template' => $template->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('put')
-                @if ($errors->any())
-                    <div class="relative border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
-                        {{ $errors->first() }}
-                    </div>
-                @endif
                 @include('components.admin.template.background')
                 <div class=" bg-white p-4 sm:p-6 relative">
                     <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="$template->name" name="name" />
@@ -99,25 +120,25 @@
                                         background: {{ $template->desc_main_color ?? '#ffffff' }};
                                         color: {{ $template->desc_text_color ?? '#1E293B' }};
                                     "
-                                    class="relative overflow-hidden rounded-[32px] shadow-xl p-10"
+                                    class="relative overflow-hidden rounded-[28px] shadow-xl px-6 py-7"
                                 >
 
                                     <!-- Background Blur -->
                                     <div
-                                        class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-100 opacity-50 blur-3xl">
+                                        class="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-blue-100 opacity-50 blur-3xl">
                                     </div>
 
                                     <div class="relative z-10">
 
                                         <!-- Header -->
-                                        <div class="flex items-start gap-6">
+                                        <div class="flex items-start gap-4">
 
                                             <!-- Icon -->
                                             <div
-                                                class="w-[82px] h-[82px] rounded-[22px] bg-gradient-to-br from-blue-500 to-blue-700 shadow-xl flex items-center justify-center flex-shrink-0">
+                                                class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg">
 
                                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="w-10 h-10 text-white"
+                                                    class="h-8 w-8 text-white"
                                                     fill="none"
                                                     viewBox="0 0 24 24"
                                                     stroke="currentColor"
@@ -136,17 +157,17 @@
                                             </div>
 
                                             <!-- Text -->
-                                            <div class="pt-1">
+                                            <div class="pt-0.5">
 
                                                 <span
-                                                    class="inline-flex items-center rounded-full bg-blue-100 text-blue-600 font-semibold uppercase tracking-wide text-[13px] px-5 py-2">
+                                                    class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-600">
 
                                                     COMPANY PROFILE
 
                                                 </span>
 
                                                 <h2
-                                                    class="mt-4 text-[48px] font-bold leading-none text-slate-900">
+                                                    class="mt-3 text-[28px] font-bold leading-tight text-slate-900">
 
                                                     Tentang Kami
 
@@ -157,35 +178,19 @@
                                         </div>
 
                                         <!-- Line -->
-                                        <div class="mt-9 mb-8">
+                                        <div class="mb-6 mt-6">
 
-                                            <div class="w-28 h-1.5 rounded-full bg-blue-600"></div>
+                                            <div class="h-1 w-20 rounded-full bg-blue-600"></div>
 
                                         </div>
 
                                         <!-- Description -->
                                         <div
-                                            class="text-[18px] leading-[2.3] text-slate-700">
+                                            class="text-[12px] leading-6 text-slate-700">
 
                                             {!! $template->description ?? 'Deskripsi...' !!}
 
                                         </div>
-
-                                    </div>
-
-                                </div>
-
-                                    <div class="space-y-3">
-
-                                        <div class="h-3 bg-gray-300 rounded w-full"></div>
-
-                                        <div class="h-3 bg-gray-300 rounded w-11/12"></div>
-
-                                        <div class="h-3 bg-gray-300 rounded w-10/12"></div>
-
-                                        <div class="h-3 bg-gray-300 rounded w-full"></div>
-
-                                        <div class="h-3 bg-gray-300 rounded w-9/12"></div>
 
                                     </div>
 
@@ -323,15 +328,23 @@
                                 </div>
                                 <div
                                     x-show="producttype === 'network'"
-                                    class="w-full rounded-xl bg-white shadow-md overflow-hidden">
+                                    class="w-full space-y-4">
+
+                                    <div class="w-full py-4">
+                                        <div class="flex items-center justify-center gap-4 text-center">
+                                            <span class="h-px w-10" style="background: {{ $template->product_second_color }};"></span>
+                                            <p class="text-[2rem] font-black tracking-tight" style="color: {{ $template->product_text_color }};">Menu Favorit</p>
+                                            <span class="h-px w-10" style="background: {{ $template->product_second_color }};"></span>
+                                        </div>
+                                    </div>
 
                                     <div class="grid grid-cols-2 gap-3 p-3">
 
                                         <template x-for="i in 4">
 
-                                            <div class="rounded-xl border overflow-hidden">
+                                            <div class="rounded-2xl overflow-hidden shadow-md shadow-black/20">
 
-                                                <div class="aspect-square bg-gray-200">
+                                                <div class="aspect-[4/3] bg-gray-200">
                                                     <img
                                                         src="{{ asset('assets/images/placeholder.webp') }}"
                                                         class="w-full h-full object-cover">
@@ -342,19 +355,31 @@
                                                         background: {{ $template->product_main_color }};
                                                         color: {{ $template->product_text_color }};
                                                     "
-                                                    class="p-3 space-y-2">
+                                                    class="p-3 space-y-3">
 
-                                                    <p class="font-semibold text-sm">
-                                                        Produk
-                                                    </p>
-                                                    <button
-                                                        id="probutton"
-                                                        style="background: {{ $template->product_second_color }}"
-                                                        class="w-full py-2 rounded-lg text-white text-xs">
-
-                                                        order via whatsup
-
-                                                    </button>
+                                                    <div class="space-y-1 text-center">
+                                                        <p class="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">
+                                                            Produk
+                                                        </p>
+                                                        <p class="text-xs opacity-80">
+                                                            Rp 150.000
+                                                        </p>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <button
+                                                            type="button"
+                                                            style="background: {{ $template->product_second_color }}; color: #ffffff;"
+                                                            class="w-full rounded-md py-2 text-white text-xs">
+                                                            Detail
+                                                        </button>
+                                                        <button
+                                                            id="probutton"
+                                                            type="button"
+                                                            style="background: {{ $template->product_second_color }}; color: #ffffff;"
+                                                            class="w-full rounded-md py-2 text-white text-xs">
+                                                            Order
+                                                        </button>
+                                                    </div>
 
                                                 </div>
 

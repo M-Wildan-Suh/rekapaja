@@ -1,6 +1,6 @@
 <div class="w-full max-w-[600px] mx-auto px-4 md:px-0">
 
-    <div class="relative overflow-hidden rounded-3xl shadow-xl">
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl">
 
         {{-- Background Banner --}}
         <div class="relative w-full aspect-[2/1]">
@@ -15,15 +15,15 @@
             <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-700/40 to-transparent"></div>
 
             {{-- Content --}}
-            <div class="relative z-10 grid grid-cols-2 h-full">
+            <div class="relative z-10 grid h-full grid-cols-2">
 
                 {{-- KIRI --}}
-                <div class="flex flex-col justify-center px-8">
+                <div class="flex flex-col justify-center px-4 sm:px-8">
 
     
 
                     <h1
-                        h1 class="mt-2 text-3xl sm:text-4xl font-extrabold leading-tight text-white">
+                        h1 class="mt-1 text-[1.35rem] sm:mt-2 sm:text-4xl font-extrabold leading-tight text-white">
 
                         {{ $data->name }}
 
@@ -31,7 +31,7 @@
 
                     @if(!empty($data->subtitle))
 
-                        <p class="mt-3 text-white/90">
+                        <p class="mt-2 text-[10px] leading-4 text-white/90 sm:mt-3 sm:text-base sm:leading-normal">
 
                             {{ $data->subtitle }}
 
@@ -39,11 +39,11 @@
 
                     @endif
 
-                    <div class="mt-6">
+                    <div class="mt-3 sm:mt-6">
 
                         <a
                             href="https://wa.me/{{ $notlp ?? '' }}"
-                            class="rounded-xl bg-white px-6 py-3 font-semibold text-blue-600 shadow hover:bg-slate-100">
+                            class="inline-flex rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-blue-600 shadow hover:bg-slate-100 sm:rounded-xl sm:px-6 sm:py-3 sm:text-base">
 
                             Hubungi Kami
 
@@ -54,10 +54,10 @@
                 </div>
 
                 {{-- KANAN --}}
-                <div class="flex items-center justify-center p-6">
+                <div class="flex items-center justify-center p-3 sm:p-6">
 
                     <div
-                        class="w-48 h-48 rounded-full overflow-hidden border-8 border-white shadow-2xl">
+                        class="h-24 w-24 rounded-full overflow-hidden border-4 border-white shadow-2xl sm:h-48 sm:w-48 sm:border-8">
 
                         <img
                             src="{{ $data->image }}"

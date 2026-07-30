@@ -10,7 +10,7 @@
                     <p class=" text-center">{{$data->subtitle}}</p>
                 </div>
             </div>
-            <div class=" wf max-w-[640px] mx-auto px-4 md:px-0">
+            <div class=" w-full max-w-[640px] mx-auto px-4 md:px-0">
                 <div class=" w-full grid grid-cols-3 gap-4">
                     <div class=" w-full h-full rounded-md bg-[#FF0000] flex items-center justify-center p-[10%]">
                         <div class=" w-full aspect-square">

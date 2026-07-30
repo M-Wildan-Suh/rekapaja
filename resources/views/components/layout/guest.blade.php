@@ -30,8 +30,11 @@
         <link rel="icon" href="{{ asset('/assets/images/logo.webp') }}" type="image/x-icon">
 
         <!-- Styles -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        {{-- <link href="{{ asset('build/assets/app.css') }}" rel="stylesheet" /> --}}
+        @if (config('app.deploy', true))
+            <link href="{{ Vite::asset('resources/css/app.css') }}" rel="stylesheet" />
+        @else
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @endif
     </head>
     <body class="antialiased">
         @include('components.page-loading')
@@ -41,7 +44,9 @@
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    {{-- <script src="{{ asset('build/assets/app.js') }}"></script> --}}
+    @if (config('app.deploy', true))
+        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
+    @endif
 
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
