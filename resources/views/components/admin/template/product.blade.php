@@ -53,6 +53,12 @@
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
+                                  <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Network</p>
+                                    <input type="radio" name="product_type" value="network" class="hidden peer" {{ $selectedProductType === 'network' ? 'checked' : '' }}>
+                                    <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -80,6 +86,7 @@
                             </div>
                         </div>
                     </div>
+             
                 </div>
             </div>
 
@@ -108,6 +115,16 @@
                             productbtn.forEach(element => {
                                 element.style.backgroundColor = productsecond.value;
                             });
+
+                            product.forEach(item => {
+                            item.style.backgroundColor = productmain.value;
+                            item.style.color = producttext.value;
+                        });
+
+                        productbtn.forEach(item => {
+                            item.style.backgroundColor = productsecond.value;
+                            item.style.color = "#fff";
+                        });
 
                             window.dispatchEvent(new CustomEvent('updateProductType', { detail: producttype.value }));
                         }

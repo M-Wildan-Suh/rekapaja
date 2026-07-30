@@ -212,6 +212,30 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div x-show="producttype === 'network'" class="w-full rounded-xl bg-white shadow-md overflow-hidden">
+                                    <div class="grid grid-cols-2 gap-3 p-3">
+                                        <div class="rounded-xl border overflow-hidden">
+                                            <div class="aspect-square bg-gray-200">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="w-full h-full object-cover">
+                                            </div>
+                                            <div id="product" style="background-color: #000000; color: #ffffff;" class="p-3 space-y-2">
+                                                <p class="font-semibold text-sm">Produk Network</p>
+                                                <p class="text-xs opacity-80">Rp 150.000</p>
+                                                <button id="probutton" style="background-color: #2563eb;" class="w-full py-2 rounded-lg text-white text-xs">Pesan</button>
+                                            </div>
+                                        </div>
+                                        <div class="rounded-xl border overflow-hidden">
+                                            <div class="aspect-square bg-gray-200">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="w-full h-full object-cover">
+                                            </div>
+                                            <div id="product" style="background-color: #000000; color: #ffffff;" class="p-3 space-y-2">
+                                                <p class="font-semibold text-sm">Aksesoris</p>
+                                                <p class="text-xs opacity-80">Rp 250.000</p>
+                                                <button id="probutton" style="background-color: #2563eb;" class="w-full py-2 rounded-lg text-white text-xs">Pesan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

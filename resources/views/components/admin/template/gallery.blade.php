@@ -44,6 +44,13 @@
                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                             </div>
                         </label>
+                        <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
+                            <input type="radio" name="gallery" value="network" class="hidden peer" {{ $selectedGallery === 'potrait' ? 'checked' : '' }}>
+                            <img src="{{asset('assets/images/template/gallery/network.png')}}" class=" w-full" alt="">
+                            <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                            </div>
+                        </label>
+                        <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
                     </div>
                 </div>
             </div>
@@ -63,6 +70,10 @@
                             const galleryShow = document.getElementById("gallery");
 
                             galleryShow.src = `/assets/images/template/gallery/${galleryInput.value}.png`;
+
+                              window.dispatchEvent(new CustomEvent('updateGalleryType', { detail: galleryInput.value }));
+
+
                         }
                     </script>
                 </div>
