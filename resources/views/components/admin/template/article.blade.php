@@ -50,6 +50,11 @@
                                     <input type="radio" name="desc_type" value="network" class="hidden peer" {{ $selectedDescType === 'network' ? 'checked' : '' }}>
                                     <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                                 </label>
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Florist</p>
+                                    <input type="radio" name="desc_type" value="florist" class="hidden peer" {{ $selectedDescType === 'florist' ? 'checked' : '' }}>
+                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -89,6 +94,8 @@
                             const defaultPreview = document.getElementById('desc-default-preview');
                             const ramenPreview = document.getElementById('desc-ramen-preview');
                             const networkPreview = document.getElementById('desc-network-preview');
+                            const floristPreview = document.getElementById('desc-florist-preview');
+
 
                             if (defaultPreview) {
                                 defaultPreview.style.backgroundColor = descmain.value;
@@ -102,6 +109,10 @@
                             if (networkPreview) {
                                 networkPreview.style.backgroundColor = descmain.value;
                                 networkPreview.style.color = desctext.value;
+                            }
+                            if (floristPreview) {
+                                floristPreview.style.backgroundColor = descmain.value;
+                                floristPreview.style.color = desctext.value;
                             }
 
                             window.dispatchEvent(new CustomEvent('updateDescType', { detail: desctype.value }));

@@ -83,6 +83,14 @@
 
     <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
 </label>   
+                    <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#F7EFE5] to-[#F3D6C7]">
+                        <input type="radio" name="header" value="florist" class="hidden peer" {{ $selectedHeader === 'florist' ? 'checked' : '' }}>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                            <p class="text-lg font-black text-[#8F110E]">Florist</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-700">Custom Header</p>
+                        </div>
+                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                    </label>
                 </div>
             </div>
 
@@ -100,18 +108,32 @@
                             const headerInput = document.querySelector('input[name="header"]:checked');
                             const headerShow = document.getElementById("header");
                             const headerRamenPreview = document.getElementById("header-ramen-preview");
+                            const headerFloristPreview = document.getElementById("header-florist-preview");
+
 
                             if (headerInput.value === 'ramen') {
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.remove('hidden');
+                                headerFloristPreview?.classList.remove('hidden');
+                                return;
+                            
+                            }
+
+                            if (headerInput.value === 'florist') {
+                                headerShow.src = `/assets/images/template/header/florist.png`;
+                                headerShow.classList.add('opacity-0');
+                                headerRamenPreview?.classList.remove('hidden');
+                                headerFloristPreview?.classList.remove('hidden');
                                 return;
                             }
 
                             headerShow.src = `/assets/images/template/header/${headerInput.value}.jpg`;
                             headerShow.classList.remove('opacity-0');
                             headerRamenPreview?.classList.add('hidden');
+                            headerfloristPreview?.classList.add('hidden');
 
+                            
                             window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value}));
                         }
                     </script>

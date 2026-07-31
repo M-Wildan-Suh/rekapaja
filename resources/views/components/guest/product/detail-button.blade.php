@@ -17,8 +17,7 @@
 
 <button
     type="button"
-    x-data='@json(['product' => $productDetail, 'orderViaWhatsapp' => optional($item->product)->order_via_whatsapp ?? 'instan_rekap', 'pricePrefix' => optional($item->product)->price_prefix])'
-    x-init="if (orderViaWhatsapp === 'tanya' && pricePrefix && product.price) { product.price = `${pricePrefix} ${product.price}`; }"
+    x-data='@json(['product' => $productDetail])'
     @click='window.dispatchEvent(new CustomEvent("open-product-detail", { detail: product }))'
     class="{{ $class }}"
     style="{{ $style }}"

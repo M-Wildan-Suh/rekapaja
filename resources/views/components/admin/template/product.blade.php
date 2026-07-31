@@ -53,9 +53,15 @@
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
-                                  <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
                                     <p>Network</p>
                                     <input type="radio" name="product_type" value="network" class="hidden peer" {{ $selectedProductType === 'network' ? 'checked' : '' }}>
+                                    <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
+                                    </div>
+                                </label>
+                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
+                                    <p>Florist</p>
+                                    <input type="radio" name="product_type" value="florist" class="hidden peer" {{ $selectedProductType === 'florist' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
@@ -86,7 +92,7 @@
                             </div>
                         </div>
                     </div>
-             
+
                 </div>
             </div>
 

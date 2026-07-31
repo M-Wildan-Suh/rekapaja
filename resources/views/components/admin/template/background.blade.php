@@ -114,6 +114,31 @@
                             if (headerRamenPreview) {
                                 headerRamenPreview.style.background = `linear-gradient(135deg, #F7EFE5 0%, ${color}22 100%)`;
                             }
+                            
+
+                            accentTexts.forEach((element) => {
+                                element.style.color = color;
+                            });
+
+                            accentBorders.forEach((element) => {
+                                element.style.borderColor = color;
+                            });
+                        }
+
+                         function applyAccentPreview(color) {
+                            const headerFloristTitle = document.getElementById("header-florist-title-preview");
+                            const headerFloristPreview = document.getElementById("header-florist-preview");
+                            const accentTexts = document.querySelectorAll(".florist-accent-text");
+                            const accentBorders = document.querySelectorAll(".florist-accent-border");
+
+                            if (headerFloristTitle) {
+                                headerFloristTitle.style.color = color;
+                            }
+
+                            if (headerFloristPreview) {
+                                headerFloristPreview.style.background = `linear-gradient(135deg, #F7EFE5 0%, ${color}22 100%)`;
+                            }
+                            
 
                             accentTexts.forEach((element) => {
                                 element.style.color = color;
