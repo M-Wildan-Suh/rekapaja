@@ -1,148 +1,35 @@
-<section class="py-20 bg-white" id="about">
+@php
+    $floristText = $template->desc_text_color ?? '#FFFFFF';
+    $floristBg = $template->desc_main_color ?? '#EC4899';
+@endphp
 
-    <div class="max-w-7xl mx-auto px-6">
-
-        <div class="grid lg:grid-cols-2 gap-14 items-center">
-
-            {{-- Image --}}
-            <div class="relative">
-
-                <img
-                    src="{{ asset('images/templates/florist/about.webp') }}"
-                    alt="About Florist"
-                    class="rounded-3xl shadow-xl w-full">
-
-                <div class="absolute -bottom-6 -right-6 bg-pink-500 text-white p-6 rounded-2xl shadow-lg">
-
-                    <h3 class="text-4xl font-bold">
-                        10+
-                    </h3>
-
-                    <p class="mt-2">
-                        Tahun Pengalaman
-                    </p>
-
-                </div>
-
-            </div>
-
-            {{-- Content --}}
-            <div>
-
-                <span class="text-pink-500 uppercase font-semibold tracking-widest">
-                    Tentang Kami
-                </span>
-
-                <h2 class="text-4xl font-bold text-gray-800 mt-4 leading-tight">
-                    Florist Profesional dengan
-                    Bunga Segar Berkualitas
-                </h2>
-
-                <p class="text-gray-600 mt-6 leading-8">
-                    Kami menghadirkan berbagai pilihan bunga segar yang dirangkai
-                    dengan penuh ketelitian untuk setiap momen berharga.
-                    Mulai dari bouquet ulang tahun, wisuda, anniversary,
-                    pernikahan, hingga dekorasi berbagai acara spesial.
-                </p>
-
-                <div class="grid sm:grid-cols-2 gap-6 mt-10">
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-14 h-14 rounded-full bg-pink-100 flex items-center justify-center text-2xl">
-                            🌹
-                        </div>
-
-                        <div>
-
-                            <h4 class="font-bold text-lg text-gray-800">
-                                Bunga Segar
-                            </h4>
-
-                            <p class="text-gray-500 mt-2">
-                                Dipilih langsung setiap hari agar kualitas
-                                bunga tetap terjaga.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-2xl">
-                            🚚
-                        </div>
-
-                        <div>
-
-                            <h4 class="font-bold text-lg text-gray-800">
-                                Pengiriman Cepat
-                            </h4>
-
-                            <p class="text-gray-500 mt-2">
-                                Pengiriman tepat waktu dengan kemasan yang aman.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center text-2xl">
-                            💐
-                        </div>
-
-                        <div>
-
-                            <h4 class="font-bold text-lg text-gray-800">
-                                Rangkaian Elegan
-                            </h4>
-
-                            <p class="text-gray-500 mt-2">
-                                Dirancang oleh florist berpengalaman sesuai kebutuhan.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center text-2xl">
-                            ❤️
-                        </div>
-
-                        <div>
-
-                            <h4 class="font-bold text-lg text-gray-800">
-                                Pelayanan Ramah
-                            </h4>
-
-                            <p class="text-gray-500 mt-2">
-                                Siap membantu Anda memilih bunga terbaik
-                                untuk setiap kesempatan.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <a
-                    href="#contact"
-                    class="inline-block mt-10 px-8 py-4 bg-pink-500 hover:bg-pink-600 rounded-xl text-white font-semibold transition">
-
-                    Hubungi Kami
-
-                </a>
-
-            </div>
-
+<div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative">
+    <div class="rounded-md px-5 py-6 sm:px-6 shadow-lg shadow-pink-200/40 relative overflow-hidden" style="background-color: {{ $floristBg }}; color: {{ $floristText }};">
+        <div class="absolute inset-0 opacity-15">
+            <div class="absolute -top-10 -right-8 h-32 w-32 rounded-full border border-white/30"></div>
+            <div class="absolute bottom-4 left-4 h-16 w-16 rounded-full bg-white/10"></div>
         </div>
 
-    </div>
+        <div class="relative space-y-4">
+            <div class="flex items-center gap-4">
+                <div class="flex h-14 w-14 sm:h-16 sm:w-16 flex-none items-center justify-center rounded-full bg-white/10">
+                    <svg viewBox="0 0 24 24" class="h-8 w-8 sm:h-9 sm:w-9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 13.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M19 7.5h.01M5 7.5h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xl sm:text-[2rem] font-black leading-tight">{{ $data->name }}</p>
+                    <p class="mt-1 text-sm font-medium uppercase tracking-[0.18em] text-white/75">Tentang Usaha</p>
+                </div>
+            </div>
 
-</section>
+            <div>
+                <p class="text-sm sm:text-base leading-7 text-white/90">
+                    {!! nl2br(e($data->description == '' ? 'Description' : $data->description)) !!}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -15,7 +15,7 @@
 
         <!-- Scripts -->
         @if (config('app.deploy', true))
-            <link href="{{ Vite::asset('resources/css/app.css') }}" rel="stylesheet" />
+            <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
         @else
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
@@ -37,6 +37,6 @@
         </div>
     </body>
     @if (config('app.deploy', true))
-        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
+        <script src="{{ asset('build/assets/app.js') }}"></script>
     @endif
 </html>

@@ -1,5 +1,4 @@
-<div class="py-8">
-
+<div class="w-full max-w-[560px] mx-auto px-4 md:px-0 py-2">
     <div class="swiper floristGallery">
 
         <div class="swiper-wrapper">
@@ -8,20 +7,20 @@
 
                 <div class="swiper-slide">
 
-                    <div class="relative overflow-hidden rounded-[35px] shadow-2xl">
+                    <div class="relative overflow-hidden rounded-[28px] shadow-xl">
 
                         <img
                             src="{{ $gallery->image }}"
                             alt=""
-                            class="w-full h-[420px] object-cover">
+                            class="w-full h-[240px] sm:h-[320px] object-cover">
 
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
-                        <div class="absolute bottom-8 left-8 text-white">
+                        <div class="absolute bottom-5 left-5 sm:bottom-7 sm:left-7 text-white">
 
-                            <div class="w-14 h-1 rounded-full bg-white mb-4"></div>
+                            <div class="w-10 sm:w-14 h-1 rounded-full bg-white mb-3 sm:mb-4"></div>
 
-                            <h2 class="text-3xl font-bold">
+                            <h2 class="text-xl sm:text-2xl font-bold">
                                 {{ $gallery->title ?? 'Beautiful Bouquet' }}
                             </h2>
 
@@ -57,7 +56,7 @@ new Swiper(".floristGallery",{
 
     centeredSlides:true,
 
-    slidesPerView:1.25,
+    slidesPerView:1.1,
 
     spaceBetween:20,
 
@@ -73,13 +72,13 @@ new Swiper(".floristGallery",{
 
     breakpoints:{
         640:{
-            slidesPerView:1.5,
+            slidesPerView:1.2,
         },
         768:{
-            slidesPerView:2.2,
+            slidesPerView:1.35,
         },
         1024:{
-            slidesPerView:2.6,
+            slidesPerView:1.45,
         }
     }
 
@@ -91,7 +90,8 @@ new Swiper(".floristGallery",{
 
 .floristGallery{
     overflow:hidden;
-    padding:20px 0 60px;
+    padding:12px 0 52px;
+    width:100%;
 }
 
 .floristGallery .swiper-slide{
@@ -107,8 +107,8 @@ new Swiper(".floristGallery",{
 
 .floristGallery .swiper-button-prev,
 .floristGallery .swiper-button-next{
-    width:55px;
-    height:55px;
+    width:44px;
+    height:44px;
     border-radius:999px;
     background:rgba(255,255,255,.85);
     color:#555;
@@ -117,12 +117,12 @@ new Swiper(".floristGallery",{
 
 .floristGallery .swiper-button-prev::after,
 .floristGallery .swiper-button-next::after{
-    font-size:18px;
+    font-size:14px;
     font-weight:bold;
 }
 
 .floristGallery .swiper-pagination{
-    margin-top:25px;
+    margin-top:18px;
     position:relative;
 }
 

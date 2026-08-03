@@ -31,7 +31,7 @@
 
         <!-- Styles -->
         @if (config('app.deploy', true))
-            <link href="{{ Vite::asset('resources/css/app.css') }}" rel="stylesheet" />
+            <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
         @else
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
@@ -45,7 +45,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     @if (config('app.deploy', true))
-        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
+        <script src="{{ asset('build/assets/app.js') }}"></script>
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
