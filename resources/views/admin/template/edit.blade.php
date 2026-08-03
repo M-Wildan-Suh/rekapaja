@@ -59,12 +59,31 @@
                             <div class=" w-[400px] aspect-[2/1] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
                                 @include('components.admin.template.header')
                                 <div class=" w-full relative">
-                                    <img id="header" src="{{asset('assets/images/template/header/'.($template->head_type === 'ramen' ? 'one'  : $template->head_type).'.jpg')}}" class=" w-full duration-300 {{ $template->head_type === 'ramen' ? 'opacity-0' : '' }}" alt="">
+                                    <img id="header" src="{{ asset($template->head_type === 'network' ? 'assets/images/template/header/network.png' : 'assets/images/template/header/' . ($template->head_type === 'ramen' || $template->head_type === 'florist' ? 'one' : $template->head_type) . '.jpg') }}" class=" w-full duration-300 {{ in_array($template->head_type, ['ramen', 'florist']) ? 'opacity-0' : '' }}" alt="">
                                     <div id="header-ramen-preview" class="{{ $template->head_type === 'ramen' ? '' : 'hidden' }} absolute inset-0 bg-gradient-to-br from-[#F7EFE5] to-[#E7B79A] text-[#8F110E]">
                                         <div class="flex h-full items-center justify-center">
                                             <div class="space-y-1 text-center">
                                                 <p id="header-ramen-title-preview" style="color: {{ old('accent_color', $template->accent_color ?? '#A72018') }}" class="text-3xl font-black">Ramen</p>
                                                 <p id="header-ramen-subtitle-preview" class="text-sm font-semibold uppercase tracking-[0.24em] text-neutral-700">Custom Header</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="header-florist-preview" class="{{ $template->head_type === 'florist' ? '' : 'hidden' }} absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF5F8] via-[#FBCFE8] to-[#F9A8D4] text-[#6A1B4D]">
+                                        <div class="absolute left-[6%] top-[10%] h-[80%] w-[42%] rounded-full border-2 border-white/70"></div>
+                                        <div class="absolute right-[6%] top-[16%] h-[68%] w-[36%] rounded-full border border-white/50"></div>
+                                        <div class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('assets/images/placeholder.webp') }}');"></div>
+                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-8">
+                                            <div class="max-w-[46%] space-y-2">
+                                                <p class="text-[1.45rem] font-black leading-tight" style="font-family: 'Segoe Script', 'Brush Script MT', cursive;">Nama Usaha</p>
+                                                <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9D174D]">Subtitle usaha florist</p>
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Buket</span>
+                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Fresh Flower</span>
+                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Wisuda</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-xl shadow-pink-300/30">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -113,7 +132,7 @@
                                         <p class="text-sm leading-7 opacity-85">Deskripsi usaha akan tampil dengan layout highlight seperti template ramen.</p>
                                     </div>
                                 </div>
-                                 <div
+                                <div
                                     x-show="desctype === 'network'"
                                     id="desc-network-preview"
                                     style="
@@ -194,6 +213,32 @@
 
                                     </div>
 
+                                </div>
+                                <div
+                                    x-show="desctype === 'florist'"
+                                    id="desc-florist-preview"
+                                    class="rounded-md px-5 py-6 sm:px-6 shadow-lg shadow-pink-200/40 relative overflow-hidden"
+                                    style="background-color: {{ $template->desc_main_color ?? '#EC4899' }}; color: {{ $template->desc_text_color ?? '#FFFFFF' }};"
+                                >
+                                    <div class="absolute inset-0 opacity-20">
+                                        <div class="absolute -top-10 right-0 h-28 w-28 rounded-full bg-white/40 blur-2xl"></div>
+                                        <div class="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-white/20 blur-2xl"></div>
+                                    </div>
+                                    <div class="relative space-y-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
+                                                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 21c4.418 0 8-2.91 8-6.5 0-2.377-1.57-4.456-3.91-5.593A4.5 4.5 0 1 0 7.91 8.907C5.57 10.044 4 12.123 4 14.5 4 18.09 7.582 21 12 21Z" stroke="currentColor" stroke-width="1.5"/>
+                                                    <path d="M12 7.5c.828 0 1.5-.672 1.5-1.5S12.828 4.5 12 4.5 10.5 5.172 10.5 6 11.172 7.5 12 7.5Z" fill="currentColor"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="text-lg font-black leading-tight">Tentang Florist</p>
+                                                <p class="text-sm opacity-80">Preview deskripsi usaha dengan nuansa lembut dan elegan.</p>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm leading-7 opacity-90">Cocok untuk usaha bunga, buket wisuda, papan ucapan, dan dekorasi spesial dengan tampilan yang manis dan premium.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -389,6 +434,41 @@
 
                                     </div>
 
+                                </div>
+                                <div x-show="producttype === 'florist'" class="w-full space-y-4">
+                                    <div class="flex items-center justify-center gap-3 text-center">
+                                        <span class="h-px w-8" style="background-color: {{ old('accent_color', $template->accent_color ?? '#EC4899') }};"></span>
+                                        <p class="text-xl font-black" style="color: {{ $template->product_text_color ?? '#6A1B4D' }};">Produk Kami</p>
+                                        <span class="h-px w-8" style="background-color: {{ old('accent_color', $template->accent_color ?? '#EC4899') }};"></span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="overflow-hidden rounded-[1.4rem] border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: #F8BBD0;">
+                                            <div class="aspect-[1.05/1]">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                            <div id="product" style="background-color: {{ $template->product_main_color }}; color: {{ $template->product_text_color }};" class="space-y-3 p-3">
+                                                <p class="text-left text-sm font-black leading-snug">Sweet Pink Bouquet</p>
+                                                <p class="text-left text-sm font-semibold" style="color: {{ $template->product_text_color }};">Rp 175.000</p>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button type="button" class="w-full rounded-full border px-3 py-2 text-xs font-semibold" style="border-color: #F8BBD0; color: {{ $template->product_text_color ?? '#6A1B4D' }};">Detail</button>
+                                                    <button id="probutton" type="button" style="background-color: {{ $template->product_second_color }}" class="w-full rounded-full px-3 py-2 text-xs font-semibold text-white">Pesan</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="overflow-hidden rounded-[1.4rem] border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: #F8BBD0;">
+                                            <div class="aspect-[1.05/1]">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                            <div id="product" style="background-color: {{ $template->product_main_color }}; color: {{ $template->product_text_color }};" class="space-y-3 p-3">
+                                                <p class="text-left text-sm font-black leading-snug">Elegant White Bloom</p>
+                                                <p class="text-left text-sm font-semibold" style="color: {{ $template->product_text_color }};">Rp 220.000</p>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button type="button" class="w-full rounded-full border px-3 py-2 text-xs font-semibold" style="border-color: #F8BBD0; color: {{ $template->product_text_color ?? '#6A1B4D' }};">Detail</button>
+                                                    <button id="probutton" type="button" style="background-color: {{ $template->product_second_color }}" class="w-full rounded-full px-3 py-2 text-xs font-semibold text-white">Pesan</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

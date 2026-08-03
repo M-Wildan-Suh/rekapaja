@@ -63,26 +63,11 @@
                         </div>
                         <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                     </label>
-                    <label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative"><label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative">
+                    <label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative">
                         <input type="radio" name="header" value="network" class="hidden peer" {{ $selectedHeader === 'network' ? 'checked' : '' }}>
-                        <img src="{{asset('/assets/images/template/header/network.jpg')}}" class=" w-full h-full object-cover object-center" alt="">
-                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                        </div>
-                    </label><label class="w-full rounded-md bg-white aspect-[2/1] overflow-hidden relative">
-    <input
-        type="radio"
-        name="header"
-        value="network"
-        class="hidden peer"
-        {{ $selectedHeader === 'network' ? 'checked' : '' }}>
-
-    <img
-        src="{{ asset('assets/images/template/header/network.png') }}"
-        class="w-full h-full object-cover object-center"
-        alt="">
-
-    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-</label>   
+                        <img src="{{asset('assets/images/template/header/network.png')}}" class="w-full h-full object-cover object-center" alt="">
+                        <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                    </label>
                     <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#F7EFE5] to-[#F3D6C7]">
                         <input type="radio" name="header" value="florist" class="hidden peer" {{ $selectedHeader === 'florist' ? 'checked' : '' }}>
                         <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
@@ -115,7 +100,7 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.remove('hidden');
-                                headerFloristPreview?.classList.remove('hidden');
+                                headerFloristPreview?.classList.add('hidden');
                                 return;
                             
                             }
@@ -123,15 +108,17 @@
                             if (headerInput.value === 'florist') {
                                 headerShow.src = `/assets/images/template/header/florist.png`;
                                 headerShow.classList.add('opacity-0');
-                                headerRamenPreview?.classList.remove('hidden');
+                                headerRamenPreview?.classList.add('hidden');
                                 headerFloristPreview?.classList.remove('hidden');
                                 return;
                             }
 
-                            headerShow.src = `/assets/images/template/header/${headerInput.value}.jpg`;
+                            headerShow.src = headerInput.value === 'network'
+                                ? `/assets/images/template/header/network.png`
+                                : `/assets/images/template/header/${headerInput.value}.jpg`;
                             headerShow.classList.remove('opacity-0');
                             headerRamenPreview?.classList.add('hidden');
-                            headerfloristPreview?.classList.add('hidden');
+                            headerFloristPreview?.classList.add('hidden');
 
                             
                             window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value}));

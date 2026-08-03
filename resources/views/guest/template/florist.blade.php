@@ -12,52 +12,40 @@
     <div class="space-y-6">
         <div class="min-h-screen pt-6 relative space-y-4" style="background-color: {{ $floristBg }};">
             <div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative rounded-md overflow-hidden">
-                <div class="w-full aspect-[2/1] overflow-hidden rounded-md bg-white shadow-md shadow-black/10">
-                    <div class="grid grid-cols-[0.95fr_1.05fr] sm:grid-cols-[0.88fr_1.12fr] relative h-full overflow-hidden" style="background-color: {{ $floristBg }};">
-                        <div
-                            class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat"
-                            style="background-image: url('{{ $data->image }}');"
-                        ></div>
+                <div class="relative w-full aspect-[2/1] overflow-hidden rounded-[1.2rem] shadow-[0_20px_60px_rgba(236,72,153,0.16)] text-[#6A1B4D]" style="background: linear-gradient(135deg, #FFF5F8 0%, #FBCFE8 52%, #F9A8D4 100%);">
+                    <div class="absolute left-[6%] top-[10%] h-[80%] w-[42%] rounded-full border-2 border-white/70"></div>
+                    <div class="absolute right-[6%] top-[16%] h-[68%] w-[36%] rounded-full border border-white/50"></div>
+                    <div class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat" style="background-image: url('{{ $data->image }}');"></div>
 
-                        <div class="px-4 py-4 sm:px-6 sm:py-6">
-                            <div class="space-y-2.5 sm:space-y-4 relative z-10">
-                                <div class="space-y-1">
-                                    <p class="text-[1.3rem] sm:text-[2.8rem] leading-none" style="font-family: 'Segoe Script', 'Brush Script MT', cursive; color: {{ $floristText }};">
-                                        {{ $data->name }}
-                                    </p>
+                    @php
+                        $keywords = $data->productTags
+                            ->map(fn ($item) => optional($item->productTag)->tag)
+                            ->filter()
+                            ->take(3);
+                    @endphp
 
-                                    <p class="text-[1.45rem] sm:text-[2.9rem] font-bold italic leading-[0.95]" style="color: {{ $floristAccent }};">
-                                        {{ $data->subtitle ?: 'Rangkaian Buket Cantik untuk Momen Spesial' }}
-                                    </p>
+                    <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-8">
+                        <div class="max-w-[46%] space-y-2 sm:space-y-3">
+                            <p class="text-[1.45rem] sm:text-[2.2rem] font-black leading-tight" style="font-family: 'Segoe Script', 'Brush Script MT', cursive; color: {{ $floristText }};">
+                                {{ $data->name }}
+                            </p>
+                            <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.22em]" style="color: {{ $floristAccentDark }};">
+                                {{ $data->subtitle ?: 'Custom Header' }}
+                            </p>
+
+                            @if ($keywords->isNotEmpty())
+                                <div class="flex flex-wrap gap-1.5">
+                                    @foreach ($keywords as $keyword)
+                                        <div class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] sm:text-xs font-semibold shadow-sm" style="color: {{ $floristAccentDark }};">
+                                            {{ $keyword }}
+                                        </div>
+                                    @endforeach
                                 </div>
-
-                                @php
-                                    $keywords = $data->productTags
-                                        ->map(fn ($item) => optional($item->productTag)->tag)
-                                        ->filter()
-                                        ->take(6);
-                                @endphp
-
-                                @if ($keywords->isNotEmpty())
-                                    <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                                        @foreach ($keywords as $keyword)
-                                            <div class="rounded-full border px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-sm font-semibold" style="background-color: {{ $floristSurface }}; border-color: {{ $floristBorder }}; color: {{ $floristText }};">
-                                                {{ $keyword }}
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
+                            @endif
                         </div>
 
-                        <div class="relative h-full overflow-hidden z-10" style="background: linear-gradient(135deg, #FBCFE8 0%, #EC4899 55%, #BE185D 100%);">
-                            <div class="absolute left-[-6%] top-[4%] h-[92%] w-[92%] rounded-full border-2 opacity-90" style="border-color: #FCE7F3;"></div>
-                            <div class="absolute left-[2%] top-[1%] h-[95%] w-[92%] rounded-full border opacity-50" style="border-color: #FCE7F3;"></div>
-                            <div class="absolute inset-0 flex items-center justify-center p-3 sm:p-6">
-                                <div class="w-full max-w-[440px] overflow-hidden rounded-full shadow-2xl shadow-pink-300/40">
-                                    <img src="{{ $data->image }}" class="aspect-square w-full object-cover object-center" alt="{{ $data->name }}">
-                                </div>
-                            </div>
+                        <div class="flex h-28 w-28 sm:h-40 sm:w-40 items-center justify-center overflow-hidden rounded-full border-[5px] sm:border-[6px] border-white shadow-xl shadow-pink-300/30">
+                            <img src="{{ $data->image }}" class="h-full w-full object-cover" alt="{{ $data->name }}">
                         </div>
                     </div>
                 </div>
@@ -178,11 +166,11 @@
                         <input type="hidden" name="customer_address" :value="customerAddress">
                         <input type="hidden" name="product_id" value="{{ $data->id }}">
 
-                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                        <div class="grid grid-cols-2 gap-3">
                             @foreach ($data->productHighlight->take(3) as $item)
-                                <div class="overflow-hidden rounded-[1.6rem] border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: {{ $floristBorder }};">
-                                    <div class="relative">
-                                        <img src="{{ $item->image }}" alt="{{ $item->title }}" class="aspect-[1.15/1] w-full object-cover object-center">
+                                <div class="overflow-hidden rounded-[1.4rem] border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: {{ $floristBorder }};">
+                                    <div class="relative aspect-[1.05/1]">
+                                        <img src="{{ $item->image }}" alt="{{ $item->title }}" class="h-full w-full object-cover object-center">
 
                                         @if (!$item->available)
                                             <div class="absolute left-4 top-4 rounded-full bg-pink-600 px-4 py-1.5 text-xs font-bold tracking-wide text-white shadow-md">
@@ -191,13 +179,11 @@
                                         @endif
                                     </div>
 
-                                    <div class="space-y-3 p-4">
-                                        <div>
-                                            <p class="text-lg sm:text-xl font-black leading-snug" style="color: {{ $floristText }};">{{ $item->title }}</p>
-                                        </div>
+                                    <div id="product" class="space-y-3 p-3" style="background-color: {{ $template->product_main_color }}; color: {{ $template->product_text_color }};">
+                                        <p class="min-h-[2.5rem] text-left text-sm font-black leading-snug">{{ $item->title }}</p>
 
                                         @if ($item->price)
-                                            <p class="text-[1.35rem] sm:text-[1.8rem] font-black" style="color: {{ $floristAccent }};">
+                                            <p class="text-left text-sm font-semibold" style="color: {{ $floristAccent }};">
                                                 Rp {{ number_format($item->price, 0, ',', '.') }}
                                             </p>
                                         @endif
@@ -206,8 +192,8 @@
                                             <x-guest.product.detail-button
                                                 :item="$item"
                                                 label="Detail Buket"
-                                                class="inline-flex w-full items-center justify-center rounded-full border px-4 py-1 text-sm font-semibold transition hover:bg-pink-50"
-                                                :style="'border-color: ' . $floristBorder . '; color: ' . $floristText"
+                                                class="inline-flex w-full items-center justify-center rounded-full border px-3 py-2 text-xs font-semibold transition hover:bg-pink-50"
+                                                :style="'border-color: ' . $floristBorder . '; color: ' . ($template->product_text_color ?? $floristText)"
                                             />
 
                                             @if ($role === 'admin' || $role === 'premium')
@@ -230,8 +216,8 @@
                                                 >
                                                 <label
                                                     @if ($item->available) for="order-{{ $item->id }}" @endif
-                                                    class="inline-flex w-full cursor-pointer items-center justify-center rounded-full px-5 py-1 text-sm font-bold text-white transition hover:opacity-90"
-                                                    style="background-color: {{ $floristWhatsapp }};"
+                                                    class="inline-flex w-full cursor-pointer items-center justify-center rounded-full px-3 py-2 text-xs font-bold text-white transition hover:opacity-90"
+                                                    style="background-color: {{ $template->product_second_color ?? $floristWhatsapp }};"
                                                     :class="checkedItems.some(data => data.id === {{ $item->id }}) ? 'opacity-60' : ''"
                                                 >
                                                     Pesan

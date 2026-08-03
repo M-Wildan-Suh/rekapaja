@@ -1,4 +1,4 @@
-<div class="w-full max-w-[560px] mx-auto px-4 md:px-0 py-2">
+<div class="w-full max-w-[600px] mx-auto px-2 sm:px-0 py-2">
     <div class="swiper floristGallery">
 
         <div class="swiper-wrapper">
@@ -7,24 +7,12 @@
 
                 <div class="swiper-slide">
 
-                    <div class="relative overflow-hidden rounded-[28px] shadow-xl">
+                    <div class="relative overflow-hidden rounded-[24px] shadow-xl bg-white">
 
                         <img
                             src="{{ $gallery->image }}"
                             alt=""
-                            class="w-full h-[240px] sm:h-[320px] object-cover">
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-
-                        <div class="absolute bottom-5 left-5 sm:bottom-7 sm:left-7 text-white">
-
-                            <div class="w-10 sm:w-14 h-1 rounded-full bg-white mb-3 sm:mb-4"></div>
-
-                            <h2 class="text-xl sm:text-2xl font-bold">
-                                {{ $gallery->title ?? 'Beautiful Bouquet' }}
-                            </h2>
-
-                        </div>
+                            class="w-full h-[160px] sm:h-[180px] md:h-[190px] object-cover bg-[#FFF5F8]">
 
                     </div>
 
@@ -36,8 +24,6 @@
 
         <div class="swiper-button-prev floristPrev"></div>
         <div class="swiper-button-next floristNext"></div>
-
-        <div class="swiper-pagination floristPagination"></div>
 
     </div>
 
@@ -56,14 +42,8 @@ new Swiper(".floristGallery",{
 
     centeredSlides:true,
 
-    slidesPerView:1.1,
-
-    spaceBetween:20,
-
-    pagination:{
-        el:".floristPagination",
-        clickable:true,
-    },
+    slidesPerView:2.05,
+    spaceBetween:6,
 
     navigation:{
         nextEl:".floristNext",
@@ -72,13 +52,16 @@ new Swiper(".floristGallery",{
 
     breakpoints:{
         640:{
-            slidesPerView:1.2,
+            slidesPerView:2.35,
+            spaceBetween:8,
         },
         768:{
-            slidesPerView:1.35,
+            slidesPerView:2.6,
+            spaceBetween:8,
         },
         1024:{
-            slidesPerView:1.45,
+            slidesPerView:2.85,
+            spaceBetween:6,
         }
     }
 
@@ -90,14 +73,15 @@ new Swiper(".floristGallery",{
 
 .floristGallery{
     overflow:hidden;
-    padding:12px 0 52px;
+    padding:12px 4px;
     width:100%;
 }
 
 .floristGallery .swiper-slide{
-    transform:scale(.82);
-    opacity:.45;
-    transition:.4s;
+    height:auto;
+    transform:scale(.84);
+    opacity:.62;
+    transition:transform .35s ease, opacity .35s ease;
 }
 
 .floristGallery .swiper-slide-active{

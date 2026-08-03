@@ -137,7 +137,7 @@
         <div class="w-full relative py-4">
             <div class="flex items-center justify-center gap-4 text-center">
                 <span class="h-px w-10" style="background-color: {{ $floristAccent }};"></span>
-                <p class="text-[2rem] sm:text-[2.35rem] font-black tracking-tight" style="color: {{ $floristText }};">{{ $data->product_title ?: 'Koleksi Buket Pilihan' }}</p>
+                <p class="text-[2rem] sm:text-[2.35rem] font-black tracking-tight" style="color: {{ $floristText }};">{{ $data->product_title ?: 'Produk Kami' }}</p>
                 <span class="h-px w-10" style="background-color: {{ $floristAccent }};"></span>
             </div>
         </div>
@@ -148,23 +148,23 @@
             <input type="hidden" name="customer_address" :value="customerAddress">
             <input type="hidden" name="product_id" value="{{ $data->id }}">
 
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-2 gap-3">
                 @foreach ($data->productHighlight->take(3) as $item)
-                    <div class="overflow-hidden rounded-md border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: {{ $floristBorder }};">
-                        <div class="relative">
-                            <img src="{{ $item->image }}" alt="{{ $item->title }}" class="aspect-[1.15/1] w-full object-cover object-center">
+                    <div class="overflow-hidden rounded-[1.4rem] border bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]" style="border-color: {{ $floristBorder }};">
+                        <div class="relative aspect-[1.05/1]">
+                            <img src="{{ $item->image }}" alt="{{ $item->title }}" class="h-full w-full object-cover object-center">
                             @if (!$item->available)
                                 <div class="absolute left-4 top-4 rounded-full bg-pink-600 px-4 py-1.5 text-xs font-bold tracking-wide text-white shadow-md">
                                     Habis
                                 </div>
                             @endif
                         </div>
-                        <div class="space-y-3 p-4">
+                        <div id="product" class="space-y-3 p-3" style="background-color: {{ $template->product_main_color }}; color: {{ $template->product_text_color }};">
                             <div>
-                                <p class="text-lg sm:text-xl font-black leading-snug" style="color: {{ $floristText }};">{{ $item->title }}</p>
+                                <p class=" text-left text-sm font-black leading-snug">{{ $item->title }}</p>
                             </div>
                             @if ($item->price)
-                                <p class="text-[1.35rem] sm:text-[1.8rem] font-black" style="color: {{ $floristAccent }};">
+                                <p class="text-left text-sm font-semibold" style="color: {{ $template->product_text_color }};">
                                     @if (($data->order_via_whatsapp ?? 'instan_rekap') === 'tanya' && filled($data->price_prefix))
                                         {{ $data->price_prefix }}
                                     @endif
@@ -175,8 +175,8 @@
                                 <x-guest.product.detail-button
                                     :item="$item"
                                     label="Detail"
-                                    class="inline-flex w-full items-center justify-center rounded-full border px-4 py-1 text-sm font-semibold transition hover:bg-pink-50"
-                                    :style="'border-color: ' . $floristBorder . '; color: ' . $floristText"
+                                    class="inline-flex w-full items-center justify-center rounded-full border px-3 py-2 text-xs font-semibold transition hover:bg-pink-50"
+                                    :style="'border-color: ' . $floristBorder . '; color: ' . ($template->product_text_color ?? $floristText)"
                                 />
                                 @if ($role === 'admin' || $role === 'premium')
                                     <input type="checkbox" class="hidden" name="order[{{ $item->id }}][id]" value="{{ $item->id }}" id="order-{{ $item->id }}"
@@ -188,8 +188,8 @@
                                         x-model="checkedItems.find(item => item.id === {{ $item->id }})?.quantity">
                                     <label @if ($item->available) for="order-{{ $item->id }}" @endif
                                         @click="if (orderViaWhatsapp === 'tanya' && {{ $item->available ? 'true' : 'false' }}) { $event.preventDefault(); window.open('https://wa.me/{{ $no_tlp }}?text=' + encodeURIComponent('Halo, saya ingin bertanya mengenai produk {{ addslashes($item->title) }}.\nAsal chat: RekapAja.com'), '_blank', 'noopener'); return; }"
-                                        class="inline-flex w-full cursor-pointer items-center justify-center rounded-full px-5 py-1 text-sm font-bold text-white transition hover:opacity-90"
-                                        style="background-color: {{ $floristWhatsapp }};"
+                                        class="inline-flex w-full cursor-pointer items-center justify-center rounded-full px-3 py-2 text-xs font-bold text-white transition hover:opacity-90"
+                                        style="background-color: {{ $template->product_second_color ?? $floristWhatsapp }};"
                                         :class="checkedItems.some(data => data.id === {{ $item->id }}) ? 'opacity-60' : ''">
                                         {{ $data->order_title ?: 'Pesan' }}
                                     </label>

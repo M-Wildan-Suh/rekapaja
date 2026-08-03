@@ -1,45 +1,41 @@
+@php
+    $bannerKeywords = $data->productTags
+        ->map(fn ($item) => optional($item->productTag)->tag)
+        ->filter()
+        ->take(3);
+@endphp
+
 <div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative rounded-md overflow-hidden">
-    <div class="relative w-full aspect-[2/1] overflow-hidden rounded-[32px] bg-[#FFF0F5] shadow-[0_20px_60px_rgba(233,120,150,.15)]">
-        <div class="absolute inset-0">
-            <img
-                src="{{ $data->image }}"
-                class="w-full h-full object-cover opacity-15"
-                alt="{{ $data->name }}">
-        </div>
+    <div class="relative w-full aspect-[2/1] overflow-hidden rounded-[1.2rem] shadow-[0_20px_60px_rgba(236,72,153,0.16)] text-[#6A1B4D]" style="background: linear-gradient(135deg, #FFF5F8 0%, #FBCFE8 52%, #F9A8D4 100%);">
+        <div class="absolute left-[6%] top-[10%] h-[80%] w-[42%] rounded-full border-2 border-white/70"></div>
+        <div class="absolute right-[6%] top-[16%] h-[68%] w-[36%] rounded-full border border-white/50"></div>
+        <div class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat" style="background-image: url('{{ $data->image }}');"></div>
 
-        <div class="relative grid grid-cols-[0.95fr_1.05fr] sm:grid-cols-[0.88fr_1.12fr] items-center h-full">
-            <div class="px-4 py-4 sm:px-6 sm:py-6 h-full flex items-center">
-                <div class="space-y-2.5 sm:space-y-4">
-                    <div>
-                        <h1 class="text-[1.3rem] sm:text-[2.65rem] font-black leading-[0.95] text-[#4D3A3A]">
-                            {{ $data->name }}
-                        </h1>
+        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-8">
+            <div class="max-w-[46%] space-y-2 sm:space-y-3">
+                <p class="text-[1.45rem] sm:text-[2.2rem] font-black leading-tight" style="font-family: 'Segoe Script', 'Brush Script MT', cursive; color: #6A1B4D;">
+                    {{ $data->name }}
+                </p>
+                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.22em] text-[#9D174D]">
+                    {{ $data->subtitle ?: 'Custom Header' }}
+                </p>
 
-                        <p class="mt-2 sm:mt-4 text-[11px] sm:text-base text-gray-500 leading-5 sm:leading-7">
-                            {{ $data->subtitle ?: 'Rangkaian bunga segar untuk setiap momen spesial Anda.' }}
-                        </p>
+                @if ($bannerKeywords->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach ($bannerKeywords as $keyword)
+                            <div class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] sm:text-xs font-semibold shadow-sm text-[#9D174D]">
+                                {{ $keyword }}
+                            </div>
+                        @endforeach
                     </div>
-
-                    @if($data->productTags->count())
-                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                            @foreach($data->productTags->take(4) as $tag)
-                                <span class="px-2.5 py-1 sm:px-4 sm:py-2 rounded-full bg-white shadow text-[10px] sm:text-sm text-pink-500 font-semibold">
-                                    {{ optional($tag->productTag)->tag }}
-                                </span>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+                @endif
             </div>
 
-            <div class="relative h-full flex justify-center items-center p-3 sm:p-6">
-                <div class="absolute w-36 h-36 sm:w-72 sm:h-72 bg-pink-200 rounded-full blur-3xl opacity-40"></div>
-                <div class="relative w-full max-w-[220px] sm:max-w-[320px]">
-                    <img
-                        src="{{ $data->image }}"
-                        class="aspect-square w-full rounded-full object-cover border-[6px] sm:border-8 border-white shadow-2xl"
-                        alt="{{ $data->name }}">
-                </div>
+            <div class="flex h-28 w-28 sm:h-40 sm:w-40 items-center justify-center overflow-hidden rounded-full border-[5px] sm:border-[6px] border-white shadow-xl shadow-pink-300/30">
+                <img
+                    src="{{ $data->image }}"
+                    class="h-full w-full object-cover"
+                    alt="{{ $data->name }}">
             </div>
         </div>
     </div>
