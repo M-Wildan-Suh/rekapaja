@@ -73,7 +73,7 @@
                                             </a>
 
                                             @if (Auth::user()->role === 'admin')
-                                                <button type="button" @click="openDomainModal(item)"
+                                                <button type="button" @click="openActionMenu($event, item)"
                                                     class="w-5 h-5 hover:text-[#16a34a] duration-300">
                                                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M12 16a1 1 0 0 1-.707-.293l-4-4 1.414-1.414L11 12.586V4h2v8.586l2.293-2.293 1.414 1.414-4 4A1 1 0 0 1 12 16Z"
@@ -153,6 +153,22 @@
                     </div>
                 </div>
 
+                <div x-show="actionMenuOpen" @click.outside="closeActionMenu()" x-transition
+                    class="fixed z-30 w-48 overflow-hidden rounded-md border border-neutral-200 bg-white shadow-lg"
+                    :style="actionMenuStyle"
+                    style="display: none;">
+                    <button type="button"
+                        @click="openDomainModal(actionMenuItem, 'download')"
+                        class="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100">
+                        Download biasa
+                    </button>
+                    <button type="button"
+                        @click="openDomainModal(actionMenuItem, 'upload')"
+                        class="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100">
+                        Upload domain
+                    </button>
+                </div>
+
                 <!-- Delete Confirmation Modal -->
                 <div x-show="confirmDeleteModal"
                     class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40 px-4">
@@ -196,18 +212,60 @@
                             </svg>
                         </button>
                         <div class=" pt-6 pb-3 bg-[#ff7100] text-white">
-                            <h2 class=" px-6 text-2xl font-bold">Atur Domain Usaha</h2>
+                            <h2 class=" px-6 text-2xl font-bold" x-text="domainActionType === 'download' ? 'Download Domain Usaha' : 'Atur Domain Usaha'"></h2>
                         </div>
+                        @php
+                            $cpanelConfigured = filled(config('services.cpanel.base_url'))
+                                && filled(config('services.cpanel.username'))
+                                && filled(config('services.cpanel.api_token'))
+                                && filled(config('services.cpanel.parent_domain'))
+                                && filled(config('services.cpanel.home_directory'));
+                            $cpanelParentDomain = config('services.cpanel.parent_domain', 'rekapaja.com');
+                        @endphp
                         <div class="px-6 space-y-4">
                             <p class="text-base">Domain untuk <span class="font-semibold" x-text="modalData.name"></span></p>
                             <div class="space-y-2">
-                                <label for="product-domain-index" class="text-sm font-semibold">Domain (Optional)</label>
-                                <input id="product-domain-index" type="text" x-model="domainForm"
-                                    placeholder="contoh: tokoanda.com"
-                                    class="w-full rounded-md border border-[#ff7100] px-3 py-2 text-sm focus:border-[#b95300] focus:ring-[#b95300]">
-                                <p class="text-xs text-neutral-500">Boleh isi `tokoanda.com` atau `https://tokoanda.com`.</p>
-                                <p x-show="domainError" x-text="domainError" class="text-sm text-red-500"></p>
+                                <label class="text-sm font-semibold">Jenis Domain</label>
+                                <div class="grid gap-2 sm:grid-cols-2">
+                                    <label class="flex items-start gap-3 rounded-md border border-[#ff7100]/30 px-3 py-3 text-sm">
+                                        <input type="radio" x-model="domainTypeForm" value="custom" class="mt-1 border-[#ff7100] text-[#ff7100] focus:ring-[#b95300]">
+                                        <span>
+                                            <span class="block font-semibold text-neutral-800">Domain Custom</span>
+                                            <span class="block text-xs text-neutral-500">Contoh `tokoanda.com` atau `https://tokoanda.com`.</span>
+                                        </span>
+                                    </label>
+                                    <label class="flex items-start gap-3 rounded-md border border-[#ff7100]/30 px-3 py-3 text-sm">
+                                        <input type="radio" x-model="domainTypeForm" value="subdomain" class="mt-1 border-[#ff7100] text-[#ff7100] focus:ring-[#b95300]">
+                                        <span>
+                                            <span class="block font-semibold text-neutral-800">Subdomain RekapAja</span>
+                                            <span class="block text-xs text-neutral-500">Contoh `namatoko` untuk `.{{ $cpanelParentDomain }}`.</span>
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
+                            <div x-show="domainTypeForm === 'custom'" class="space-y-2">
+                                <label for="product-domain-index" class="text-sm font-semibold">Domain Custom</label>
+                                <div class="flex items-center rounded-md border border-[#ff7100] focus-within:border-[#b95300] focus-within:ring-1 focus-within:ring-[#b95300]">
+                                    <input id="product-domain-index" type="text" x-model="domainForm"
+                                        placeholder="contoh: tokoanda.com"
+                                        class="w-full border-0 px-3 py-2 text-sm focus:ring-0">
+                                </div>
+                                <p class="text-xs text-neutral-500">Isi domain tujuan yang ingin dipakai untuk usaha ini.</p>
+                            </div>
+                            <div x-show="domainTypeForm === 'subdomain'" class="space-y-2">
+                                <label for="product-subdomain-index" class="text-sm font-semibold">Subdomain RekapAja</label>
+                                <div class="flex items-center rounded-md border border-[#ff7100] focus-within:border-[#b95300] focus-within:ring-1 focus-within:ring-[#b95300]">
+                                    <input id="product-subdomain-index" type="text" x-model="domainForm"
+                                        placeholder="namatoko"
+                                        class="w-full border-0 px-3 py-2 text-sm focus:ring-0">
+                                    <span class="border-l border-[#ff7100]/30 px-3 text-sm text-neutral-500">.{{ $cpanelParentDomain }}</span>
+                                </div>
+                                <p class="text-xs text-neutral-500">Isi nama subdomain saja. Sistem akan membuat `https://nama.{{ $cpanelParentDomain }}`.</p>
+                            </div>
+                            <p x-show="domainError" x-text="domainError" class="text-sm text-red-500"></p>
+                            @unless ($cpanelConfigured)
+                                <p class="text-sm text-amber-600">Konfigurasi cPanel belum lengkap di `.env`, jadi opsi upload domain belum bisa dipakai.</p>
+                            @endunless
                         </div>
                         <div class="flex justify-end gap-3 px-6">
                             <button type="button" @click="saveDomain()"
@@ -216,10 +274,10 @@
                                 <span x-show="!domainLoading">Simpan</span>
                                 <span x-show="domainLoading">Menyimpan...</span>
                             </button>
-                            <button type="button" @click="saveDomainAndDownload()"
+                            <button type="button" @click="submitDomainAction()"
                                 :disabled="domainLoading"
                                 class="px-4 py-2 bg-[#ff7100] text-white rounded hover:bg-[#b95300] disabled:opacity-60">
-                                <span x-show="!domainLoading">Simpan &amp; Download</span>
+                                <span x-show="!domainLoading" x-text="domainActionType === 'download' ? 'Download biasa' : (domainTypeForm === 'subdomain' ? 'Upload ke .{{ $cpanelParentDomain }}' : 'Simpan domain custom')"></span>
                                 <span x-show="domainLoading">Memproses...</span>
                             </button>
                         </div>
@@ -238,8 +296,13 @@
                         showModal: false,
                         confirmDeleteModal: false,
                         domainModalOpen: false,
+                        actionMenuOpen: false,
+                        actionMenuItem: null,
+                        actionMenuStyle: '',
+                        domainActionType: 'upload',
                         domainLoading: false,
                         domainError: '',
+                        domainTypeForm: 'custom',
                         domainForm: '',
                         modalData: {},
 
@@ -282,6 +345,24 @@
                             this.currentPage = 1;
                         },
 
+                        openActionMenu(event, item) {
+                            const rect = event.currentTarget.getBoundingClientRect();
+                            this.actionMenuItem = item;
+                            this.actionMenuStyle = `top:${rect.bottom + 8}px;left:${Math.max(rect.right - 192, 16)}px;`;
+                            this.actionMenuOpen = true;
+                        },
+
+                        closeActionMenu() {
+                            this.actionMenuOpen = false;
+                            this.actionMenuItem = null;
+                        },
+
+                        downloadBasicFor(item) {
+                            this.closeActionMenu();
+                            const downloadUrl = `{{ route('product.download-domain', '') }}/${item.id}?t=${Date.now()}`;
+                            this.$refs.downloadFrame.src = downloadUrl;
+                        },
+
                         showDetail(item) {
                             this.modalData = item;
                             this.showModal = true;
@@ -292,9 +373,71 @@
                             this.confirmDeleteModal = true;
                         },
 
-                        openDomainModal(item) {
+                        inferDomainType(domain) {
+                            if (!domain) {
+                                return 'custom';
+                            }
+
+                            try {
+                                const normalized = /^https?:\/\//i.test(domain) ? domain : `https://${domain}`;
+                                const hostname = new URL(normalized).hostname.toLowerCase();
+                                const suffix = '.{{ $cpanelParentDomain }}';
+
+                                return hostname.endsWith(suffix) ? 'subdomain' : 'custom';
+                            } catch (error) {
+                                return 'custom';
+                            }
+                        },
+
+                        extractDomainInputValue(domain) {
+                            if (!domain) {
+                                return '';
+                            }
+
+                            if (this.inferDomainType(domain) !== 'subdomain') {
+                                return domain;
+                            }
+
+                            try {
+                                const normalized = /^https?:\/\//i.test(domain) ? domain : `https://${domain}`;
+                                const hostname = new URL(normalized).hostname.toLowerCase();
+                                const suffix = '.{{ $cpanelParentDomain }}';
+
+                                return hostname.endsWith(suffix) ? hostname.slice(0, -suffix.length) : domain;
+                            } catch (error) {
+                                return domain;
+                            }
+                        },
+
+                        buildDomainValueForSaving() {
+                            const value = this.domainForm.trim();
+
+                            if (!value) {
+                                return '';
+                            }
+
+                            if (this.domainTypeForm === 'subdomain') {
+                                return `https://${value.toLowerCase()}.{{ $cpanelParentDomain }}`;
+                            }
+
+                            return value;
+                        },
+
+                        openDomainModal(item, actionType = 'upload') {
+                            this.closeActionMenu();
                             this.modalData = item;
-                            this.domainForm = item.domain ?? '';
+                            const existingDomain = item.domain ?? '';
+                            const inferredType = actionType === 'upload'
+                                ? 'subdomain'
+                                : (existingDomain ? this.inferDomainType(existingDomain) : 'custom');
+
+                            this.domainTypeForm = inferredType;
+                            this.domainForm = inferredType === 'subdomain'
+                                ? (this.inferDomainType(existingDomain) === 'subdomain'
+                                    ? this.extractDomainInputValue(existingDomain)
+                                    : (item.slug || ''))
+                                : (existingDomain ? this.extractDomainInputValue(existingDomain) : '');
+                            this.domainActionType = actionType;
                             this.domainError = '';
                             this.domainModalOpen = true;
                         },
@@ -305,13 +448,29 @@
                             this.domainError = '';
                         },
 
+                        async submitDomainAction() {
+                            if (this.domainActionType === 'download') {
+                                try {
+                                    await this.persistDomain();
+                                    this.downloadBasicFor(this.modalData);
+                                    this.closeDomainModal();
+                                } catch (error) {
+                                    this.domainError = error.message;
+                                    this.domainLoading = false;
+                                }
+                                return;
+                            }
+
+                            await this.uploadToCpanel();
+                        },
+
                         async persistDomain() {
                             this.domainLoading = true;
                             this.domainError = '';
 
                             const formData = new FormData();
                             formData.append('_method', 'PUT');
-                            formData.append('domain', this.domainForm);
+                            formData.append('domain', this.buildDomainValueForSaving());
 
                             const response = await fetch(`{{ route('product.domain', '') }}/${this.modalData.id}`, {
                                 method: 'POST',
@@ -345,17 +504,48 @@
                             }
                         },
 
-                        async saveDomainAndDownload() {
+                        async uploadToCpanel() {
                             try {
+                                if (this.domainTypeForm !== 'subdomain') {
+                                    await this.persistDomain();
+                                    this.closeDomainModal();
+                                    return;
+                                }
+
                                 await this.persistDomain();
-                                const downloadUrl = `{{ route('product.download-domain', '') }}/${this.modalData.id}?t=${Date.now()}`;
-                                this.$refs.downloadFrame.src = downloadUrl;
+                                this.domainLoading = true;
+
+                                const formData = new FormData();
+                                formData.append('subdomain', this.domainForm.trim());
+
+                                const response = await fetch(`{{ route('product.upload-domain', '') }}/${this.modalData.id}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
+                                        'Accept': 'application/json',
+                                    },
+                                    body: formData,
+                                });
+
+                                const result = await response.json().catch(() => ({}));
+
+                                if (!response.ok) {
+                                    throw new Error(result.message || 'Gagal upload ke cPanel.');
+                                }
+
+                                this.modalData.domain = result.domain ?? '';
+                                this.domainTypeForm = 'subdomain';
+                                this.domainForm = this.extractDomainInputValue(this.modalData.domain);
+                                this.data = this.data.map(item => item.id === this.modalData.id
+                                    ? { ...item, domain: this.modalData.domain }
+                                    : item
+                                );
                                 this.closeDomainModal();
                             } catch (error) {
                                 this.domainError = error.message;
                                 this.domainLoading = false;
                             }
-                        }
+                        },
                     }
                 }
             </script>

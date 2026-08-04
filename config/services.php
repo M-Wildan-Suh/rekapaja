@@ -37,5 +37,13 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'cpanel' => [
+        'base_url' => env('CPANEL_BASE_URL'),
+        'username' => env('CPANEL_USERNAME'),
+        'api_token' => env('CPANEL_API_TOKEN'),
+        'parent_domain' => env('CPANEL_PARENT_DOMAIN', 'rekapaja.com'),
+        'home_directory' => env('CPANEL_HOME_DIRECTORY'),
+    ],
+
 
 ];

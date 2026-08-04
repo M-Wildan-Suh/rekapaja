@@ -12,15 +12,22 @@ use App\Models\ProductGallery;
 use App\Models\ProductTag;
 use App\Models\Template;
 use App\Models\User;
+use App\Services\CpanelDomainPublisher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use RuntimeException;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        private readonly CpanelDomainPublisher $cpanelDomainPublisher
+    ) {
+    }
+
     private function normalizeWholeNumberPrice(mixed $price): ?int
     {
         if ($price === null || $price === '') {
@@ -411,17 +418,15 @@ class ProductController extends Controller
             ->with('success', 'Teks sebelum harga berhasil diperbarui.');
     }
 
-    public function downloadDomainFile(Product $product)
+    private function buildDomainFileContent(Product $product): string
     {
-        $this->ensureProductAccess($product);
-
         $appUrl = rtrim(config('app.url'), '/');
         $detailUrl = $appUrl . '/' . $product->slug . '?domain_preview=1';
         $orderApiUrl = $appUrl . '/api/business/' . $product->slug . '/order';
         $slug = $product->slug;
         $title = addslashes($product->name);
 
-        $content = <<<PHP
+        return <<<PHP
 <?php
 \$sourceUrl = '{$detailUrl}';
 \$originUrl = '{$appUrl}';
@@ -619,12 +624,75 @@ if (stripos(\$html, '</body>') !== false) {
 
 echo \$html;
 PHP;
+    }
+
+    public function downloadDomainFile(Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $content = $this->buildDomainFileContent($product);
 
         return response()->streamDownload(function () use ($content) {
             echo $content;
         }, 'index.php', [
             'Content-Type' => 'application/octet-stream',
         ]);
+    }
+
+    public function uploadDomainToCpanel(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'subdomain' => ['required', 'string', 'max:63'],
+        ]);
+
+        try {
+            $subdomain = $this->cpanelDomainPublisher->normalizeSubdomain($validated['subdomain']);
+            $result = $this->cpanelDomainPublisher->publish($subdomain, $this->buildDomainFileContent($product));
+
+            $product->domain = $result['url'];
+            $product->save();
+
+            return response()->json([
+                'message' => $result['subdomain_created']
+                    ? 'Subdomain berhasil dibuat dan file berhasil diunggah.'
+                    : 'Subdomain sudah ada. File berhasil diunggah ulang.',
+                'domain' => $result['url'],
+                'subdomain' => $result['subdomain'],
+                'document_root' => $result['document_root'],
+                'subdomain_created' => $result['subdomain_created'],
+            ]);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function browseDomainFolder(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'subdomain' => ['required', 'string', 'max:63'],
+        ]);
+
+        try {
+            $folder = $this->cpanelDomainPublisher->listDirectoryContents($validated['subdomain']);
+
+            return response()->json([
+                'message' => 'Isi folder berhasil dimuat.',
+                'document_root' => $folder['document_root'],
+                'path' => $folder['path'],
+                'entries' => $folder['entries'],
+            ]);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'entries' => [],
+            ], 422);
+        }
     }
 
     public function updateDomain(Request $request, Product $product)
