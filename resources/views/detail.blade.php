@@ -1,5 +1,5 @@
 @php
-    $hideBusinessProfileSections = in_array(($template->head_type ?? null), ['ramen', 'network', 'donut'], true);
+    $hideBusinessProfileSections = in_array(($template->head_type ?? null), ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'], true);
 @endphp
 
 <x-layout.guest

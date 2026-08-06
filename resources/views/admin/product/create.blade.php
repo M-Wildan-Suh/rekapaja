@@ -25,8 +25,8 @@
                         x-data="{
                             selectedTemplateId: @js($selectedTemplateId),
                             templateHeaders: @js($templateHeaders),
-                            isRamenTemplate() {
-                                return this.templateHeaders[this.selectedTemplateId] === 'ramen';
+                            hidesProfileFields() {
+                                return ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'].includes(this.templateHeaders[this.selectedTemplateId]);
                             }
                         }"
                         action="{{route('product.store')}}"
@@ -92,7 +92,7 @@
                                 </script>
                             </div>
 
-                            <div x-show="!isRamenTemplate()" x-cloak>
+                            <div x-show="!hidesProfileFields()" x-cloak>
                                 <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
                             </div>
                             
@@ -102,13 +102,13 @@
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
-                            <div x-show="!isRamenTemplate()" x-cloak>
+                            <div x-show="!hidesProfileFields()" x-cloak>
                                 <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
                             </div>
                             
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 
-                            <div x-show="!isRamenTemplate()" x-cloak>
+                            <div x-show="!hidesProfileFields()" x-cloak>
                                 <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
                             </div>
 

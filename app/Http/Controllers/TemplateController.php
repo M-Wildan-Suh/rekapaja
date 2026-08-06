@@ -11,6 +11,34 @@ use Intervention\Image\ImageManager;
 
 class TemplateController extends Controller
 {
+    private function pastelProductPreset(string $buttonColor = '#F26CA7', string $textColor = '#4A2F3A'): array
+    {
+        return [
+            'product_type' => 'grid3',
+            'product_main_color' => '#FFFFFF',
+            'product_second_color' => $buttonColor,
+            'product_text_color' => $textColor,
+        ];
+    }
+
+    private function applyHeaderPreset(Template $template): void
+    {
+        $preset = match ($template->head_type) {
+            'skincare' => $this->pastelProductPreset('#F26CA7', '#4A2F3A'),
+            'pudding_putih' => $this->pastelProductPreset('#F26CA7', '#5C3446'),
+            'sembako' => $this->pastelProductPreset('#2F9E44', '#24411F'),
+            default => null,
+        };
+
+        if ($preset === null) {
+            return;
+        }
+
+        foreach ($preset as $field => $value) {
+            $template->{$field} = $value;
+        }
+    }
+
     public function editimage($id, Request $request) {
         $request->validate([
             'thumbnail' => ['required', 'image', 'max:5120'],
@@ -106,6 +134,8 @@ class TemplateController extends Controller
             }
         }
 
+        $this->applyHeaderPreset($newdata);
+
         $newdata->save();
           
         return redirect()->route('template.index');
@@ -170,6 +200,8 @@ class TemplateController extends Controller
             }
         }
 
+        $this->applyHeaderPreset($template);
+
         $template->save();
           
         return redirect()
@@ -224,7 +256,7 @@ class TemplateController extends Controller
         return [
             'name' => ['required', 'string', 'max:255'],
             'bg_type' => ['required', 'in:normal,gradient,image'],
-            'header' => ['required', 'in:one,two,three,four,ramen,network,florist,donut'],
+            'header' => ['required', 'in:one,two,three,four,ramen,network,florist,donut,skincare,pudding_putih,sembako'],
             'gallery' => ['required', 'in:square,potrait,network,florist'],
             'accent_color' => $colorRule,
             'desc_type' => ['required', 'in:default,ramen,network,florist'],

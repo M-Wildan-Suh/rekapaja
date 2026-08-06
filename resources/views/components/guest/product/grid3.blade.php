@@ -4,6 +4,24 @@
     $gridText = $template->product_text_color ?? '#0F172A';
     $gridAccent = $template->accent_color ?? '#EC4899';
     $gridWhatsapp = $template->contact_main_color ?? '#25D366';
+    $pastelGridHeader = in_array(($template->head_type ?? null), ['skincare', 'pudding_putih'], true) ? $template->head_type : null;
+    $skincareCardPalettes = [
+        ['surface' => '#FFFFFF', 'border' => '#F3D2E1', 'accent' => '#F26CA7', 'text' => '#5C3446'],
+        ['surface' => '#FFFFFF', 'border' => '#E3D4FF', 'accent' => '#A875E8', 'text' => '#4C3768'],
+        ['surface' => '#FFFFFF', 'border' => '#FFD8BC', 'accent' => '#FF9A62', 'text' => '#694533'],
+        ['surface' => '#FFFFFF', 'border' => '#D8D0FF', 'accent' => '#9D7AE6', 'text' => '#493D72'],
+        ['surface' => '#FFFFFF', 'border' => '#CBE6FF', 'accent' => '#5F9FE8', 'text' => '#36506C'],
+        ['surface' => '#FFFFFF', 'border' => '#CDEFD8', 'accent' => '#67C98E', 'text' => '#355742'],
+    ];
+    $puddingPutihCardPalettes = [
+        ['surface' => '#FFFFFF', 'border' => '#F6D3E1', 'accent' => '#F45B97', 'text' => '#623549'],
+        ['surface' => '#FFFFFF', 'border' => '#FFE0B8', 'accent' => '#FF9F1C', 'text' => '#7A4D1E'],
+        ['surface' => '#FFFFFF', 'border' => '#D9E9BE', 'accent' => '#8BBF59', 'text' => '#4F6A33'],
+        ['surface' => '#FFFFFF', 'border' => '#DFC8F4', 'accent' => '#A56BDB', 'text' => '#5A3E73'],
+        ['surface' => '#FFFFFF', 'border' => '#E2C4AA', 'accent' => '#A8683A', 'text' => '#6A4327'],
+        ['surface' => '#FFFFFF', 'border' => '#F4D1DA', 'accent' => '#F58CB2', 'text' => '#6A3C4F'],
+    ];
+    $pastelCardPalettes = $pastelGridHeader === 'pudding_putih' ? $puddingPutihCardPalettes : $skincareCardPalettes;
 @endphp
 
 <div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative space-y-6">
@@ -149,24 +167,34 @@
 
             <div class="grid grid-cols-3 gap-2 sm:gap-3">
                 @foreach ($data->productHighlight as $item)
-                    <div class="overflow-hidden rounded-xl border bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]" style="border-color: #E5E7EB;">
-                        <div class="relative aspect-square bg-[#F8FAFC]">
+                    @php
+                        $cardTheme = $pastelGridHeader
+                            ? $pastelCardPalettes[$loop->index % count($pastelCardPalettes)]
+                            : [
+                                'surface' => $template->product_main_color,
+                                'border' => '#E5E7EB',
+                                'accent' => $template->product_second_color ?? $gridWhatsapp,
+                                'text' => $template->product_text_color,
+                            ];
+                    @endphp
+                    <div class="overflow-hidden rounded-xl border bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]" style="border-color: {{ $cardTheme['border'] }};">
+                        <div class="relative aspect-square" style="background-color: {{ $cardTheme['surface'] }};">
                             <img src="{{ $item->image }}" alt="{{ $item->title }}" class="h-full w-full object-cover object-center">
                             @if (!$item->available)
-                                <div class="absolute left-1.5 top-1.5 rounded-full bg-pink-600 px-1.5 py-0.5 text-[8px] sm:left-2 sm:top-2 sm:px-2.5 sm:py-1 sm:text-[10px] font-bold tracking-wide text-white shadow-md">
+                                <div class="absolute left-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[8px] sm:left-2 sm:top-2 sm:px-2.5 sm:py-1 sm:text-[10px] font-bold tracking-wide text-white shadow-md" style="background-color: {{ $pastelGridHeader ? $cardTheme['accent'] : '#DB2777' }};">
                                     Habis
                                 </div>
                             @endif
                         </div>
-                        <div id="product" class="space-y-[3px] p-[5px] sm:space-y-2 sm:p-3" style="background-color: {{ $template->product_main_color }}; color: {{ $template->product_text_color }};">
+                        <div id="product" class="space-y-[3px] p-[5px] sm:space-y-2 sm:p-3" style="background-color: {{ $cardTheme['surface'] }}; color: {{ $cardTheme['text'] }};">
                             <div class="space-y-1">
-                                <p class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-2" style="color: {{ $template->accent_color ?? $gridAccent }};">{{ $item->title }}</p>
+                                <p class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-2" style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : ($template->accent_color ?? $gridAccent) }};">{{ $item->title }}</p>
                             </div>
-                            <p class="text-left text-[7px] sm:text-[11px] leading-[1.25] line-clamp-2" style="color: {{ $template->product_text_color }};">
+                            <p class="text-left text-[7px] sm:text-[11px] leading-[1.25] line-clamp-2" style="color: {{ $cardTheme['text'] }};">
                                 {{ $item->description ?: 'Deskripsi produk akan tampil langsung pada kartu grid 3.' }}
                             </p>
                             @if ($item->price)
-                                <p class="text-left text-[8px] sm:text-[13px] font-extrabold" style="color: {{ $template->product_text_color }};">
+                                <p class="text-left text-[8px] sm:text-[13px] font-extrabold" style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : $cardTheme['text'] }};">
                                     @if (($data->order_via_whatsapp ?? 'instan_rekap') === 'tanya' && filled($data->price_prefix))
                                         {{ $data->price_prefix }}
                                     @endif
@@ -185,7 +213,7 @@
                                     <label @if ($item->available) for="order-{{ $item->id }}" @endif
                                         @click="if (orderViaWhatsapp === 'tanya' && {{ $item->available ? 'true' : 'false' }}) { $event.preventDefault(); window.open('https://wa.me/{{ $no_tlp }}?text=' + encodeURIComponent('Halo, saya ingin bertanya mengenai produk {{ addslashes($item->title) }}.\nAsal chat: RekapAja.com'), '_blank', 'noopener'); return; }"
                                         class="inline-flex w-full cursor-pointer items-center justify-center gap-0.5 rounded-md px-[2px] py-[4px] text-[7px] sm:px-3 sm:py-2 sm:text-[11px] font-bold text-white transition hover:opacity-90"
-                                        style="background-color: {{ $template->product_second_color ?? $gridWhatsapp }};"
+                                        style="background-color: {{ $cardTheme['accent'] }};"
                                         :class="checkedItems.some(data => data.id === {{ $item->id }}) ? 'opacity-60' : ''">
                                         <svg viewBox="0 0 56.693 56.693" class="h-2.5 w-2.5 sm:h-4 sm:w-4" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M46.38 10.714C41.73 6.057 35.544 3.492 28.954 3.489c-13.579 0-24.63 11.05-24.636 24.633a24.589 24.589 0 0 0 3.289 12.316L4.112 53.204l13.06-3.426a24.614 24.614 0 0 0 11.772 2.999h.01c13.577 0 24.63-11.052 24.635-24.635.002-6.582-2.558-12.772-7.209-17.428zM28.954 48.616h-.009a20.445 20.445 0 0 1-10.421-2.854l-.748-.444-7.75 2.033 2.07-7.555-.488-.775a20.427 20.427 0 0 1-3.13-10.897c.004-11.29 9.19-20.474 20.484-20.474a20.336 20.336 0 0 1 14.476 6.005 20.352 20.352 0 0 1 5.991 14.485c-.004 11.29-9.19 20.476-20.475 20.476z"/>

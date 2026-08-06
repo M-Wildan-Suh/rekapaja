@@ -59,8 +59,8 @@
                         orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}',
                         selectedTemplateId: @js($selectedTemplateId),
                         templateHeaders: @js($templateHeaders),
-                        isRamenTemplate() {
-                            return this.templateHeaders[this.selectedTemplateId] === 'ramen';
+                        hidesProfileFields() {
+                            return ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'].includes(this.templateHeaders[this.selectedTemplateId]);
                         }
                     }"
                     class="bg-white overflow-hidden shadow-sm rounded-lg"
@@ -153,20 +153,20 @@
                                         }
                                     </script>
                                 </div>
-                                <div x-show="!isRamenTemplate()" x-cloak>
+                                <div x-show="!hidesProfileFields()" x-cloak>
                                     <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
                                 </div>
                                 <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
                                 <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" />
 
-                                <div x-show="!isRamenTemplate()" x-cloak>
+                                <div x-show="!hidesProfileFields()" x-cloak>
                                     <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />
                                 </div>
                                 
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <x-admin.component.categoryinput title="Category" :value="$product->category" :tag="$category" name="category[]" />
-                                    <div x-show="!isRamenTemplate()" x-cloak>
+                                    <div x-show="!hidesProfileFields()" x-cloak>
                                         <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]" :tag="$tag"></x-admin.component.taginput>
                                     </div>
                                     @if (Auth::user()->role === 'admin')

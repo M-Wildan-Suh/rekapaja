@@ -70,6 +70,50 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="header-skincare-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF7FB] via-[#FDECF7] to-[#FBE6EC] text-[#4A2F3A]">
+                                        <div class="absolute left-[6%] top-[14%] h-10 w-10 rounded-full bg-[#F7B4C9]/35 blur-xl"></div>
+                                        <div class="absolute right-[10%] top-[12%] h-14 w-14 rounded-full bg-[#FBD3E2]/35 blur-2xl"></div>
+                                        <div class="absolute bottom-[12%] left-[10%] h-20 w-20 rounded-full border border-white/70"></div>
+                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
+                                            <div class="max-w-[48%] space-y-2">
+                                                <p class="text-[0.85rem] font-semibold italic text-[#D66AA3]" style="font-family: 'Patrick Hand', cursive;">Cantik Alami Setiap Hari</p>
+                                                <p class="text-[1.55rem] font-black leading-tight">Skincare Terbaik</p>
+                                                <p class="text-[1.55rem] font-black leading-tight text-[#EF6AA5]">untuk Kulitmu</p>
+                                            </div>
+                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/70 shadow-xl shadow-pink-200/40">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="header-pudding-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8F4] via-[#FDEEF8] to-[#F8EAFE] text-[#5C3446]">
+                                        <div class="absolute left-[6%] top-[14%] h-10 w-10 rounded-full bg-[#F9BCD4]/35 blur-xl"></div>
+                                        <div class="absolute right-[10%] top-[12%] h-14 w-14 rounded-full bg-[#E7D5FF]/35 blur-2xl"></div>
+                                        <div class="absolute bottom-[12%] left-[10%] h-20 w-20 rounded-full border border-white/70"></div>
+                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
+                                            <div class="max-w-[50%] space-y-2">
+                                                <p class="text-[0.95rem] font-semibold italic text-[#8B5E3C]" style="font-family: 'Patrick Hand', cursive;">Manisnya Pas, Lembutnya Juara!</p>
+                                                <p class="text-[1.55rem] font-black leading-none text-[#F0679A]" style="font-family: 'Patrick Hand', cursive;">Puding Putih</p>
+                                                <p class="text-[1.4rem] font-black leading-none text-[#9B6AE4]" style="font-family: 'Patrick Hand', cursive;">Aneka Rasa</p>
+                                            </div>
+                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/75 shadow-xl shadow-pink-200/40">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="header-sembako-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8E9] via-[#F7F4DE] to-[#EAF4DE] text-[#24411F]">
+                                        <div class="absolute left-[4%] top-[14%] h-14 w-14 rounded-full bg-[#FDE68A]/40 blur-xl"></div>
+                                        <div class="absolute right-[8%] top-[12%] h-16 w-16 rounded-full bg-[#D9F99D]/35 blur-2xl"></div>
+                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
+                                            <div class="max-w-[50%] space-y-2">
+                                                <p class="text-[1.45rem] font-bold leading-none text-[#2F9E44]" style="font-family: 'Patrick Hand', cursive;">Sembako Lengkap,</p>
+                                                <p class="text-[1.45rem] font-bold leading-none text-[#D97706]" style="font-family: 'Patrick Hand', cursive;">Harga Bersahabat!</p>
+                                                <p class="inline-flex rounded-full bg-[#FACC15]/90 px-3 py-1 text-[0.72rem] font-bold text-[#365314]">Belanja harian dari rumah</p>
+                                            </div>
+                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/80 shadow-xl shadow-lime-200/40">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +192,12 @@
                         <div class=" w-full flex items-center justify-center">
                             <div
                                 x-data="{producttype: 'grid2'}"
-                                x-init="window.addEventListener('updateProductType', (e) => producttype = e.detail)"
+                                x-init="
+                                    window.addEventListener('updateProductType', (e) => producttype = e.detail);
+                                    window.addEventListener('updateHeaderType', (e) => {
+                                        if (['skincare', 'pudding_putih', 'sembako'].includes(e.detail)) producttype = 'grid3';
+                                    });
+                                "
                                 class=" max-w-[400px] w-full rounded-md relative">
                                 @include('components.admin.template.product')
                                 <div x-show="producttype === 'grid2'" class=" w-full grid grid-cols-2 gap-2 sm:gap-3">

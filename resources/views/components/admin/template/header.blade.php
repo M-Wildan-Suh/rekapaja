@@ -84,6 +84,30 @@
                         </div>
                         <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                     </label>
+                    <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#FFF7FB] via-[#FDECF7] to-[#FBE6EC]">
+                        <input type="radio" name="header" value="skincare" class="hidden peer" {{ $selectedHeader === 'skincare' ? 'checked' : '' }}>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                            <p class="text-lg font-black text-[#EF6AA5]">Skincare</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A4A5A]">Custom Header</p>
+                        </div>
+                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                    </label>
+                    <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#FFF8F4] via-[#FDEEF8] to-[#F8EAFE]">
+                        <input type="radio" name="header" value="pudding_putih" class="hidden peer" {{ $selectedHeader === 'pudding_putih' ? 'checked' : '' }}>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                            <p class="text-lg font-black text-[#F0679A]">Pudding Putih</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B4B5F]">Custom Header</p>
+                        </div>
+                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                    </label>
+                    <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#FFF8E9] via-[#F7F4DE] to-[#EAF4DE]">
+                        <input type="radio" name="header" value="sembako" class="hidden peer" {{ $selectedHeader === 'sembako' ? 'checked' : '' }}>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                            <p class="text-lg font-black text-[#2F9E44]">Sembako</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B5B1C]">Custom Header</p>
+                        </div>
+                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
+                    </label>
                 </div>
             </div>
 
@@ -103,6 +127,9 @@
                             const headerRamenPreview = document.getElementById("header-ramen-preview");
                             const headerFloristPreview = document.getElementById("header-florist-preview");
                             const headerDonutPreview = document.getElementById("header-donut-preview");
+                            const headerSkincarePreview = document.getElementById("header-skincare-preview");
+                            const headerPuddingPreview = document.getElementById("header-pudding-preview");
+                            const headerSembakoPreview = document.getElementById("header-sembako-preview");
 
 
                             if (headerInput.value === 'ramen') {
@@ -110,8 +137,12 @@
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.remove('hidden');
                                 headerFloristPreview?.classList.add('hidden');
+                                headerDonutPreview?.classList.add('hidden');
+                                headerSkincarePreview?.classList.add('hidden');
+                                headerPuddingPreview?.classList.add('hidden');
+                                headerSembakoPreview?.classList.add('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
-                            
                             }
 
                             if (headerInput.value === 'florist') {
@@ -120,6 +151,10 @@
                                 headerRamenPreview?.classList.add('hidden');
                                 headerFloristPreview?.classList.remove('hidden');
                                 headerDonutPreview?.classList.add('hidden');
+                                headerSkincarePreview?.classList.add('hidden');
+                                headerPuddingPreview?.classList.add('hidden');
+                                headerSembakoPreview?.classList.add('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
 
@@ -129,6 +164,49 @@
                                 headerRamenPreview?.classList.add('hidden');
                                 headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.remove('hidden');
+                                headerSkincarePreview?.classList.add('hidden');
+                                headerPuddingPreview?.classList.add('hidden');
+                                headerSembakoPreview?.classList.add('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
+                                return;
+                            }
+
+                            if (headerInput.value === 'skincare') {
+                                headerShow.src = `/assets/images/template/header/one.jpg`;
+                                headerShow.classList.add('opacity-0');
+                                headerRamenPreview?.classList.add('hidden');
+                                headerFloristPreview?.classList.add('hidden');
+                                headerDonutPreview?.classList.add('hidden');
+                                headerSkincarePreview?.classList.remove('hidden');
+                                headerPuddingPreview?.classList.add('hidden');
+                                headerSembakoPreview?.classList.add('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
+                                return;
+                            }
+
+                            if (headerInput.value === 'pudding_putih') {
+                                headerShow.src = `/assets/images/template/header/one.jpg`;
+                                headerShow.classList.add('opacity-0');
+                                headerRamenPreview?.classList.add('hidden');
+                                headerFloristPreview?.classList.add('hidden');
+                                headerDonutPreview?.classList.add('hidden');
+                                headerSkincarePreview?.classList.add('hidden');
+                                headerPuddingPreview?.classList.remove('hidden');
+                                headerSembakoPreview?.classList.add('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
+                                return;
+                            }
+
+                            if (headerInput.value === 'sembako') {
+                                headerShow.src = `/assets/images/template/header/one.jpg`;
+                                headerShow.classList.add('opacity-0');
+                                headerRamenPreview?.classList.add('hidden');
+                                headerFloristPreview?.classList.add('hidden');
+                                headerDonutPreview?.classList.add('hidden');
+                                headerSkincarePreview?.classList.add('hidden');
+                                headerPuddingPreview?.classList.add('hidden');
+                                headerSembakoPreview?.classList.remove('hidden');
+                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
 
@@ -139,6 +217,9 @@
                             headerRamenPreview?.classList.add('hidden');
                             headerFloristPreview?.classList.add('hidden');
                             headerDonutPreview?.classList.add('hidden');
+                            headerSkincarePreview?.classList.add('hidden');
+                            headerPuddingPreview?.classList.add('hidden');
+                            headerSembakoPreview?.classList.add('hidden');
 
                             
                             window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value}));

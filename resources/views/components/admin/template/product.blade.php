@@ -2,11 +2,12 @@
     $rawProductType = old('product_type', $template->product_type ?? 'grid2');
     $selectedProductType = match ($rawProductType) {
         'grid' => 'grid2',
-        'ramen', 'network', 'florist', 'donut' => 'grid3',
+        'ramen', 'network', 'florist', 'donut', 'skincare', 'pudding_putih', 'sembako' => 'grid3',
         default => $rawProductType,
     };
+    $selectedHeaderType = old('header', $template->head_type ?? 'one');
 @endphp
-<div x-data="{article: false}" class="">
+<div x-data="{article: false, lockedHeader: @js($selectedHeaderType)}" x-init="window.addEventListener('updateHeaderType', (e) => lockedHeader = e.detail)" class="">
     <button @click="article = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] rounded-tr-md z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m18.988 2.012 3 3L19.701 7.3l-3-3zM8 16h3l7.287-7.287-3-3L8 13z" fill="currentColor" class="fill-000000"></path><path d="M19 19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .896-2 2v14c0 1.104.897 2 2 2h14a2 2 0 0 0 2-2v-8.668l-2 2V19z" fill="currentColor" class="fill-000000"></path></svg>
@@ -36,6 +37,9 @@
             </div>
             <div class="w-full px-4 sm:px-6">
                 <div class=" space-y-4 sm:space-y-6 text-black">
+                    <div x-show="['skincare', 'pudding_putih', 'sembako'].includes(lockedHeader)" class="rounded-xl border border-pink-200 bg-pink-50 px-4 py-3 text-sm text-pink-700">
+                        Warna produk dan tipe produk dikunci otomatis ke preset untuk template custom ini.
+                    </div>
                     <div class="w-full">
                         <div class=" flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="">Type</label>
@@ -99,7 +103,68 @@
                         Simpan
                     </button>
                     <script>
+                        function applyPastelProductPreset(buttonColor = '#F26CA7', textColor = '#4A2F3A') {
+                            const productMain = document.getElementById('product_main_color');
+                            const productSecond = document.getElementById('product_second_color');
+                            const productText = document.getElementById('product_text_color');
+                            const grid3Input = document.querySelector('input[name="product_type"][value="grid3"]');
+                            const productCards = document.querySelectorAll('#product');
+                            const productButtons = document.querySelectorAll('#probutton');
+
+                            if (grid3Input) {
+                                grid3Input.checked = true;
+                            }
+
+                            if (productMain) {
+                                productMain.value = '#FFFFFF';
+                            }
+
+                            if (productSecond) {
+                                productSecond.value = buttonColor;
+                            }
+
+                            if (productText) {
+                                productText.value = textColor;
+                            }
+
+                            productCards.forEach((item) => {
+                                item.style.backgroundColor = '#FFFFFF';
+                                item.style.color = textColor;
+                            });
+
+                            productButtons.forEach((item) => {
+                                item.style.backgroundColor = buttonColor;
+                                item.style.color = '#FFFFFF';
+                            });
+                        }
+
+                        window.addEventListener('updateHeaderType', (event) => {
+                            const presets = {
+                                skincare: { button: '#F26CA7', text: '#4A2F3A' },
+                                pudding_putih: { button: '#F26CA7', text: '#5C3446' },
+                                sembako: { button: '#2F9E44', text: '#24411F' },
+                            };
+
+                            if (!presets[event.detail]) {
+                                return;
+                            }
+
+                            applyPastelProductPreset(presets[event.detail].button, presets[event.detail].text);
+                            window.dispatchEvent(new CustomEvent('updateProductType', { detail: 'grid3' }));
+                        });
+
                         function changeproduct() {
+                            const selectedHeader = document.querySelector('input[name="header"]:checked')?.value;
+                            const presets = {
+                                skincare: { button: '#F26CA7', text: '#4A2F3A' },
+                                pudding_putih: { button: '#F26CA7', text: '#5C3446' },
+                                sembako: { button: '#2F9E44', text: '#24411F' },
+                            };
+
+                            if (presets[selectedHeader]) {
+                                applyPastelProductPreset(presets[selectedHeader].button, presets[selectedHeader].text);
+                            }
+
                             const producttype = document.querySelector('input[name="product_type"]:checked');
                             const productmain = document.getElementById('product_main_color');
                             const productsecond = document.getElementById('product_second_color');

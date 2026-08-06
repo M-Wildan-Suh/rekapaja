@@ -149,13 +149,17 @@ class ProductController extends Controller
         }
     }
 
-    private function usesRamenBannerByTemplateId(mixed $templateId): bool
+    private function templateHidesProfileFieldsByTemplateId(mixed $templateId): bool
     {
         if (blank($templateId)) {
             return false;
         }
 
-        return Template::whereKey($templateId)->value('head_type') === 'ramen';
+        return in_array(
+            Template::whereKey($templateId)->value('head_type'),
+            ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'],
+            true
+        );
     }
 
     public function dashboard ()
@@ -215,14 +219,14 @@ class ProductController extends Controller
     {
         $this->ensureAdmin();
 
-        $usesRamenBanner = $this->usesRamenBannerByTemplateId($request->input('template_id'));
+        $templateHidesProfileFields = $this->templateHidesProfileFieldsByTemplateId($request->input('template_id'));
 
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-            'subtitle' => [$usesRamenBanner ? 'nullable' : 'required', 'string', 'max:255'],
+            'subtitle' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => [$usesRamenBanner ? 'nullable' : 'required', 'string'],
+            'description' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
@@ -739,14 +743,14 @@ PHP;
         $this->ensureProductAccess($product);
 
         $activeTab = $request->input('active_tab', 'product');
-        $usesRamenBanner = $this->usesRamenBannerByTemplateId($request->input('template_id', $product->template_id));
+        $templateHidesProfileFields = $this->templateHidesProfileFieldsByTemplateId($request->input('template_id', $product->template_id));
 
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
-            'subtitle' => [$usesRamenBanner ? 'nullable' : 'required', 'string', 'max:255'],
+            'subtitle' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => [$usesRamenBanner ? 'nullable' : 'required', 'string'],
+            'description' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
