@@ -17,7 +17,22 @@
                             <span>Kembali</span>
                         </a>
                     </div>
-                    <form action="{{route('product.store')}}" method="POST" enctype="multipart/form-data">
+                    @php
+                        $templateHeaders = $template->mapWithKeys(fn ($item) => [(string) $item->id => $item->head_type])->all();
+                        $selectedTemplateId = (string) old('template_id', optional($template->first())->id);
+                    @endphp
+                    <form
+                        x-data="{
+                            selectedTemplateId: @js($selectedTemplateId),
+                            templateHeaders: @js($templateHeaders),
+                            isRamenTemplate() {
+                                return this.templateHeaders[this.selectedTemplateId] === 'ramen';
+                            }
+                        }"
+                        action="{{route('product.store')}}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                    >
                         @csrf
                         <div class=" w-full space-y-6">
                             <p class=" text-lg sm:text-xl font-semibold">Data Usaha</p>
@@ -77,7 +92,9 @@
                                 </script>
                             </div>
 
-                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" required />
+                            <div x-show="!isRamenTemplate()" x-cloak>
+                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
+                            </div>
                             
                             <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
 
@@ -85,11 +102,15 @@
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
-                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" required />
+                            <div x-show="!isRamenTemplate()" x-cloak>
+                                <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
+                            </div>
                             
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 
-                            <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
+                            <div x-show="!isRamenTemplate()" x-cloak>
+                                <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
+                            </div>
 
                             @if (Auth::user()->role === 'admin')
                                 <x-admin.component.accessinput title="Access" :value="[]" :users="$accessUsers" name="access[]" />
@@ -104,7 +125,7 @@
                                 <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     @foreach ($template as $item)
                                         <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{$item->id}}" class="hidden peer" {{ (string) old('template_id', $loop->first ? $item->id : '') === (string) $item->id ? 'checked' : '' }} required>
+                                            <input type="radio" name="template_id" value="{{$item->id}}" x-model="selectedTemplateId" class="hidden peer" {{ (string) old('template_id', $loop->first ? $item->id : '') === (string) $item->id ? 'checked' : '' }} required>
                                             <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
                                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                             </div>

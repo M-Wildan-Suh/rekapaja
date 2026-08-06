@@ -1,4 +1,12 @@
-<x-layout.guest :title="$data->name" :desc="$data->subtitle" :tags="$data->productTags">
+@php
+    $hideBusinessProfileSections = in_array(($template->head_type ?? null), ['ramen', 'network', 'donut'], true);
+@endphp
+
+<x-layout.guest
+    :title="$data->name"
+    :desc="$hideBusinessProfileSections ? null : $data->subtitle"
+    :tags="$hideBusinessProfileSections ? collect() : $data->productTags"
+>
     <div class=" mx-auto rounded-md bg-white min-h-screen relative">
         <div class=" space-y-6">
             <div class=" background min-h-screen pt-6 relative space-y-4 bg-gradient-to-b">
@@ -10,11 +18,15 @@
 
                 @include('components.guest.youtube')
 
-                @includeFirst(['components.guest.description-' . ($template->desc_type ?? 'default'), 'components.guest.description'])
+                @unless($hideBusinessProfileSections)
+                    @includeFirst(['components.guest.description-' . ($template->desc_type ?? 'default'), 'components.guest.description'])
+                @endunless
 
-                @includeFirst(['components.guest.product.' . $template->product_type, 'components.guest.product.grid'])
+                @includeFirst(['components.guest.product.' . $template->product_type, 'components.guest.product.grid2'])
 
-                @includeFirst(['components.guest.tags-' . $template->product_type, 'components.guest.tags'])
+                @unless($hideBusinessProfileSections)
+                    @includeFirst(['components.guest.tags-' . $template->product_type, 'components.guest.tags'])
+                @endunless
 
                 @include('components.guest.contact')
             </div>

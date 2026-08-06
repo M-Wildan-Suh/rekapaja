@@ -55,6 +55,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="header-donut-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8F4] via-[#FFECEF] to-[#FFDCE8] text-[#4A2F22]">
+                                        <div class="absolute left-[6%] top-[12%] h-12 w-12 rounded-full bg-[#F7B4C9]/35 blur-xl"></div>
+                                        <div class="absolute right-[14%] top-[10%] h-16 w-16 rounded-full bg-[#FFD8A8]/30 blur-2xl"></div>
+                                        <div class="absolute bottom-[10%] left-[10%] h-20 w-20 rounded-full border border-white/60"></div>
+                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
+                                            <div class="max-w-[46%] space-y-2">
+                                                <p class="text-[1.35rem] font-black leading-tight text-[#E66B98]" style="font-family: 'Patrick Hand', cursive;">Donat Lezat,</p>
+                                                <p class="text-[1.8rem] font-black leading-[0.95]">Setiap Gigitan</p>
+                                                <p class="text-[1.8rem] font-black leading-[0.95] text-[#E66B98]">Penuh Kenangan</p>
+                                            </div>
+                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/70 shadow-xl shadow-pink-200/40">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -131,11 +146,12 @@
                     </div>
                     <div class=" w-full">
                         <div class=" w-full flex items-center justify-center">
-                            <div x-data="{producttype: 'grid'}"
+                            <div
+                                x-data="{producttype: 'grid2'}"
                                 x-init="window.addEventListener('updateProductType', (e) => producttype = e.detail)"
                                 class=" max-w-[400px] w-full rounded-md relative">
                                 @include('components.admin.template.product')
-                                <div x-show="producttype === 'grid'" class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                                <div x-show="producttype === 'grid2'" class=" w-full grid grid-cols-2 gap-2 sm:gap-3">
                                     <div class=" w-full rounded-md overflow-hidden">
                                         <div class=" w-full aspect-square bg-white">
                                             <img src="{{asset('assets/images/placeholder.webp')}}" class=" w-full h-full object-cover" alt="">
@@ -220,114 +236,49 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div x-show="producttype === 'ramen'" class="w-full space-y-3">
-                                    <div class="rounded-xl border border-[#EAD8C7] bg-[#FFF8F1] p-4 shadow-md">
-                                        <div class="flex items-center justify-center gap-3 text-center">
-                                            <span class="h-px w-8 bg-[#E0B56D]"></span>
-                                            <p class="text-lg font-black text-[#231914]">Menu Favorit</p>
-                                            <span class="h-px w-8 bg-[#E0B56D]"></span>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div class="overflow-hidden rounded-[1.25rem] border border-[#EAD8C7] bg-white">
-                                            <div class="aspect-[1.1/1] bg-white">
-                                                <img src="{{asset('assets/images/placeholder.webp')}}" class="w-full h-full object-cover" alt="">
-                                            </div>
-                                            <div class="space-y-2 p-3">
-                                                <p class="text-sm font-black text-[#231914]">Produk 1</p>
-                                                <p class="ramen-accent-text text-sm font-black" style="color: {{ old('accent_color', '#A72018') }}">Rp 20.000</p>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button type="button" class="ramen-accent-border rounded-full border border-[#EAD8C7] px-2 py-1 text-xs font-semibold text-[#231914]">Detail</button>
-                                                    <button id="probutton" type="button" style="background-color: #3EA648" class="rounded-full px-2 py-1 text-xs font-semibold text-white">Order</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="overflow-hidden rounded-[1.25rem] border border-[#EAD8C7] bg-white">
-                                            <div class="aspect-[1.1/1] bg-white">
-                                                <img src="{{asset('assets/images/placeholder.webp')}}" class="w-full h-full object-cover" alt="">
-                                            </div>
-                                            <div class="space-y-2 p-3">
-                                                <p class="text-sm font-black text-[#231914]">Produk 2</p>
-                                                <p class="ramen-accent-text text-sm font-black" style="color: {{ old('accent_color', '#A72018') }}">Rp 24.000</p>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button type="button" class="ramen-accent-border rounded-full border border-[#EAD8C7] px-2 py-1 text-xs font-semibold text-[#231914]">Detail</button>
-                                                    <button id="probutton" type="button" style="background-color: #3EA648" class="rounded-full px-2 py-1 text-xs font-semibold text-white">Order</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div x-show="producttype === 'network'" class="w-full space-y-4">
-                                    <div class="w-full py-4">
-                                        <div class="flex items-center justify-center gap-4 text-center">
-                                            <span class="h-px w-10 bg-[#2563eb]"></span>
-                                            <p class="text-[2rem] font-black tracking-tight text-[#000000]">Menu Favorit</p>
-                                            <span class="h-px w-10 bg-[#2563eb]"></span>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-3 p-3">
-                                        <div class="rounded-2xl overflow-hidden shadow-md shadow-black/20">
-                                            <div class="aspect-[4/3] bg-gray-200">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="w-full h-full object-cover">
-                                            </div>
-                                            <div id="product" style="background-color: #000000; color: #ffffff;" class="p-3 space-y-3">
-                                                <div class="space-y-1 text-center">
-                                                    <p class="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">Produk Network</p>
-                                                    <p class="text-xs opacity-80">Rp 150.000</p>
-                                                </div>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button style="background-color: #2563eb; color: #ffffff;" class="w-full rounded-md py-2 text-white text-xs">Detail</button>
-                                                    <button id="probutton" style="background-color: #2563eb; color: #ffffff;" class="w-full rounded-md py-2 text-white text-xs">Order</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="rounded-2xl overflow-hidden shadow-md shadow-black/20">
-                                            <div class="aspect-[4/3] bg-gray-200">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="w-full h-full object-cover">
-                                            </div>
-                                            <div id="product" style="background-color: #000000; color: #ffffff;" class="p-3 space-y-3">
-                                                <div class="space-y-1 text-center">
-                                                    <p class="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">Aksesoris</p>
-                                                    <p class="text-xs opacity-80">Rp 250.000</p>
-                                                </div>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button style="background-color: #2563eb; color: #ffffff;" class="w-full rounded-md py-2 text-white text-xs">Detail</button>
-                                                    <button id="probutton" style="background-color: #2563eb; color: #ffffff;" class="w-full rounded-md py-2 text-white text-xs">Order</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div x-show="producttype === 'florist'" class="w-full space-y-4">
+                                <div x-show="producttype === 'grid3'" class="w-full space-y-4">
                                     <div class="flex items-center justify-center gap-3 text-center">
                                         <span class="h-px w-8 bg-[#EC4899]"></span>
-                                        <p class="text-xl font-black text-[#6A1B4D]">Produk Kami</p>
+                                        <p class="text-lg sm:text-xl font-black text-[#6A1B4D]">Produk Grid 3</p>
                                         <span class="h-px w-8 bg-[#EC4899]"></span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div class="overflow-hidden rounded-[1.4rem] border border-[#F8BBD0] bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]">
-                                            <div class="aspect-[1.05/1]">
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]">
+                                            <div class="aspect-[4/3] bg-[#F8FAFC]">
                                                 <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
                                             </div>
-                                            <div id="product" style="background-color: #FFFFFF; color: #6A1B4D;" class="space-y-3 p-3">
-                                                <p class="text-left text-sm font-black leading-snug">Sweet Pink Bouquet</p>
-                                                <p class="text-left text-sm font-semibold text-[#6A1B4D]">Rp 175.000</p>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button type="button" class="w-full rounded-full border border-[#F8BBD0] px-3 py-2 text-xs font-semibold text-[#6A1B4D]">Detail</button>
-                                                    <button id="probutton" type="button" style="background-color: #25D366" class="w-full rounded-full px-3 py-2 text-xs font-semibold text-white">Pesan</button>
+                                            <div id="product" style="background-color: #FFFFFF; color: #111827;" class="space-y-1.5 p-2.5">
+                                                <p class="text-left text-[11px] font-bold leading-[1.25] min-h-[2rem]" style="color: {{ old('accent_color', '#EC4899') }};">Switch 8 Port</p>
+                                                <p class="text-left text-[10px] leading-[1.45] min-h-[2.6rem] text-[#111827]">Transfer data cepat dan stabil untuk kebutuhan jaringan Anda.</p>
+                                                <p class="text-left text-[11px] font-extrabold text-[#2563EB]">Rp 275.000</p>
+                                                <div class="grid grid-cols-1 gap-1.5">
+                                                    <button id="probutton" type="button" style="background-color: #16A34A" class="inline-flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[10px] font-semibold text-white"><span class="text-[11px]">◔</span>Beli</button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="overflow-hidden rounded-[1.4rem] border border-[#F8BBD0] bg-white shadow-[0_10px_30px_rgba(236,72,153,0.12)]">
-                                            <div class="aspect-[1.05/1]">
+                                        <div class="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]">
+                                            <div class="aspect-[4/3] bg-[#F8FAFC]">
                                                 <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
                                             </div>
-                                            <div id="product" style="background-color: #FFFFFF; color: #6A1B4D;" class="space-y-3 p-3">
-                                                <p class="text-left text-sm font-black leading-snug">Elegant White Bloom</p>
-                                                <p class="text-left text-sm font-semibold text-[#6A1B4D]">Rp 220.000</p>
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <button type="button" class="w-full rounded-full border border-[#F8BBD0] px-3 py-2 text-xs font-semibold text-[#6A1B4D]">Detail</button>
-                                                    <button id="probutton" type="button" style="background-color: #25D366" class="w-full rounded-full px-3 py-2 text-xs font-semibold text-white">Pesan</button>
+                                            <div id="product" style="background-color: #FFFFFF; color: #111827;" class="space-y-1.5 p-2.5">
+                                                <p class="text-left text-[11px] font-bold leading-[1.25] min-h-[2rem]" style="color: {{ old('accent_color', '#EC4899') }};">Adapter WiFi</p>
+                                                <p class="text-left text-[10px] leading-[1.45] min-h-[2.6rem] text-[#111827]">Menerima sinyal WiFi lebih kuat, praktis dan mudah digunakan.</p>
+                                                <p class="text-left text-[11px] font-extrabold text-[#2563EB]">Rp 125.000</p>
+                                                <div class="grid grid-cols-1 gap-1.5">
+                                                    <button id="probutton" type="button" style="background-color: #16A34A" class="inline-flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[10px] font-semibold text-white"><span class="text-[11px]">◔</span>Beli</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]">
+                                            <div class="aspect-[4/3] bg-[#F8FAFC]">
+                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
+                                            </div>
+                                            <div id="product" style="background-color: #FFFFFF; color: #111827;" class="space-y-1.5 p-2.5">
+                                                <p class="text-left text-[11px] font-bold leading-[1.25] min-h-[2rem]" style="color: {{ old('accent_color', '#EC4899') }};">Connector RJ45</p>
+                                                <p class="text-left text-[10px] leading-[1.45] min-h-[2.6rem] text-[#111827]">Konektor berkualitas untuk hasil crimping yang rapi dan optimal.</p>
+                                                <p class="text-left text-[11px] font-extrabold text-[#2563EB]">Rp 350 / pcs</p>
+                                                <div class="grid grid-cols-1 gap-1.5">
+                                                    <button id="probutton" type="button" style="background-color: #16A34A" class="inline-flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[10px] font-semibold text-white"><span class="text-[11px]">◔</span>Beli</button>
                                                 </div>
                                             </div>
                                         </div>

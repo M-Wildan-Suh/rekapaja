@@ -1,5 +1,10 @@
 @php
-    $selectedProductType = old('product_type', $template->product_type ?? 'grid');
+    $rawProductType = old('product_type', $template->product_type ?? 'grid2');
+    $selectedProductType = match ($rawProductType) {
+        'grid' => 'grid2',
+        'ramen', 'network', 'florist', 'donut' => 'grid3',
+        default => $rawProductType,
+    };
 @endphp
 <div x-data="{article: false}" class="">
     <button @click="article = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] rounded-tr-md z-10">
@@ -36,8 +41,8 @@
                             <label for="">Type</label>
                             <div class=" w-full grid grid-cols-3 gap-2">
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Grid</p>
-                                    <input type="radio" name="product_type" value="grid" class="hidden peer" {{ $selectedProductType === 'grid' ? 'checked' : '' }}>
+                                    <p>Grid 2</p>
+                                    <input type="radio" name="product_type" value="grid2" class="hidden peer" {{ $selectedProductType === 'grid2' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>
@@ -48,20 +53,8 @@
                                     </div>
                                 </label>
                                 <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Ramen</p>
-                                    <input type="radio" name="product_type" value="ramen" class="hidden peer" {{ $selectedProductType === 'ramen' ? 'checked' : '' }}>
-                                    <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                                    </div>
-                                </label>
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Network</p>
-                                    <input type="radio" name="product_type" value="network" class="hidden peer" {{ $selectedProductType === 'network' ? 'checked' : '' }}>
-                                    <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                                    </div>
-                                </label>
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Florist</p>
-                                    <input type="radio" name="product_type" value="florist" class="hidden peer" {{ $selectedProductType === 'florist' ? 'checked' : '' }}>
+                                    <p>Grid 3</p>
+                                    <input type="radio" name="product_type" value="grid3" class="hidden peer" {{ $selectedProductType === 'grid3' ? 'checked' : '' }}>
                                     <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                     </div>
                                 </label>

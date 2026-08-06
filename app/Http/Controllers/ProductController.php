@@ -149,6 +149,15 @@ class ProductController extends Controller
         }
     }
 
+    private function usesRamenBannerByTemplateId(mixed $templateId): bool
+    {
+        if (blank($templateId)) {
+            return false;
+        }
+
+        return Template::whereKey($templateId)->value('head_type') === 'ramen';
+    }
+
     public function dashboard ()
     {
         $no_tlp = NoHandphone::query()->value('no_tlp');
@@ -206,12 +215,14 @@ class ProductController extends Controller
     {
         $this->ensureAdmin();
 
+        $usesRamenBanner = $this->usesRamenBannerByTemplateId($request->input('template_id'));
+
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-            'subtitle' => ['required', 'string', 'max:255'],
+            'subtitle' => [$usesRamenBanner ? 'nullable' : 'required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => ['required', 'string'],
+            'description' => [$usesRamenBanner ? 'nullable' : 'required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
@@ -240,10 +251,10 @@ class ProductController extends Controller
 
         $newdata->name = $validated['name'];
         $newdata->slug = Str::slug($newdata->name);
-        $newdata->subtitle = $validated['subtitle'];
+        $newdata->subtitle = $usesRamenBanner ? null : ($validated['subtitle'] ?? null);
         $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $newdata->template_id = $validated['template_id'];
-        $newdata->description = $validated['description'];
+        $newdata->description = $usesRamenBanner ? null : ($validated['description'] ?? null);
         $newdata->price_prefix = $validated['price_prefix'] ?? null;
         $newdata->address = $validated['address'] ?? null;
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
@@ -277,7 +288,7 @@ class ProductController extends Controller
 
         Category::doesntHave('products')->forceDelete();
 
-        if (!empty($validated['tag'])) {
+        if (!$usesRamenBanner && !empty($validated['tag'])) {
             foreach ($validated['tag'] as $item) {
                 $tag = ProductTag::where('tag', $item)->first();
                 
@@ -728,13 +739,14 @@ PHP;
         $this->ensureProductAccess($product);
 
         $activeTab = $request->input('active_tab', 'product');
+        $usesRamenBanner = $this->usesRamenBannerByTemplateId($request->input('template_id', $product->template_id));
 
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
-            'subtitle' => ['required', 'string', 'max:255'],
+            'subtitle' => [$usesRamenBanner ? 'nullable' : 'required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => ['required', 'string'],
+            'description' => [$usesRamenBanner ? 'nullable' : 'required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
@@ -762,10 +774,14 @@ PHP;
 
         $product->name = $validated['name'];
         $product->slug = Str::slug($product->name);
-        $product->subtitle = $validated['subtitle'];
+        if (!$usesRamenBanner) {
+            $product->subtitle = $validated['subtitle'] ?? null;
+        }
         $product->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $product->template_id = $validated['template_id'];
-        $product->description = $validated['description'];
+        if (!$usesRamenBanner) {
+            $product->description = $validated['description'] ?? null;
+        }
         $product->price_prefix = $validated['price_prefix'] ?? null;
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
@@ -827,11 +843,10 @@ PHP;
 
         Category::doesntHave('products')->forceDelete();
 
-        PivotProductTag::where('product_id', $product->id)->delete();
-        
+        if (!$usesRamenBanner) {
+            PivotProductTag::where('product_id', $product->id)->delete();
+
         if (!empty($validated['tag'])) {
-            // Hapus data pivot yang memiliki product_id sesuai
-        
             foreach ($validated['tag'] as $item) {
                 $tag = ProductTag::where('tag', $item)->first();
         
@@ -857,6 +872,7 @@ PHP;
                     $newpivot->save();
                 }
             }
+        }
         }
 
         if (Auth::user()->role === 'admin') {

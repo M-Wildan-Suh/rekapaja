@@ -48,7 +48,23 @@
         </div>
         <div class="py-4 px-4">
             <div class="max-w-xl mx-auto">
-                <div x-data="{ activeTab: '{{ old('active_tab', session('highlight', 'product')) }}', orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}' }" class="bg-white overflow-hidden shadow-sm rounded-lg">
+                @php
+                    $templateHeaders = $template->mapWithKeys(fn ($item) => [(string) $item->id => $item->head_type])->all();
+                    $selectedTemplateId = old('template_id', $product->template_id);
+                    $selectedTemplateId = $selectedTemplateId !== null ? (string) $selectedTemplateId : '';
+                @endphp
+                <div
+                    x-data="{
+                        activeTab: '{{ old('active_tab', session('highlight', 'product')) }}',
+                        orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}',
+                        selectedTemplateId: @js($selectedTemplateId),
+                        templateHeaders: @js($templateHeaders),
+                        isRamenTemplate() {
+                            return this.templateHeaders[this.selectedTemplateId] === 'ramen';
+                        }
+                    }"
+                    class="bg-white overflow-hidden shadow-sm rounded-lg"
+                >
                     <!-- Tabs -->
                     <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
                         <div class=" grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 font-bold">
@@ -137,16 +153,22 @@
                                         }
                                     </script>
                                 </div>
-                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
+                                <div x-show="!isRamenTemplate()" x-cloak>
+                                    <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
+                                </div>
                                 <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
                                 <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" />
 
-                                <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />
+                                <div x-show="!isRamenTemplate()" x-cloak>
+                                    <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />
+                                </div>
                                 
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <x-admin.component.categoryinput title="Category" :value="$product->category" :tag="$category" name="category[]" />
-                                    <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]" :tag="$tag"></x-admin.component.taginput>
+                                    <div x-show="!isRamenTemplate()" x-cloak>
+                                        <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]" :tag="$tag"></x-admin.component.taginput>
+                                    </div>
                                     @if (Auth::user()->role === 'admin')
                                         <x-admin.component.accessinput title="Access" :value="$product->access->pluck('user_id')->all()" :users="$accessUsers" name="access[]" />
                                     @endif
@@ -191,7 +213,7 @@
                                 <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     @foreach ($template as $item)
                                         <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{$item->id}}" form="bussiness" class="hidden peer" {{ $selectedTemplateId === (string) $item->id ? 'checked' : '' }}>
+                                            <input type="radio" name="template_id" value="{{$item->id}}" form="bussiness" x-model="selectedTemplateId" class="hidden peer" {{ $selectedTemplateId === (string) $item->id ? 'checked' : '' }}>
                                             <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
                                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                                             </div>

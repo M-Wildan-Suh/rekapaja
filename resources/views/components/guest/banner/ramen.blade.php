@@ -1,54 +1,64 @@
 @php
     $ramenBg = $template->bg_main_color ?? '#F7EFE5';
-    $ramenSurface = '#FFF8F1';
-    $ramenBorder = '#EAD8C7';
     $ramenText = '#231914';
     $ramenAccent = $template->accent_color ?? '#A72018';
+    $ramenCategory = optional($data->category->first())->category;
+    $ramenDescription = filled($data->description)
+        ? $data->description
+        : 'Ramen berkualitas dengan kuah kaya rasa, mie kenyal, dan topping premium pilihan.';
+    $ramenTags = $data->productTags
+        ->map(fn ($item) => optional($item->productTag)->tag)
+        ->filter()
+        ->take(4);
 @endphp
 
-<div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative rounded-md overflow-hidden">
-    <div class="w-full aspect-[2/1] overflow-hidden rounded-md bg-white shadow-md shadow-black/10">
-        <div class="grid grid-cols-[0.95fr_1.05fr] sm:grid-cols-[0.88fr_1.12fr] relative h-full overflow-hidden" style="background-color: {{ $ramenBg }};">
-            <div
-                class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat"
-                style="background-image: url('{{ $data->image }}');"
-            ></div>
-            <div class="px-4 py-4 sm:px-6 sm:py-6 h-full flex items-center">
-                <div class="space-y-2.5 sm:space-y-4 relative z-10">
-                    <div class="space-y-1">
-                        <p class="text-[1.3rem] sm:text-[2.8rem] leading-none" style="font-family: 'Segoe Script', 'Brush Script MT', cursive; color: {{ $ramenText }};">
+<div class="w-full relative overflow-hidden">
+    <div class="w-full overflow-hidden bg-white shadow-md shadow-black/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
+        <div
+            class="relative aspect-[4/3] overflow-hidden"
+            style="background-color: {{ $ramenBg }};"
+        >
+            <div class="absolute inset-0">
+                <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
+            </div>
+            <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
+                <div class="w-[45%] space-y-2.5 md:space-y-3">
+                    <div class="space-y-1.5">
+                        @if (filled($ramenCategory))
+                            <div class="flex items-center gap-1.5 md:gap-2">
+                                <p class="text-[0.58rem] font-semibold tracking-[0.08em] md:text-[0.78rem]" style="color: {{ $ramenAccent }};">
+                                    {{ $ramenCategory }}
+                                </p>
+                            </div>
+                        @endif
+                        <p class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenText }};">
                             {{ $data->name }}
                         </p>
-                        <p class="text-[1.45rem] sm:text-[2.9rem] font-bold italic leading-[0.95]" style="color: {{ $ramenAccent }};">
-                            {{ $data->subtitle ?: 'Buat Hari Makin Nikmat!' }}
+                        @if (filled($data->subtitle))
+                            <p class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenAccent }};">
+                                {{ $data->subtitle }}
+                            </p>
+                        @endif
+                        <p class=" pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
+                            {!! nl2br(e($ramenDescription)) !!}
                         </p>
-                    </div>
-
-                    @php
-                        $keywords = $data->productTags
-                            ->map(fn ($item) => optional($item->productTag)->tag)
-                            ->filter()
-                            ->take(6);
-                    @endphp
-
-                    @if ($keywords->isNotEmpty())
-                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                            @foreach ($keywords as $keyword)
-                                <div class="rounded-full border px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-sm font-semibold" style="background-color: {{ $ramenSurface }}; border-color: {{ $ramenBorder }}; color: {{ $ramenText }};">
-                                    {{ $keyword }}
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="relative h-full overflow-hidden z-10" style="background: radial-gradient(circle at top left, #D3492F 0%, {{ $ramenAccent }} 58%, #7D140F 100%);">
-                <div class="absolute left-[-6%] top-[4%] h-[92%] w-[92%] rounded-full border-2 opacity-90" style="border-color: #F2DDD4;"></div>
-                <div class="absolute left-[2%] top-[1%] h-[95%] w-[92%] rounded-full border opacity-50" style="border-color: #F2DDD4;"></div>
-                <div class="absolute inset-0 flex items-center justify-center p-3 sm:p-6">
-                    <div class="w-full max-w-[440px] overflow-hidden rounded-full shadow-2xl shadow-black/30">
-                        <img src="{{ $data->image }}" class="aspect-square w-full object-cover object-center" alt="{{ $data->name }}">
+                        @if ($ramenTags->isNotEmpty())
+                            <div class="grid grid-cols-3 gap-1.5 pt-1 md:gap-2 md:pt-2">
+                                @foreach ($ramenTags->take(3) as $tag)
+                                    <div
+                                        class="flex flex-col items-center justify-start px-1 py-1 text-center md:px-2 md:py-1.5"
+                                        style="color: {{ $ramenText }};"
+                                    >
+                                        <span class="inline-flex items-center justify-center text-[1rem] font-bold md:text-[1.25rem]" style="color: {{ $ramenAccent }};">
+                                            o
+                                        </span>
+                                        <span class="text-[0.42rem] font-semibold leading-[1.25] md:text-[0.62rem]" style="color: {{ $ramenText }};">
+                                            {{ $tag }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

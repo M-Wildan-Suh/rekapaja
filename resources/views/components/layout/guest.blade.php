@@ -19,6 +19,8 @@
 
         <style>
             @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wdth,wght@75..100,400..700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
         </style>
 
         <!-- CDN -->

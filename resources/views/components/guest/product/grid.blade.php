@@ -137,7 +137,7 @@
             @csrf
             <input type="hidden" name="customer_name" :value="customerName">
             <input type="hidden" name="customer_address" :value="customerAddress">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3">
                 @foreach ($data->productHighlight as $item)
                     <div style="background-color: {{ $template->product_main_color }}"
                         class=" flex flex-col w-full text-white rounded-md overflow-hidden shadow-md shadow-black/20 relative">
