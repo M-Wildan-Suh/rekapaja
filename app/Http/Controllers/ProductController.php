@@ -149,19 +149,6 @@ class ProductController extends Controller
         }
     }
 
-    private function templateHidesProfileFieldsByTemplateId(mixed $templateId): bool
-    {
-        if (blank($templateId)) {
-            return false;
-        }
-
-        return in_array(
-            Template::whereKey($templateId)->value('head_type'),
-            ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'],
-            true
-        );
-    }
-
     public function dashboard ()
     {
         $no_tlp = NoHandphone::query()->value('no_tlp');
@@ -219,14 +206,12 @@ class ProductController extends Controller
     {
         $this->ensureAdmin();
 
-        $templateHidesProfileFields = $this->templateHidesProfileFieldsByTemplateId($request->input('template_id'));
-
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-            'subtitle' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string', 'max:255'],
+            'subtitle' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string'],
+            'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
@@ -255,10 +240,10 @@ class ProductController extends Controller
 
         $newdata->name = $validated['name'];
         $newdata->slug = Str::slug($newdata->name);
-        $newdata->subtitle = $usesRamenBanner ? null : ($validated['subtitle'] ?? null);
+        $newdata->subtitle = $validated['subtitle'] ?? null;
         $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $newdata->template_id = $validated['template_id'];
-        $newdata->description = $usesRamenBanner ? null : ($validated['description'] ?? null);
+        $newdata->description = $validated['description'] ?? null;
         $newdata->price_prefix = $validated['price_prefix'] ?? null;
         $newdata->address = $validated['address'] ?? null;
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
@@ -292,7 +277,7 @@ class ProductController extends Controller
 
         Category::doesntHave('products')->forceDelete();
 
-        if (!$usesRamenBanner && !empty($validated['tag'])) {
+        if (!empty($validated['tag'])) {
             foreach ($validated['tag'] as $item) {
                 $tag = ProductTag::where('tag', $item)->first();
                 
@@ -743,14 +728,13 @@ PHP;
         $this->ensureProductAccess($product);
 
         $activeTab = $request->input('active_tab', 'product');
-        $templateHidesProfileFields = $this->templateHidesProfileFieldsByTemplateId($request->input('template_id', $product->template_id));
 
         $validated = $request->validate(array_merge([
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
-            'subtitle' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string', 'max:255'],
+            'subtitle' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'regex:/^\d+$/'],
             'template_id' => ['required', 'exists:templates,id'],
-            'description' => [$templateHidesProfileFields ? 'nullable' : 'required', 'string'],
+            'description' => ['required', 'string'],
             'address' => ['nullable', 'string', 'max:255'],
             'no_tlp' => ['nullable', 'string', 'max:20'],
             'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
@@ -778,14 +762,10 @@ PHP;
 
         $product->name = $validated['name'];
         $product->slug = Str::slug($product->name);
-        if (!$usesRamenBanner) {
-            $product->subtitle = $validated['subtitle'] ?? null;
-        }
+        $product->subtitle = $validated['subtitle'] ?? null;
         $product->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
         $product->template_id = $validated['template_id'];
-        if (!$usesRamenBanner) {
-            $product->description = $validated['description'] ?? null;
-        }
+        $product->description = $validated['description'] ?? null;
         $product->price_prefix = $validated['price_prefix'] ?? null;
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
@@ -847,36 +827,34 @@ PHP;
 
         Category::doesntHave('products')->forceDelete();
 
-        if (!$usesRamenBanner) {
-            PivotProductTag::where('product_id', $product->id)->delete();
+        PivotProductTag::where('product_id', $product->id)->delete();
 
         if (!empty($validated['tag'])) {
             foreach ($validated['tag'] as $item) {
                 $tag = ProductTag::where('tag', $item)->first();
-        
+
                 if ($tag) {
                     $newpivot = new PivotProductTag;
-    
+
                     $newpivot->tag_id = $tag->id;
                     $newpivot->product_id = $product->id;
-    
+
                     $newpivot->save();
                 } else {
                     $newtag = new ProductTag;
-        
+
                     $newtag->tag = ucfirst($item);
-        
+
                     $newtag->save();
-        
+
                     $newpivot = new PivotProductTag;
-        
+
                     $newpivot->tag_id = $newtag->id;
                     $newpivot->product_id = $product->id;
-        
+
                     $newpivot->save();
                 }
             }
-        }
         }
 
         if (Auth::user()->role === 'admin') {

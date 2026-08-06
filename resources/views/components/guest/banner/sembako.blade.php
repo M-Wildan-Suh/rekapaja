@@ -20,17 +20,13 @@
     }
 @endphp
 
-<div class="w-full relative overflow-hidden">
-    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
-        <div class="relative overflow-hidden pb-[4.9rem] md:pb-[5.7rem]">
+<div class="w-full relative mb-20">
+    <div class="w-full bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
+        <div class="relative">
             <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $sembakoBg }};">
                 <div class="absolute inset-0">
                     <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
                 </div>
-
-                <div class="absolute left-0 top-[10%] h-24 w-10 rounded-r-full bg-[#D9F99D]/40 blur-sm"></div>
-                <div class="absolute left-[5%] top-[18%] h-8 w-8 rounded-full bg-[#FDE68A]/40 blur-xl"></div>
-                <div class="absolute right-[12%] top-[15%] h-16 w-16 rounded-full bg-[#DCFCE7]/35 blur-2xl"></div>
 
                 <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
                     <div class="w-[50%] space-y-2.5 md:space-y-3">

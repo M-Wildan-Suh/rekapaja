@@ -24,10 +24,7 @@
                     <form
                         x-data="{
                             selectedTemplateId: @js($selectedTemplateId),
-                            templateHeaders: @js($templateHeaders),
-                            hidesProfileFields() {
-                                return ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'].includes(this.templateHeaders[this.selectedTemplateId]);
-                            }
+                            templateHeaders: @js($templateHeaders)
                         }"
                         action="{{route('product.store')}}"
                         method="POST"
@@ -92,9 +89,7 @@
                                 </script>
                             </div>
 
-                            <div x-show="!hidesProfileFields()" x-cloak>
-                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
-                            </div>
+                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
                             
                             <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
 
@@ -102,15 +97,11 @@
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
 
-                            <div x-show="!hidesProfileFields()" x-cloak>
-                                <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
-                            </div>
+                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
                             
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 
-                            <div x-show="!hidesProfileFields()" x-cloak>
-                                <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
-                            </div>
+                            <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
 
                             @if (Auth::user()->role === 'admin')
                                 <x-admin.component.accessinput title="Access" :value="[]" :users="$accessUsers" name="access[]" />
