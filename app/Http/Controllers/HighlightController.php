@@ -12,6 +12,25 @@ use Intervention\Image\ImageManager;
 
 class HighlightController extends Controller
 {
+    private function saveHighlightImage($image): string
+    {
+        $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+        $currentDate = now()->format('YmdHis');
+        $imageName = $originalName . '_' . $currentDate;
+        $imagePath = public_path('storage/images/product/highlight/');
+
+        if (!file_exists($imagePath)) {
+            mkdir($imagePath, 0755, true);
+        }
+
+        $manager = new ImageManager(new Driver());
+        $imageOptimized = $manager->read($image->getPathname());
+        $imageFullPath = $imagePath . $imageName . '.webp';
+        $imageOptimized->save($imageFullPath);
+
+        return $imageName . '.webp';
+    }
+
     private function normalizeWholeNumberPrice(mixed $price): ?int
     {
         if ($price === null || $price === '' || $price === 'null') {
@@ -260,6 +279,74 @@ class HighlightController extends Controller
                 'message' => 'Data tidak bisa di update.'.$highlight
             ], 404);
         }
+    }
+
+    public function bulkUpdate(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $highlights = $product->productHighlight()->get()->keyBy('id');
+        $submittedHighlights = $request->input('highlights', []);
+
+        foreach ($submittedHighlights as $highlightId => $highlightData) {
+            $highlight = $highlights->get((int) $highlightId);
+
+            if (!$highlight) {
+                continue;
+            }
+
+            $title = trim((string) ($highlightData['title'] ?? ''));
+            $price = $highlightData['price'] ?? null;
+            $description = $highlightData['description'] ?? null;
+
+            if ($title === '') {
+                return back()
+                    ->withErrors(["highlights.$highlightId.title" => 'Nama produk/jasa wajib diisi.'])
+                    ->withInput()
+                    ->with('highlight', 'highlight');
+            }
+
+            if (mb_strlen($title) > 27) {
+                return back()
+                    ->withErrors(["highlights.$highlightId.title" => 'Nama produk/jasa maksimal 27 karakter.'])
+                    ->withInput()
+                    ->with('highlight', 'highlight');
+            }
+
+            if ($price !== null && $price !== '' && !preg_match('/^\d+$/', (string) $price)) {
+                return back()
+                    ->withErrors(["highlights.$highlightId.price" => 'Harga hanya boleh berisi angka.'])
+                    ->withInput()
+                    ->with('highlight', 'highlight');
+            }
+
+            $highlight->title = $title;
+            $highlight->price = $this->normalizeWholeNumberPrice($price);
+            $highlight->description = $description;
+
+            if ($request->hasFile("highlightimage.$highlightId")) {
+                if ($highlight->image) {
+                    $path = public_path('storage/images/product/highlight/' . $highlight->image);
+
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
+                }
+
+                $image = $request->file("highlightimage.$highlightId");
+                $highlight->image = $this->saveHighlightImage($image);
+            }
+
+            $requestedAvailable = filter_var($highlightData['available'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $highlight->available = $requestedAvailable && $this->canBeMarkedAvailable($highlight);
+
+            $highlight->save();
+        }
+
+        return redirect()
+            ->route('product.show', $product)
+            ->with('highlight', 'highlight')
+            ->with('success', 'Produk/jasa berhasil diperbarui.');
     }
 
     /**

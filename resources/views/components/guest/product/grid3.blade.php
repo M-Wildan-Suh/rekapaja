@@ -176,10 +176,25 @@
                                 'accent' => $template->product_second_color ?? $gridWhatsapp,
                                 'text' => $template->product_text_color,
                             ];
+                        $productDetail = [
+                            'id' => $item->id,
+                            'title' => $item->title,
+                            'description' => $item->description,
+                            'image' => $item->image,
+                            'price' => $item->price ? 'Rp' . number_format($item->price, 0, ',', '.') : null,
+                            'canOrder' => (bool) $item->available,
+                        ];
                     @endphp
                     <div class="overflow-hidden rounded-xl border bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]" style="border-color: {{ $cardTheme['border'] }};">
                         <div class="relative aspect-square" style="background-color: {{ $cardTheme['surface'] }};">
-                            <img src="{{ $item->image }}" alt="{{ $item->title }}" class="h-full w-full object-cover object-center">
+                            <button
+                                type="button"
+                                x-data='@json(['product' => $productDetail])'
+                                @click='window.dispatchEvent(new CustomEvent("open-product-detail", { detail: product }))'
+                                class="h-full w-full text-left"
+                            >
+                                <img src="{{ $item->image }}" alt="{{ $item->title }}" class="h-full w-full object-cover object-center transition duration-300 hover:scale-[1.03]">
+                            </button>
                             @if (!$item->available)
                                 <div class="absolute left-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[8px] sm:left-2 sm:top-2 sm:px-2.5 sm:py-1 sm:text-[10px] font-bold tracking-wide text-white shadow-md" style="background-color: {{ $pastelGridHeader ? $cardTheme['accent'] : '#DB2777' }};">
                                     Habis
@@ -188,7 +203,15 @@
                         </div>
                         <div id="product" class="space-y-[3px] p-[5px] sm:space-y-2 sm:p-3" style="background-color: {{ $cardTheme['surface'] }}; color: {{ $cardTheme['text'] }};">
                             <div class="space-y-1">
-                                <p class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-2" style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : ($template->accent_color ?? $gridAccent) }};">{{ $item->title }}</p>
+                                <button
+                                    type="button"
+                                    x-data='@json(['product' => $productDetail])'
+                                    @click='window.dispatchEvent(new CustomEvent("open-product-detail", { detail: product }))'
+                                    class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-2 transition hover:opacity-80"
+                                    style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : ($template->accent_color ?? $gridAccent) }};"
+                                >
+                                    {{ $item->title }}
+                                </button>
                             </div>
                             <p class="text-left text-[7px] sm:text-[11px] leading-[1.25] line-clamp-2" style="color: {{ $cardTheme['text'] }};">
                                 {{ $item->description ?: 'Deskripsi produk akan tampil langsung pada kartu grid 3.' }}

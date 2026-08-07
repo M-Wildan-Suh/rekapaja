@@ -52,6 +52,9 @@
                     $templateHeaders = $template->mapWithKeys(fn ($item) => [(string) $item->id => $item->head_type])->all();
                     $selectedTemplateId = old('template_id', $product->template_id);
                     $selectedTemplateId = $selectedTemplateId !== null ? (string) $selectedTemplateId : '';
+                    $qrisImageUrl = old('remove_qris') === '1'
+                        ? null
+                        : ($product->qris ? asset('storage/images/product/qris/' . $product->qris) : null);
                 @endphp
                 <div
                     x-data="{
@@ -106,7 +109,20 @@
                                     <div class=" flex flex-col gap-2">
                                         <label class="text-sm sm:text-base font-semibold text-center" for="qris-input">QRIS (Optional)</label>
                                         <div class="w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto border border-dashed border-gray-300">
-                                            <x-admin.component.imageinput :value="$product->qris ? asset('storage/images/product/qris/' . $product->qris) : null" name="qris" />
+                                            <x-admin.component.imageinput :value="$qrisImageUrl" name="qris" />
+                                        </div>
+                                        <input type="hidden" name="remove_qris" id="remove-qris-input" value="{{ old('remove_qris', '0') }}">
+                                        <div class="flex flex-col items-center gap-2 text-center">
+                                            <button
+                                                type="button"
+                                                id="remove-qris-button"
+                                                class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                Hapus Gambar QRIS
+                                            </button>
+                                            <p class="text-xs text-neutral-500">
+                                                Jika gambar QRIS kosong atau dihapus, fitur QRIS otomatis nonaktif. Jika upload gambar baru, fitur otomatis aktif.
+                                            </p>
                                         </div>
                                     </div>
                                 @endif
@@ -180,7 +196,12 @@
                                 <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="$product->home_button" name="home_button" form="bussiness" />
                                 <x-admin.component.radioinput title="Order via WhatsApp" :value="[['label'=>'Instan Rekap', 'value'=>'instan_rekap'], ['label'=>'Tanya', 'value'=>'tanya']]" :defaultvalue="$product->order_via_whatsapp ?? 'instan_rekap'" name="order_via_whatsapp" form="bussiness" xModel="orderViaWhatsapp" />
                                 <x-admin.component.radioinput title="Customer Data" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->customer_data ?? 'active'" name="customer_data" form="bussiness" />
-                                <x-admin.component.radioinput title="QRIS" :value="[['label'=>'Active', 'value'=>'active'], ['label'=>'Unactive', 'value'=>'unactive']]" :defaultvalue="$product->qris_status ?? 'active'" name="qris_status" form="bussiness" />
+                                <div class="space-y-2">
+                                    <label class="font-semibold">QRIS</label>
+                                    <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                                        Status QRIS mengikuti gambar QRIS. Jika ada gambar maka aktif, jika tidak ada gambar maka nonaktif.
+                                    </div>
+                                </div>
                             @endif
 
                             @php
@@ -308,7 +329,7 @@
                             <div class=" space-y-4">
                                 @include('admin.product.component.product')
                                 <div class="">
-                                    <button @click="document.getElementById('bussiness').submit()" class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
+                                    <button type="submit" form="highlight-form" class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
                                 </div>
                             </div>
                         </div>
@@ -417,3 +438,47 @@
         </button>
     </a>
 </x-app-layout>
+@if (Auth::user()->canAccessPremiumFeatures())
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrisInput = document.getElementById('qris-input');
+            const qrisPreview = document.getElementById('qris-preview');
+            const removeQrisInput = document.getElementById('remove-qris-input');
+            const removeQrisButton = document.getElementById('remove-qris-button');
+            const placeholderImage = @js(asset('assets/images/placeholder.jpg'));
+            const initialQrisImage = @js($qrisImageUrl);
+
+            if (!qrisInput || !qrisPreview || !removeQrisInput || !removeQrisButton) {
+                return;
+            }
+
+            const syncRemoveButtonState = () => {
+                const hasInitialImage = Boolean(initialQrisImage) && removeQrisInput.value !== '1';
+                const hasNewImage = qrisInput.files && qrisInput.files.length > 0;
+
+                removeQrisButton.disabled = !hasInitialImage && !hasNewImage;
+            };
+
+            if (removeQrisInput.value === '1') {
+                qrisPreview.src = placeholderImage;
+            }
+
+            qrisInput.addEventListener('change', () => {
+                if (qrisInput.files && qrisInput.files.length > 0) {
+                    removeQrisInput.value = '0';
+                }
+
+                syncRemoveButtonState();
+            });
+
+            removeQrisButton.addEventListener('click', () => {
+                removeQrisInput.value = '1';
+                qrisInput.value = '';
+                qrisPreview.src = placeholderImage;
+                syncRemoveButtonState();
+            });
+
+            syncRemoveButtonState();
+        });
+    </script>
+@endif

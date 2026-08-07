@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/admin/product-gallery', ProductGalleryController::class);
 
     Route::resource('/admin/highlight', HighlightController::class);
+    Route::put('/admin/highlight-bulk/{product}', [HighlightController::class, 'bulkUpdate'])->name('highlight.bulk-update');
     Route::post('/admin/highlight/multiple', [HighlightController::class, 'multiple'])->name('highlight.multiple');
     Route::put('/admin/highlight-available/{id}', [HighlightController::class, 'available'])->name('highlight.available');
 

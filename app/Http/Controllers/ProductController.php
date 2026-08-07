@@ -230,7 +230,6 @@ class ProductController extends Controller
             'access' => ['nullable', 'array'],
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
             'customer_data' => ['nullable', 'in:active,unactive'],
-            'qris_status' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
         ], $this->canManageQris() ? [
             'qris' => ['nullable', 'image'],
@@ -251,7 +250,6 @@ class ProductController extends Controller
         $newdata->youtube = $validated['link'] ?? null;
         $newdata->home_button = $validated['home_button'];
         $newdata->customer_data = $validated['customer_data'] ?? 'active';
-        $newdata->qris_status = $validated['qris_status'] ?? 'active';
         $newdata->order_via_whatsapp = $validated['order_via_whatsapp'] ?? 'instan_rekap';
         $newdata->status = 'active';
 
@@ -262,6 +260,8 @@ class ProductController extends Controller
         if ($this->canManageQris() && $request->hasFile('qris')) {
             $newdata->qris = $this->storeQrisImage($request->file('qris'));
         }
+
+        $newdata->qris_status = filled($newdata->qris) ? 'active' : 'unactive';
 
         $newdata->save();
 
@@ -747,7 +747,6 @@ PHP;
             'home_button' => ['nullable', 'in:on,off'],
             'status' => ['nullable', 'in:active,unactive'],
             'customer_data' => ['nullable', 'in:active,unactive'],
-            'qris_status' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
             'thumbnail' => ['nullable', 'image'],
             'category' => ['nullable', 'array'],
@@ -758,6 +757,7 @@ PHP;
             'access.*' => ['nullable', 'integer', 'exists:users,id'],
         ], $this->canManageQris() ? [
             'qris' => ['nullable', 'image'],
+            'remove_qris' => ['nullable', 'boolean'],
         ] : []));
 
         $product->name = $validated['name'];
@@ -780,10 +780,6 @@ PHP;
             $product->customer_data = $validated['customer_data'];
         }
 
-        if (array_key_exists('qris_status', $validated)) {
-            $product->qris_status = $validated['qris_status'];
-        }
-
         if (array_key_exists('order_via_whatsapp', $validated)) {
             $product->order_via_whatsapp = $validated['order_via_whatsapp'];
         }
@@ -800,17 +796,19 @@ PHP;
             $product->image = $newImageName;
         }
 
-        if ($this->canManageQris() && $request->hasFile('qris')) {
-            $newQrisName = $this->storeQrisImage($request->file('qris'));
-            $this->deleteImageIfExists($product->qris, 'storage/images/product/qris');
-            $product->qris = $newQrisName;
-        }
+        if ($this->canManageQris()) {
+            if ($request->boolean('remove_qris')) {
+                $this->deleteImageIfExists($product->qris, 'storage/images/product/qris');
+                $product->qris = null;
+            }
 
-        if (($validated['qris_status'] ?? $product->qris_status) === 'active' && empty($product->qris)) {
-            return back()
-                ->withErrors(['qris' => 'Upload gambar QRIS sebelum mengaktifkan fitur QRIS.'])
-                ->withInput()
-                ->with('highlight', 'feature');
+            if ($request->hasFile('qris')) {
+                $newQrisName = $this->storeQrisImage($request->file('qris'));
+                $this->deleteImageIfExists($product->qris, 'storage/images/product/qris');
+                $product->qris = $newQrisName;
+            }
+
+            $product->qris_status = filled($product->qris) ? 'active' : 'unactive';
         }
 
         $product->save();
