@@ -256,10 +256,10 @@ class TemplateController extends Controller
         return [
             'name' => ['required', 'string', 'max:255'],
             'bg_type' => ['required', 'in:normal,gradient,image'],
-            'header' => ['required', 'in:one,two,three,four,ramen,network,florist,donut,skincare,pudding_putih,sembako'],
-            'gallery' => ['required', 'in:square,potrait,network,florist'],
+            'header' => ['required', 'in:one,two,three,four,ramen,network,donut,skincare,pudding_putih,sembako'],
+            'gallery' => ['required', 'in:square,potrait,network'],
             'accent_color' => $colorRule,
-            'desc_type' => ['required', 'in:default,ramen,network,florist'],
+            'desc_type' => ['required', 'in:default'],
             'desc_main_color' => $colorRule,
             'desc_text_color' => $colorRule,
             'product_type' => ['required', 'in:grid2,list,grid3'],

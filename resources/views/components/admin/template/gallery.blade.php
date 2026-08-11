@@ -45,19 +45,11 @@
                             </div>
                         </label>
                         <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
-                            <input type="radio" name="gallery" value="network" class="hidden peer" {{ $selectedGallery === 'potrait' ? 'checked' : '' }}>
+                            <input type="radio" name="gallery" value="network" class="hidden peer" {{ $selectedGallery === 'network' ? 'checked' : '' }}>
                             <img src="{{asset('assets/images/template/gallery/network.png')}}" class=" w-full" alt="">
                             <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
                             </div>
                         </label>
-                        <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center shadow-sm border border-gray-100 hover:border-gray-300 transition cursor-pointer">
-                            <input type="radio" name="gallery" value="florist" class="hidden peer" {{ $selectedGallery === 'florist' ? 'checked' : '' }}>
-                            <img src="{{asset('assets/images/template/gallery/florist.png')}}" class=" w-full" alt="florist">
-                            <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-white opacity-0 peer-checked:opacity-100 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                        </label>
-                        <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center">
                     </div>
                 </div>
             </div>

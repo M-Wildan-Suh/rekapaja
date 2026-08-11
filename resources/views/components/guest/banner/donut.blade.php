@@ -28,25 +28,25 @@
             <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
                 <div class="w-[45%] space-y-2.5 md:w-[55%] md:space-y-3">
                     <div class="space-y-1.5">
-                        <p class="text-[1.58rem] font-semibold leading-none md:text-[2.65rem]" style="font-family: {!! $donutNameFont !!}; color: {{ $donutAccent }};">
+                        <p class="line-clamp-1 text-[1.58rem] font-semibold leading-none md:text-[2.65rem]" style="font-family: {!! $donutNameFont !!}; color: {{ $donutAccent }};">
                             {{ $data->name }}
                         </p>
                         @if (filled($data->subtitle))
                             <div class="space-y-0.5">
                                 @if (filled($donutSubtitlePrimary))
-                                    <p class="text-[1rem] font-black leading-[0.95] md:text-[2.2rem]" style="color: {{ $donutText }};">
+                                    <p class="line-clamp-1 text-[1rem] font-black leading-[0.95] md:text-[2.2rem]" style="color: {{ $donutText }};">
                                         {{ $donutSubtitlePrimary }}
                                     </p>
                                 @endif
                                 @if (filled($donutSubtitleAccent))
-                                    <p class="text-[1rem] font-black leading-[0.95] md:text-[2.2rem]" style="color: {{ $donutAccent }};">
+                                    <p class="line-clamp-1 text-[1rem] font-black leading-[0.95] md:text-[2.2rem]" style="color: {{ $donutAccent }};">
                                         {{ $donutSubtitleAccent }}
                                     </p>
                                 @endif
                             </div>
                         @endif
                         @if (filled($donutDescription))
-                            <p class="pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $donutText }};">
+                            <p class="line-clamp-3 pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $donutText }};">
                                 {!! nl2br(e($donutDescription)) !!}
                             </p>
                         @endif
@@ -59,7 +59,7 @@
                                     <span class="inline-flex items-center justify-center text-[0.72rem] font-black md:text-[0.9rem]" style="color: {{ $donutAccent }};">
                                         o
                                     </span>
-                                    <span class="text-[0.46rem] font-semibold leading-[1.25] md:text-[0.68rem]" style="color: {{ $donutText }};">
+                                    <span class="line-clamp-2 text-[0.46rem] font-semibold leading-[1.25] md:text-[0.68rem]" style="color: {{ $donutText }};">
                                         {{ $tag }}
                                     </span>
                                 </div>

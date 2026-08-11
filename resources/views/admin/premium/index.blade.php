@@ -145,6 +145,15 @@
                         modalData: {},
 
                         get paginatedData() {
+                            if (this.totalPages === 0) {
+                                this.currentPage = 1;
+                                return [];
+                            }
+
+                            if (this.currentPage > this.totalPages) {
+                                this.currentPage = 1;
+                            }
+
                             let start = (this.currentPage - 1) * this.perPage;
                             let end = start + this.perPage;
                             return this.filteredData.slice(start, end);

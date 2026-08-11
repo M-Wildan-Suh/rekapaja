@@ -7,10 +7,14 @@
     $floristWhatsapp = $template->contact_main_color ?? '#25D366';
 @endphp
 
+@include('components.guest.product.cart-animation-style')
+
 <div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative space-y-6">
     <div
         x-data="{
             checkedItems: [],
+            cartBounceActive: false,
+            cartBounceTimeout: null,
             showOrderModal: false,
             showQrisPreviewModal: false,
             customerName: '',
@@ -36,6 +40,31 @@
             },
             incrementQuantity(item) {
                 item.quantity = Math.min(999, (parseInt(item.quantity || 1) + 1));
+            },
+            triggerCartFeedback() {
+                this.cartBounceActive = false;
+
+                if (this.cartBounceTimeout) {
+                    clearTimeout(this.cartBounceTimeout);
+                }
+
+                this.$nextTick(() => {
+                    this.cartBounceActive = true;
+                    this.cartBounceTimeout = window.setTimeout(() => {
+                        this.cartBounceActive = false;
+                    }, 450);
+                });
+            },
+            toggleCheckedItem(item) {
+                const existingIndex = this.checkedItems.findIndex((checkedItem) => checkedItem.id === item.id);
+
+                if (existingIndex !== -1) {
+                    this.checkedItems.splice(existingIndex, 1);
+                    return;
+                }
+
+                this.checkedItems.push({ ...item, quantity: parseInt(item.quantity || 1) || 1 });
+                this.triggerCartFeedback();
             },
             openOrderModal() {
                 if (!this.checkedItems.length) {
@@ -180,9 +209,7 @@
                                 />
                                 @if ($role === 'admin' || $role === 'premium')
                                     <input type="checkbox" class="hidden" name="order[{{ $item->id }}][id]" value="{{ $item->id }}" id="order-{{ $item->id }}"
-                                        @input="checkedItems.some(data => data.id === {{ $item->id }})
-                                            ? checkedItems = checkedItems.filter(data => data.id !== {{ $item->id }})
-                                            : checkedItems.push({ id: {{ $item->id }}, title: '{{ addslashes($item->title) }}', quantity: 1, price: {{ (int) ($item->price ?? 0) }} })">
+                                        @input="toggleCheckedItem({ id: {{ $item->id }}, title: '{{ addslashes($item->title) }}', quantity: 1, price: {{ (int) ($item->price ?? 0) }} })">
                                     <input type="number" class="hidden" name="order[{{ $item->id }}][quantity]"
                                         :value="checkedItems.find(item => item.id === {{ $item->id }})?.quantity || 1"
                                         x-model="checkedItems.find(item => item.id === {{ $item->id }})?.quantity">
@@ -203,9 +230,9 @@
 
         <div class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-[600px]" x-show="checkedItems.length > 0">
             <div x-data="{ dropdownOpen: false }" class="relative">
-                <button @click="dropdownOpen = !dropdownOpen" :class="dropdownOpen ? 'bg-pink-700 rounded-b-none' : 'bg-pink-500 rounded-b-full'" class="text-base flex flex-col items-center p-2.5 rounded-t-full duration-300 text-white relative backdrop-blur-sm shadow-lg shadow-pink-300/30">
-                    <div class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center" x-text="checkedItems.length"></div>
-                    <div class="w-6 aspect-square">
+                <button @click="dropdownOpen = !dropdownOpen" :class="[dropdownOpen ? 'bg-pink-700 rounded-b-none' : 'bg-pink-500 rounded-b-full', cartBounceActive ? 'cart-feedback' : '']" class="text-base flex flex-col items-center p-2.5 rounded-t-full duration-300 text-white relative backdrop-blur-sm shadow-lg shadow-pink-300/30">
+                    <div :class="cartBounceActive ? 'cart-feedback-badge' : ''" class="absolute -top-1 -right-1 bg-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center" x-text="checkedItems.length"></div>
+                    <div :class="cartBounceActive ? 'cart-feedback-icon' : ''" class="w-6 aspect-square">
                         <svg data-name="Layer 1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M5.53 5 5 3H1.25a1 1 0 0 0 0 2h2.22L6.7 18H20v-2H8.26l-.33-1.34L21 12.17V5ZM19 10.52 7.45 12.71 6 7h13ZM7 19a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 7 19Zm12 0a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 19 19Z" fill="currentColor"></path>
                         </svg>

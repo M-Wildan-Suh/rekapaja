@@ -26,64 +26,70 @@
                     </svg>
                 </button>
             </div>
-            <div x-data="{ bgType: '{{ old('bg_type', $template->bg_type ?? 'normal') }}', tab: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
-                <div class="w-full px-4 sm:px-6 grid grid-cols-4 gap-2">
-                    <!-- Input hidden untuk menyimpan nilai tab yang aktif -->
-                    <input type="hidden" name="bg_type" id="bg_type" x-model="bgType">
-                    <button 
-                        type="button" 
-                        @click="tab = 'normal'; bgType = 'normal'" 
-                        :class="tab === 'normal' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
-                        class="border-b-2 w-full pb-2 font-bold duration-300">
-                        Normal
-                    </button>
-                    <button 
-                        type="button" 
-                        @click="tab = 'gradient'; bgType = 'gradient'" 
-                        :class="tab === 'gradient' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
-                        class="border-b-2 w-full pb-2 font-bold duration-300">
-                        Gradient
-                    </button>
-                    <button 
-                        type="button" 
-                        @click="tab = 'image'; bgType = 'image'" 
-                        :class="tab === 'image' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
-                        class="border-b-2 w-full pb-2 font-bold duration-300">
-                        Image
-                    </button>
-                    <button 
-                        type="button" 
-                        @click="tab = 'accent'" 
-                        :class="tab === 'accent' ? 'border-byolink-1 text-byolink-1' : 'text-neutral-500 border-neutral-400 hover:text-black hover:border-black'"
-                        class="border-b-2 w-full pb-2 font-bold duration-300">
-                        Accent
-                    </button>
-                </div>
-            
-                <div class="w-full px-4 sm:px-6 h-[322px] overflow-auto">
-                    <div x-show="tab === 'normal'" class=" space-y-4">
-                        <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[322px]">
-                            <input type="color" name="bg_normal_color" id="bg_normal_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_normal_color', $template->bg_main_color ?? '#F5F5F5') }}" id="bg_normal_color">
-                        </div>
-                    </div>
-                    <div x-show="tab === 'gradient'" class=" space-y-4">
-                        <div class=" grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[153px] sm:h-[322px]">
-                                <input type="color" name="bg_main_color" id="bg_main_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_main_color', $template->bg_main_color ?? '#F5F5F5') }}" id="">
+            <div x-data="{ bgType: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
+                <input type="hidden" name="bg_type" id="bg_type" x-model="bgType">
+
+                <div class="w-full px-4 sm:px-6">
+                    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1.85fr_1fr] lg:items-start">
+                        <div class="space-y-5">
+                            <div class="space-y-2">
+                                <label class="text-sm sm:text-base font-semibold text-black">Tipe Banner</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <label class="relative flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-3 text-center text-sm font-medium text-neutral-700 duration-300 hover:border-byolink-1 hover:text-byolink-1">
+                                        <input type="radio" name="bg_type_selector" value="normal" class="hidden peer" x-model="bgType">
+                                        <span>Normal</span>
+                                        <div class="absolute inset-0 rounded-xl border-2 border-transparent peer-checked:border-byolink-1 peer-checked:bg-byolink-1/5"></div>
+                                    </label>
+                                    <label class="relative flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-3 text-center text-sm font-medium text-neutral-700 duration-300 hover:border-byolink-1 hover:text-byolink-1">
+                                        <input type="radio" name="bg_type_selector" value="gradient" class="hidden peer" x-model="bgType">
+                                        <span>Gradient</span>
+                                        <div class="absolute inset-0 rounded-xl border-2 border-transparent peer-checked:border-byolink-1 peer-checked:bg-byolink-1/5"></div>
+                                    </label>
+                                    <label class="relative flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-3 text-center text-sm font-medium text-neutral-700 duration-300 hover:border-byolink-1 hover:text-byolink-1">
+                                        <input type="radio" name="bg_type_selector" value="image" class="hidden peer" x-model="bgType">
+                                        <span>Image</span>
+                                        <div class="absolute inset-0 rounded-xl border-2 border-transparent peer-checked:border-byolink-1 peer-checked:bg-byolink-1/5"></div>
+                                    </label>
+                                </div>
                             </div>
-                            <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[153px] sm:h-[322px]">
-                                <input type="color" name="bg_second_color" id="bg_second_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_second_color', $template->bg_second_color ?? '#F5F5F5') }}" id="">
+
+                            <div class="space-y-2">
+                                <label for="accent_color" class="text-sm sm:text-base font-semibold text-black">Warna Accent</label>
+                                <div class="w-full">
+                                    <div class="flex items-center justify-center overflow-hidden rounded-md shadow-md shadow-black/20 h-10">
+                                        <input type="color" name="accent_color" id="accent_color" class="min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('accent_color', $template->accent_color ?? '#A72018') }}">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div x-show="tab === 'image'" class="w-full flex h-[322px] items-center justify-center">
-                        <div class=" aspect-[3/4] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 ">
-                            <x-admin.component.imageinput value="{{ isset($template) && $template->bg_image ? asset('storage/images/template/background/'.$template->bg_image) : '' }}" name="bg_image" />
-                        </div>
-                    </div>
-                    <div x-show="tab === 'accent'" class=" space-y-4">
-                        <div class=" w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[322px]">
-                            <input type="color" name="accent_color" id="accent_color" class=" min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('accent_color', $template->accent_color ?? '#A72018') }}">
+
+                        <div class="min-h-[260px]">
+                            <div x-show="bgType === 'normal'" class="space-y-2">
+                                <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[260px]">
+                                    <input type="color" name="bg_normal_color" id="bg_normal_color" class="min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_normal_color', $template->bg_main_color ?? '#F5F5F5') }}">
+                                </div>
+                            </div>
+
+                            <div x-show="bgType === 'gradient'" class="flex h-[260px] flex-col justify-between">
+                                <div class="space-y-2">
+                                    <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[124px]">
+                                        <input type="color" name="bg_main_color" id="bg_main_color" class="min-w-[120%] h-80 rounded-md cursor-pointer" value="{{ old('bg_main_color', $template->bg_main_color ?? '#F5F5F5') }}">
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[124px]">
+                                        <input type="color" name="bg_second_color" id="bg_second_color" class="min-w-[120%] h-80 rounded-md cursor-pointer" value="{{ old('bg_second_color', $template->bg_second_color ?? '#F5F5F5') }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="bgType === 'image'" class="space-y-2">
+                                <div class="flex h-[260px] items-center justify-center">
+                                    <div class="h-[260px] aspect-[3/4] max-w-full overflow-hidden rounded-md shadow-md shadow-black/20">
+                                        <x-admin.component.imageinput value="{{ isset($template) && $template->bg_image ? asset('storage/images/template/background/'.$template->bg_image) : '' }}" name="bg_image" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -104,8 +110,8 @@
                         function applyAccentPreview(color) {
                             const headerRamenTitle = document.getElementById("header-ramen-title-preview");
                             const headerRamenPreview = document.getElementById("header-ramen-preview");
-                            const accentTexts = document.querySelectorAll(".ramen-accent-text");
-                            const accentBorders = document.querySelectorAll(".ramen-accent-border");
+                            const ramenAccentTexts = document.querySelectorAll(".ramen-accent-text");
+                            const ramenAccentBorders = document.querySelectorAll(".ramen-accent-border");
 
                             if (headerRamenTitle) {
                                 headerRamenTitle.style.color = color;
@@ -114,39 +120,15 @@
                             if (headerRamenPreview) {
                                 headerRamenPreview.style.background = `linear-gradient(135deg, #F7EFE5 0%, ${color}22 100%)`;
                             }
-                            
 
-                            accentTexts.forEach((element) => {
+                            ramenAccentTexts.forEach((element) => {
                                 element.style.color = color;
                             });
 
-                            accentBorders.forEach((element) => {
+                            ramenAccentBorders.forEach((element) => {
                                 element.style.borderColor = color;
                             });
-                        }
 
-                         function applyAccentPreview(color) {
-                            const headerFloristTitle = document.getElementById("header-florist-title-preview");
-                            const headerFloristPreview = document.getElementById("header-florist-preview");
-                            const accentTexts = document.querySelectorAll(".florist-accent-text");
-                            const accentBorders = document.querySelectorAll(".florist-accent-border");
-
-                            if (headerFloristTitle) {
-                                headerFloristTitle.style.color = color;
-                            }
-
-                            if (headerFloristPreview) {
-                                headerFloristPreview.style.background = `linear-gradient(135deg, #F7EFE5 0%, ${color}22 100%)`;
-                            }
-                            
-
-                            accentTexts.forEach((element) => {
-                                element.style.color = color;
-                            });
-
-                            accentBorders.forEach((element) => {
-                                element.style.borderColor = color;
-                            });
                         }
 
                         function changebg() {
@@ -156,8 +138,6 @@
                             if (bgType.value === "normal") {
                                 const mainColor = document.getElementById("bg_normal_color");
                                 bgImageNow.style.display = "none";
-                                console.log(mainColor.value);
-                                
                                 background.style.backgroundColor = mainColor.value;
                                 background.style.background = mainColor.value;
                             } else if (bgType.value === "gradient") {

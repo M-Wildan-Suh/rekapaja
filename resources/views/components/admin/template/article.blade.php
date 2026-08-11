@@ -1,6 +1,3 @@
-@php
-    $selectedDescType = old('desc_type', $template->desc_type ?? 'default');
-@endphp
 <div x-data="{article: false}" class="">
     <button @click="article = true" type="button" class=" absolute right-0 top-0 pl-3 pt-2 pr-2 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-bl-[70%] z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
@@ -30,34 +27,8 @@
                 </button>
             </div>
             <div class="w-full px-4 sm:px-6">
+                <input type="hidden" name="desc_type" value="default">
                 <div class=" space-y-4 sm:space-y-6 text-black">
-                    <div class="w-full">
-                        <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
-                            <label for="">Type</label>
-                            <div class="w-full grid grid-cols-3 gap-2">
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Default</p>
-                                    <input type="radio" name="desc_type" value="default" class="hidden peer" {{ $selectedDescType === 'default' ? 'checked' : '' }}>
-                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-                                </label>
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Ramen</p>
-                                    <input type="radio" name="desc_type" value="ramen" class="hidden peer" {{ $selectedDescType === 'ramen' ? 'checked' : '' }}>
-                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-                                </label>
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>network</p>
-                                    <input type="radio" name="desc_type" value="network" class="hidden peer" {{ $selectedDescType === 'network' ? 'checked' : '' }}>
-                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-                                </label>
-                                <label class="w-full rounded-md bg-white overflow-hidden relative flex items-center p-2 justify-center text-center">
-                                    <p>Florist</p>
-                                    <input type="radio" name="desc_type" value="florist" class="hidden peer" {{ $selectedDescType === 'florist' ? 'checked' : '' }}>
-                                    <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     <div class="w-full">
                         <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
                             <label for="desc_main_color">Background Color</label>
@@ -88,13 +59,11 @@
                     </button>
                     <script>
                         function changedesc() {
-                            const desctype = document.querySelector('input[name="desc_type"]:checked');
                             const descmain = document.getElementById('desc_main_color');
                             const desctext = document.getElementById('desc_text_color');
                             const defaultPreview = document.getElementById('desc-default-preview');
                             const ramenPreview = document.getElementById('desc-ramen-preview');
                             const networkPreview = document.getElementById('desc-network-preview');
-                            const floristPreview = document.getElementById('desc-florist-preview');
 
 
                             if (defaultPreview) {
@@ -110,12 +79,8 @@
                                 networkPreview.style.backgroundColor = descmain.value;
                                 networkPreview.style.color = desctext.value;
                             }
-                            if (floristPreview) {
-                                floristPreview.style.backgroundColor = descmain.value;
-                                floristPreview.style.color = desctext.value;
-                            }
 
-                            window.dispatchEvent(new CustomEvent('updateDescType', { detail: desctype.value }));
+                            window.dispatchEvent(new CustomEvent('updateDescType', { detail: 'default' }));
                         }
                     </script>
                 </div>

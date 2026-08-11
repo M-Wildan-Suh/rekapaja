@@ -40,7 +40,7 @@
                         @endif
 
                         <div class="space-y-0.5">
-                            <p class="text-[1.45rem] font-bold leading-none md:text-[2.35rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPink }};">
+                            <p class="line-clamp-1 text-[1.45rem] font-bold leading-none md:text-[2.35rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPink }};">
                                 {{ $data->name }}
                             </p>
 
@@ -53,12 +53,12 @@
                                 @endphp
                                 <div class="space-y-0.5">
                                     @if (filled($subtitlePrimary))
-                                        <p class="text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPurple }};">
+                                        <p class="line-clamp-1 text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPurple }};">
                                             {{ $subtitlePrimary }}
                                         </p>
                                     @endif
                                     @if (filled($subtitleAccent))
-                                        <p class="text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingBrown }};">
+                                        <p class="line-clamp-1 text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingBrown }};">
                                             {{ $subtitleAccent }}
                                         </p>
                                     @endif
@@ -70,12 +70,12 @@
                             <div class="pt-1">
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[0.48rem] font-bold md:px-3.5 md:text-[0.82rem]" style="color: {{ $puddingPink }};">
                                     <span class="text-[0.7rem] leading-none md:text-[0.95rem]">♡</span>
-                                    <span>{{ $puddingHeroTag }}</span>
+                                    <span class="line-clamp-2">{{ $puddingHeroTag }}</span>
                                 </span>
                             </div>
                         @endif
 
-                        <p class="pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
+                        <p class="line-clamp-3 pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
                             {!! nl2br(e($puddingDescription)) !!}
                         </p>
                     </div>
@@ -98,7 +98,7 @@
                                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-full border text-[1rem] font-black md:h-10 md:w-10 md:text-[1.15rem]" style="border-color: {{ $tagTheme['border'] }}; color: {{ $tagTheme['accent'] }};">
                                         o
                                     </span>
-                                    <span class="text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $puddingText }};">
+                                    <span class="line-clamp-2 text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $puddingText }};">
                                         {{ $tag }}
                                     </span>
                                 </div>

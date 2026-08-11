@@ -22,7 +22,7 @@
 
                     <!-- Search -->
                     <div class=" w-full sm:w-auto flex flex-row font-semibold duration-300">
-                        <input type="text" x-model="search" placeholder="Cari..."
+                        <input type="text" x-model="search" @input="applySearch()" placeholder="Cari..."
                             class=" w-full text-sm sm:text-base sm:w-auto py-2 px-3 border border-[#ff7100] rounded-md overflow-hidden focus:ring-[#b95300] focus-within:border-[#b95300] font-normal">
                     </div>
                 </div>
@@ -208,6 +208,15 @@
                         modalData: {},
 
                         get paginatedData() {
+                            if (this.totalPages === 0) {
+                                this.currentPage = 1;
+                                return [];
+                            }
+
+                            if (this.currentPage > this.totalPages) {
+                                this.currentPage = 1;
+                            }
+
                             let start = (this.currentPage - 1) * this.perPage;
                             let end = start + this.perPage;
                             return this.filteredData.slice(start, end);

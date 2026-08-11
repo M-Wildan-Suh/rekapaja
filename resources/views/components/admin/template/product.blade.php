@@ -2,7 +2,7 @@
     $rawProductType = old('product_type', $template->product_type ?? 'grid2');
     $selectedProductType = match ($rawProductType) {
         'grid' => 'grid2',
-        'ramen', 'network', 'florist', 'donut', 'skincare', 'pudding_putih', 'sembako' => 'grid3',
+        'ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako' => 'grid3',
         default => $rawProductType,
     };
     $selectedHeaderType = old('header', $template->head_type ?? 'one');
@@ -185,10 +185,14 @@
                             item.style.color = producttext.value;
                         });
 
-                        productbtn.forEach(item => {
+                            productbtn.forEach(item => {
                             item.style.backgroundColor = productsecond.value;
                             item.style.color = "#fff";
                         });
+
+                            if (typeof applyHeaderLinkedPreview === 'function' && selectedHeader) {
+                                applyHeaderLinkedPreview(selectedHeader);
+                            }
 
                             window.dispatchEvent(new CustomEvent('updateProductType', { detail: producttype.value }));
                         }

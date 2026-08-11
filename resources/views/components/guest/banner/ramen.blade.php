@@ -31,15 +31,15 @@
                                 </p>
                             </div>
                         @endif
-                        <p class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenText }};">
+                        <p class="line-clamp-1 text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenText }};">
                             {{ $data->name }}
                         </p>
                         @if (filled($data->subtitle))
-                            <p class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenAccent }};">
+                            <p class="line-clamp-2 text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenAccent }};">
                                 {{ $data->subtitle }}
                             </p>
                         @endif
-                        <p class=" pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
+                        <p class="line-clamp-3 pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
                             {!! nl2br(e($ramenDescription)) !!}
                         </p>
                         @if ($ramenTags->isNotEmpty())
@@ -52,7 +52,7 @@
                                         <span class="inline-flex items-center justify-center text-[1rem] font-bold md:text-[1.25rem]" style="color: {{ $ramenAccent }};">
                                             o
                                         </span>
-                                        <span class="text-[0.42rem] font-semibold leading-[1.25] md:text-[0.62rem]" style="color: {{ $ramenText }};">
+                                        <span class="line-clamp-2 text-[0.42rem] font-semibold leading-[1.25] md:text-[0.62rem]" style="color: {{ $ramenText }};">
                                             {{ $tag }}
                                         </span>
                                     </div>

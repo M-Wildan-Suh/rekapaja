@@ -68,14 +68,6 @@
                         <img src="{{asset('assets/images/template/header/network.png')}}" class="w-full h-full object-cover object-center" alt="">
                         <div class="absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
                     </label>
-                    <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#F7EFE5] to-[#F3D6C7]">
-                        <input type="radio" name="header" value="florist" class="hidden peer" {{ $selectedHeader === 'florist' ? 'checked' : '' }}>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-                            <p class="text-lg font-black text-[#8F110E]">Florist</p>
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-700">Custom Header</p>
-                        </div>
-                        <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300"></div>
-                    </label>
                     <label class="w-full rounded-md aspect-[2/1] overflow-hidden relative border border-dashed border-neutral-300 bg-gradient-to-br from-[#FFF7F2] via-[#FFE8EE] to-[#FFD6E1]">
                         <input type="radio" name="header" value="donut" class="hidden peer" {{ $selectedHeader === 'donut' ? 'checked' : '' }}>
                         <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
@@ -121,11 +113,100 @@
                         Simpan
                     </button>
                     <script>
+                        function applyHeaderLinkedPreview(headerType) {
+                            const hiddenHeaders = ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'];
+                            const colorfulPalettes = {
+                                skincare: [
+                                    { surface: '#FFFFFF', border: '#F3D2E1', accent: '#F26CA7', text: '#5C3446' },
+                                    { surface: '#FFFFFF', border: '#E3D4FF', accent: '#A875E8', text: '#4C3768' },
+                                    { surface: '#FFFFFF', border: '#FFD8BC', accent: '#FF9A62', text: '#694533' },
+                                ],
+                                pudding_putih: [
+                                    { surface: '#FFFFFF', border: '#F6D3E1', accent: '#F45B97', text: '#623549' },
+                                    { surface: '#FFFFFF', border: '#FFE0B8', accent: '#FF9F1C', text: '#7A4D1E' },
+                                    { surface: '#FFFFFF', border: '#D9E9BE', accent: '#8BBF59', text: '#4F6A33' },
+                                ],
+                            };
+
+                            const shouldHideDescription = hiddenHeaders.includes(headerType);
+                            const descPreviewSection = document.getElementById('desc-preview-section');
+                            if (descPreviewSection) {
+                                descPreviewSection.classList.toggle('hidden', shouldHideDescription);
+                                descPreviewSection.style.display = shouldHideDescription ? 'none' : '';
+                            }
+
+                            [
+                                document.getElementById('desc-default-preview'),
+                                document.getElementById('desc-ramen-preview'),
+                                document.getElementById('desc-network-preview'),
+                            ].forEach((element, index) => {
+                                if (!element) {
+                                    return;
+                                }
+
+                                if (shouldHideDescription) {
+                                    element.style.display = 'none';
+                                    return;
+                                }
+
+                                element.style.display = index === 0 ? '' : 'none';
+                            });
+
+                            window.dispatchEvent(new CustomEvent('updateDescType', { detail: 'default' }));
+
+                            const grid3Preview = document.getElementById('grid3-product-preview');
+                            const cards = grid3Preview?.querySelector('.grid.grid-cols-3.gap-2')?.children ?? [];
+
+                            Array.from(cards).forEach((card, index) => {
+                                const productSurface = card.querySelector('#product');
+                                const title = productSurface?.querySelector('p:nth-of-type(1)');
+                                const text = productSurface?.querySelector('p:nth-of-type(2)');
+                                const price = productSurface?.querySelector('p:nth-of-type(3)');
+                                const button = productSurface?.querySelector('#probutton');
+                                const productMain = document.getElementById('product_main_color')?.value ?? '{{ $template->product_main_color ?? '#FFFFFF' }}';
+                                const productSecond = document.getElementById('product_second_color')?.value ?? '{{ $template->product_second_color ?? '#8E1616' }}';
+                                const productText = document.getElementById('product_text_color')?.value ?? '{{ $template->product_text_color ?? '#111827' }}';
+                                const accentColor = document.getElementById('accent_color')?.value ?? '{{ old('accent_color', $template->accent_color ?? '#EC4899') }}';
+
+                                if (colorfulPalettes[headerType]) {
+                                    const palette = colorfulPalettes[headerType][index] ?? colorfulPalettes[headerType][0];
+                                    card.style.borderColor = palette.border;
+
+                                    if (productSurface) {
+                                        productSurface.style.backgroundColor = palette.surface;
+                                        productSurface.style.color = palette.text;
+                                    }
+
+                                    if (title) title.style.color = palette.accent;
+                                    if (text) text.style.color = palette.text;
+                                    if (price) price.style.color = palette.accent;
+                                    if (button) {
+                                        button.style.backgroundColor = palette.accent;
+                                        button.style.color = '#FFFFFF';
+                                    }
+
+                                    return;
+                                }
+
+                                card.style.borderColor = '#E5E7EB';
+                                if (productSurface) {
+                                    productSurface.style.backgroundColor = productMain;
+                                    productSurface.style.color = productText;
+                                }
+                                if (title) title.style.color = accentColor;
+                                if (text) text.style.color = productText;
+                                if (price) price.style.color = productText;
+                                if (button) {
+                                    button.style.backgroundColor = productSecond;
+                                    button.style.color = '#FFFFFF';
+                                }
+                            });
+                        }
+
                         function changeheader() {
                             const headerInput = document.querySelector('input[name="header"]:checked');
                             const headerShow = document.getElementById("header");
                             const headerRamenPreview = document.getElementById("header-ramen-preview");
-                            const headerFloristPreview = document.getElementById("header-florist-preview");
                             const headerDonutPreview = document.getElementById("header-donut-preview");
                             const headerSkincarePreview = document.getElementById("header-skincare-preview");
                             const headerPuddingPreview = document.getElementById("header-pudding-preview");
@@ -136,24 +217,11 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.remove('hidden');
-                                headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.add('hidden');
                                 headerSkincarePreview?.classList.add('hidden');
                                 headerPuddingPreview?.classList.add('hidden');
                                 headerSembakoPreview?.classList.add('hidden');
-                                window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
-                                return;
-                            }
-
-                            if (headerInput.value === 'florist') {
-                                headerShow.src = `/assets/images/template/header/florist.png`;
-                                headerShow.classList.add('opacity-0');
-                                headerRamenPreview?.classList.add('hidden');
-                                headerFloristPreview?.classList.remove('hidden');
-                                headerDonutPreview?.classList.add('hidden');
-                                headerSkincarePreview?.classList.add('hidden');
-                                headerPuddingPreview?.classList.add('hidden');
-                                headerSembakoPreview?.classList.add('hidden');
+                                applyHeaderLinkedPreview(headerInput.value);
                                 window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
@@ -162,11 +230,11 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.add('hidden');
-                                headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.remove('hidden');
                                 headerSkincarePreview?.classList.add('hidden');
                                 headerPuddingPreview?.classList.add('hidden');
                                 headerSembakoPreview?.classList.add('hidden');
+                                applyHeaderLinkedPreview(headerInput.value);
                                 window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
@@ -175,11 +243,11 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.add('hidden');
-                                headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.add('hidden');
                                 headerSkincarePreview?.classList.remove('hidden');
                                 headerPuddingPreview?.classList.add('hidden');
                                 headerSembakoPreview?.classList.add('hidden');
+                                applyHeaderLinkedPreview(headerInput.value);
                                 window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
@@ -188,11 +256,11 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.add('hidden');
-                                headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.add('hidden');
                                 headerSkincarePreview?.classList.add('hidden');
                                 headerPuddingPreview?.classList.remove('hidden');
                                 headerSembakoPreview?.classList.add('hidden');
+                                applyHeaderLinkedPreview(headerInput.value);
                                 window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
@@ -201,11 +269,11 @@
                                 headerShow.src = `/assets/images/template/header/one.jpg`;
                                 headerShow.classList.add('opacity-0');
                                 headerRamenPreview?.classList.add('hidden');
-                                headerFloristPreview?.classList.add('hidden');
                                 headerDonutPreview?.classList.add('hidden');
                                 headerSkincarePreview?.classList.add('hidden');
                                 headerPuddingPreview?.classList.add('hidden');
                                 headerSembakoPreview?.classList.remove('hidden');
+                                applyHeaderLinkedPreview(headerInput.value);
                                 window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value }));
                                 return;
                             }
@@ -215,15 +283,18 @@
                                 : `/assets/images/template/header/${headerInput.value}.jpg`;
                             headerShow.classList.remove('opacity-0');
                             headerRamenPreview?.classList.add('hidden');
-                            headerFloristPreview?.classList.add('hidden');
                             headerDonutPreview?.classList.add('hidden');
                             headerSkincarePreview?.classList.add('hidden');
                             headerPuddingPreview?.classList.add('hidden');
                             headerSembakoPreview?.classList.add('hidden');
 
-                            
+                            applyHeaderLinkedPreview(headerInput.value);
                             window.dispatchEvent(new CustomEvent('updateHeaderType', { detail: headerInput.value}));
                         }
+
+                        document.addEventListener('DOMContentLoaded', () => {
+                            applyHeaderLinkedPreview(@js($selectedHeader));
+                        });
                     </script>
                 </div>
             </div>

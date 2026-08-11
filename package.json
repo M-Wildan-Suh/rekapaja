@@ -16,6 +16,8 @@
         "vite": "^5.0.0"
     },
     "dependencies": {
-        "@alpinejs/intersect": "^3.14.8"
+        "@alpinejs/intersect": "^3.14.8",
+        "baseline-browser-mapping": "^2.11.13",
+        "caniuse-lite": "^1.0.30001697"
     }
 }

@@ -36,25 +36,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="header-florist-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF5F8] via-[#FBCFE8] to-[#F9A8D4] text-[#6A1B4D]">
-                                        <div class="absolute left-[6%] top-[10%] h-[80%] w-[42%] rounded-full border-2 border-white/70"></div>
-                                        <div class="absolute right-[6%] top-[16%] h-[68%] w-[36%] rounded-full border border-white/50"></div>
-                                        <div class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('assets/images/placeholder.webp') }}');"></div>
-                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-8">
-                                            <div class="max-w-[46%] space-y-2">
-                                                <p class="text-[1.45rem] font-black leading-tight" style="font-family: 'Segoe Script', 'Brush Script MT', cursive;">Nama Usaha</p>
-                                                <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9D174D]">Subtitle usaha florist</p>
-                                                <div class="flex flex-wrap gap-1.5">
-                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Buket</span>
-                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Fresh Flower</span>
-                                                    <span class="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-[#9D174D] shadow-sm">Wisuda</span>
-                                                </div>
-                                            </div>
-                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-xl shadow-pink-300/30">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div id="header-donut-preview" class="hidden absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8F4] via-[#FFECEF] to-[#FFDCE8] text-[#4A2F22]">
                                         <div class="absolute left-[6%] top-[12%] h-12 w-12 rounded-full bg-[#F7B4C9]/35 blur-xl"></div>
                                         <div class="absolute right-[14%] top-[10%] h-16 w-16 rounded-full bg-[#FFD8A8]/30 blur-2xl"></div>
@@ -141,48 +122,6 @@
 
                                     <div class=" text-sm rounded-md">
                                         <p class="">Tahu bulat adalah camilan khas Indonesia yang terbuat dari tahu berbentuk bulat, digoreng hingga renyah di luar dan lembut di dalam. Dijual keliling dengan panggilan khas, camilan ini sering disajikan dengan bumbu tabur seperti balado atau keju. Harganya terjangkau, menjadikannya favorit banyak orang.</p>
-                                    </div>
-                                </div>
-                                <div x-show="desctype === 'ramen'" id="desc-ramen-preview" class="w-full rounded-[1.8rem] px-5 py-6 sm:px-6 shadow-lg overflow-hidden relative" style="background-color: #B12719; color: #FFF7F0;">
-                                    <div class="space-y-4">
-                                        <div class="flex items-center gap-4">
-                                            <div class="flex h-14 w-14 flex-none items-center justify-center rounded-full bg-white/10">
-                                                <div class="w-8 h-8">
-                                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 13.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 7.5h.01M5 7.5h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p class="text-xl font-black leading-tight">Nama Usaha</p>
-                                                <p class="mt-1 text-sm font-medium uppercase tracking-[0.18em] opacity-70">Tentang Usaha</p>
-                                            </div>
-                                        </div>
-                                        <p class="text-sm leading-7 opacity-85">Deskripsi usaha akan tampil dengan layout highlight seperti template ramen.</p>
-                                    </div>
-                                </div>
-                                <div
-                                    x-show="desctype === 'florist'"
-                                    id="desc-florist-preview"
-                                    class="rounded-md px-5 py-6 sm:px-6 shadow-lg shadow-pink-200/40 relative overflow-hidden"
-                                    style="background-color: #EC4899; color: #FFFFFF;"
-                                >
-                                    <div class="absolute inset-0 opacity-20">
-                                        <div class="absolute -top-10 right-0 h-28 w-28 rounded-full bg-white/40 blur-2xl"></div>
-                                        <div class="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-white/20 blur-2xl"></div>
-                                    </div>
-                                    <div class="relative space-y-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
-                                                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M12 21c4.418 0 8-2.91 8-6.5 0-2.377-1.57-4.456-3.91-5.593A4.5 4.5 0 1 0 7.91 8.907C5.57 10.044 4 12.123 4 14.5 4 18.09 7.582 21 12 21Z" stroke="currentColor" stroke-width="1.5"/>
-                                                    <path d="M12 7.5c.828 0 1.5-.672 1.5-1.5S12.828 4.5 12 4.5 10.5 5.172 10.5 6 11.172 7.5 12 7.5Z" fill="currentColor"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-lg font-black leading-tight">Tentang Florist</p>
-                                                <p class="text-sm opacity-80">Preview deskripsi usaha dengan nuansa lembut dan elegan.</p>
-                                            </div>
-                                        </div>
-                                        <p class="text-sm leading-7 opacity-90">Cocok untuk usaha bunga, buket wisuda, papan ucapan, dan dekorasi spesial dengan tampilan yang manis dan premium.</p>
                                     </div>
                                 </div>
                             </div>
