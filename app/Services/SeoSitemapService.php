@@ -53,11 +53,6 @@ class SeoSitemapService
         return $this->normalizeUrl($product->domain) ?: route('detail', ['slug' => $product->slug]);
     }
 
-    public function shouldLiveOnMainDomain(Product $product): bool
-    {
-        return blank($this->normalizeUrl($product->domain));
-    }
-
     public function mainSitemapIndexXml(): string
     {
         return $this->renderSitemapIndex([
@@ -94,11 +89,11 @@ class SeoSitemapService
     public function mainBusinessesSitemapXml(): string
     {
         $entries = Product::query()
-            ->where('status', 'active')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->get()
-            ->filter(fn (Product $product) => $this->shouldLiveOnMainDomain($product))
             ->map(fn (Product $product) => $this->makeEntry(
-                route('detail', ['slug' => $product->slug]),
+                $this->productPublicUrl($product),
                 $product->updated_at,
                 'weekly',
                 '0.8'
