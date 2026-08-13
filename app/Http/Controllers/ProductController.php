@@ -754,6 +754,44 @@ PHP;
         }
     }
 
+    public function uploadCustomDomainSitemap(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'domain' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if (!$this->normalizeDomainUrl($value)) {
+                    $fail('Domain custom tidak valid.');
+                }
+            }],
+        ]);
+
+        try {
+            $normalizedDomain = $this->normalizeDomainUrl($validated['domain']);
+            $domainHost = parse_url((string) $normalizedDomain, PHP_URL_HOST) ?: '';
+
+            if ($domainHost === '') {
+                throw new RuntimeException('Domain custom tidak valid.');
+            }
+
+            $result = $this->cpanelDomainPublisher->publishCustomDomain($domainHost, $this->buildDomainSeoFiles($product, 'https://' . $domainHost));
+
+            $product->domain = $result['url'];
+            $product->save();
+
+            return response()->json([
+                'message' => 'Sitemap.xml dan robots.txt berhasil diunggah ke custom domain.',
+                'domain' => $result['url'],
+                'document_root' => $result['document_root'],
+                'files' => $result['files'] ?? [],
+            ]);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
     public function uploadCustomDomainToCpanel(Request $request, Product $product)
     {
         $this->ensureProductAccess($product);
@@ -799,11 +837,15 @@ PHP;
         $this->ensureProductAccess($product);
 
         $validated = $request->validate([
-            'subdomain' => ['required', 'string', 'max:63'],
+            'type' => ['required', 'in:subdomain,custom'],
+            'subdomain' => ['nullable', 'string', 'max:63'],
+            'domain' => ['nullable', 'string', 'max:255'],
         ]);
 
         try {
-            $folder = $this->cpanelDomainPublisher->listDirectoryContents($validated['subdomain']);
+            $folder = $validated['type'] === 'custom'
+                ? $this->cpanelDomainPublisher->listCustomDomainContents((string) $validated['domain'])
+                : $this->cpanelDomainPublisher->listDirectoryContents((string) $validated['subdomain']);
 
             return response()->json([
                 'message' => 'Isi folder berhasil dimuat.',

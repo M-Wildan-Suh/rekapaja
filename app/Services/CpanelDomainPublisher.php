@@ -150,6 +150,59 @@ class CpanelDomainPublisher
         ];
     }
 
+    public function listCustomDomainContents(string $domain): array
+    {
+        if (!$this->isConfigured()) {
+            throw new RuntimeException('Konfigurasi cPanel belum lengkap di file .env.');
+        }
+
+        $domain = $this->normalizeCustomDomain($domain);
+        $addonInfo = $this->findAddonDomain($domain);
+        $documentRoot = $addonInfo['document_root'] ?? $this->documentRootForCustomDomain($domain);
+        $fullPath = $addonInfo['full_path'] ?? $this->fullDirectoryPath($documentRoot);
+
+        $response = $this->api2('Fileman', 'listfiles', [
+            'dir' => $fullPath,
+            'filepath' => $fullPath,
+            'needmime' => 1,
+            'types' => 'dir|file',
+        ]);
+
+        $result = (int) data_get($response, 'cpanelresult.event.result', 0);
+        $reason = (string) (data_get($response, 'cpanelresult.error')
+            ?? data_get($response, 'cpanelresult.data.0.reason')
+            ?? '');
+
+        if ($result !== 1 && $reason !== '') {
+            throw new RuntimeException($reason);
+        }
+
+        $rows = data_get($response, 'cpanelresult.data', []);
+        $entries = collect(is_array($rows) ? $rows : [])
+            ->filter(fn ($item) => is_array($item))
+            ->map(function (array $item) {
+                $name = (string) ($item['file'] ?? $item['name'] ?? $item['filename'] ?? '');
+                $type = strtolower((string) ($item['type'] ?? $item['filetype'] ?? 'file'));
+                $isDirectory = str_contains($type, 'dir');
+
+                return [
+                    'name' => $name,
+                    'type' => $isDirectory ? 'dir' : 'file',
+                    'size' => (string) ($item['humansize'] ?? $item['size'] ?? ''),
+                    'modified_at' => (string) ($item['mtime'] ?? $item['modified'] ?? $item['date'] ?? ''),
+                ];
+            })
+            ->filter(fn (array $item) => $item['name'] !== '' && $item['name'] !== '.' && $item['name'] !== '..')
+            ->values()
+            ->all();
+
+        return [
+            'document_root' => $documentRoot,
+            'path' => $fullPath,
+            'entries' => $entries,
+        ];
+    }
+
     public function publishCustomDomain(string $domain, array $files): array
     {
         if (!$this->isConfigured()) {

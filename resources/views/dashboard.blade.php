@@ -266,13 +266,13 @@
                                 </div>
                                 <p class="text-xs text-neutral-500">Isi nama subdomain saja. Sistem akan membuat `https://nama.{{ $cpanelParentDomain }}`.</p>
                             </div>
-                            <div x-show="domainTypeForm === 'subdomain'" class="space-y-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
+                            <div class="space-y-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
                                 <div class="flex items-center justify-between gap-3">
                                     <div>
-                                        <p class="text-sm font-semibold text-neutral-800">Isi Folder Subdomain</p>
+                                        <p class="text-sm font-semibold text-neutral-800" x-text="domainTypeForm === 'subdomain' ? 'Isi Folder Subdomain' : 'Isi Folder Custom Domain'"></p>
                                         <p class="text-xs text-neutral-500" x-text="folderPath || 'Folder akan terbaca dari home directory cPanel.'"></p>
                                     </div>
-                                    <button type="button" @click="fetchSubdomainFiles()"
+                                    <button type="button" @click="fetchDomainFiles()"
                                         :disabled="folderLoading || !domainForm.trim()"
                                         class="px-3 py-2 text-xs font-semibold text-[#ff7100] border border-[#ff7100] rounded hover:bg-[#fff1e8] disabled:opacity-60">
                                         <span x-show="!folderLoading">Refresh</span>
@@ -307,7 +307,6 @@
                                 Download biasa
                             </button>
                             <button type="button" @click="uploadSeoFiles()"
-                                x-show="domainTypeForm === 'subdomain'"
                                 :disabled="domainLoading"
                                 class="px-4 py-2 border border-[#ff7100] text-[#ff7100] rounded hover:bg-[#fff1e8] disabled:opacity-60">
                                 <span x-show="!domainLoading">Upload Sitemap SEO</span>
@@ -464,21 +463,28 @@
                             return value;
                         },
 
-                        async fetchSubdomainFiles() {
-                            const subdomain = this.domainForm.trim();
+                        async fetchDomainFiles() {
+                            const value = this.domainForm.trim();
 
                             this.folderLoading = true;
                             this.folderMessage = '';
                             this.folderEntries = [];
 
-                            if (!subdomain) {
+                            if (!value) {
                                 this.folderLoading = false;
                                 this.folderPath = '';
-                                this.folderMessage = 'Isi subdomain dulu untuk melihat foldernya.';
+                                this.folderMessage = this.domainTypeForm === 'subdomain'
+                                    ? 'Isi subdomain dulu untuk melihat foldernya.'
+                                    : 'Isi custom domain dulu untuk melihat foldernya.';
                                 return;
                             }
 
-                            const query = new URLSearchParams({ subdomain });
+                            const query = new URLSearchParams({
+                                type: this.domainTypeForm,
+                                ...(this.domainTypeForm === 'subdomain'
+                                    ? { subdomain: value }
+                                    : { domain: value }),
+                            });
                             const response = await fetch(`{{ route('product.domain-folder', '') }}/${this.modalData.id}?${query.toString()}`, {
                                 method: 'GET',
                                 headers: {
@@ -491,7 +497,7 @@
                             if (!response.ok) {
                                 this.folderLoading = false;
                                 this.folderPath = '';
-                                this.folderMessage = result.message || 'Gagal membaca isi folder subdomain.';
+                                this.folderMessage = result.message || 'Gagal membaca isi folder domain.';
                                 return;
                             }
 
@@ -508,8 +514,8 @@
                             this.folderMessage = '';
                             this.folderEntries = [];
 
-                            if (this.domainTypeForm === 'subdomain' && this.domainForm.trim()) {
-                                await this.fetchSubdomainFiles();
+                            if (this.domainForm.trim()) {
+                                await this.fetchDomainFiles();
                             }
                         },
 
@@ -530,8 +536,8 @@
                             this.domainError = '';
                             this.domainModalOpen = true;
 
-                            if (this.domainTypeForm === 'subdomain' && this.domainForm.trim()) {
-                                this.fetchSubdomainFiles();
+                            if (this.domainForm.trim()) {
+                                this.fetchDomainFiles();
                             }
                         },
 
@@ -616,6 +622,7 @@
                                         ? { ...item, domain: this.modalData.domain }
                                         : item
                                     );
+                                    await this.fetchDomainFiles();
                                     this.closeDomainModal();
                                     return;
                                 }
@@ -644,7 +651,7 @@
                                 this.modalData.domain = result.domain ?? '';
                                 this.domainTypeForm = 'subdomain';
                                 this.domainForm = this.extractDomainInputValue(this.modalData.domain);
-                                await this.fetchSubdomainFiles();
+                                await this.fetchDomainFiles();
                                 this.folderMessage = result.message || this.folderMessage;
                                 this.data = this.data.map(item => item.id === this.modalData.id
                                     ? { ...item, domain: this.modalData.domain }
@@ -659,19 +666,20 @@
 
                         async uploadSeoFiles() {
                             try {
-                                if (this.domainTypeForm !== 'subdomain') {
-                                    this.domainError = 'Upload sitemap hanya tersedia untuk subdomain.';
-                                    return;
-                                }
-
                                 await this.persistDomain();
                                 this.domainLoading = true;
                                 this.domainError = '';
 
                                 const formData = new FormData();
-                                formData.append('subdomain', this.domainForm.trim());
+                                if (this.domainTypeForm === 'subdomain') {
+                                    formData.append('subdomain', this.domainForm.trim());
+                                } else {
+                                    formData.append('domain', this.buildDomainValueForSaving());
+                                }
 
-                                const response = await fetch(`{{ route('product.upload-domain-sitemap', '') }}/${this.modalData.id}`, {
+                                const response = await fetch(`${this.domainTypeForm === 'subdomain'
+                                    ? `{{ route('product.upload-domain-sitemap', '') }}`
+                                    : `{{ route('product.upload-custom-domain-sitemap', '') }}`}/${this.modalData.id}`, {
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
@@ -688,7 +696,7 @@
 
                                 this.modalData.domain = result.domain ?? this.modalData.domain;
                                 this.domainForm = this.extractDomainInputValue(this.modalData.domain);
-                                await this.fetchSubdomainFiles();
+                                await this.fetchDomainFiles();
                                 this.folderMessage = result.message || this.folderMessage;
                                 this.data = this.data.map(item => item.id === this.modalData.id
                                     ? { ...item, domain: this.modalData.domain }

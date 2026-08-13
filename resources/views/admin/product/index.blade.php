@@ -263,6 +263,36 @@
                                 </div>
                                 <p class="text-xs text-neutral-500">Isi nama subdomain saja. Sistem akan membuat `https://nama.{{ $cpanelParentDomain }}`.</p>
                             </div>
+                            <div class="space-y-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p class="text-sm font-semibold text-neutral-800" x-text="domainTypeForm === 'subdomain' ? 'Isi Folder Subdomain' : 'Isi Folder Custom Domain'"></p>
+                                        <p class="text-xs text-neutral-500" x-text="folderPath || 'Folder akan terbaca dari home directory cPanel.'"></p>
+                                    </div>
+                                    <button type="button" @click="fetchDomainFiles()"
+                                        :disabled="folderLoading || !domainForm.trim()"
+                                        class="px-3 py-2 text-xs font-semibold text-[#ff7100] border border-[#ff7100] rounded hover:bg-[#fff1e8] disabled:opacity-60">
+                                        <span x-show="!folderLoading">Refresh</span>
+                                        <span x-show="folderLoading">Memuat...</span>
+                                    </button>
+                                </div>
+                                <p x-show="folderMessage" x-text="folderMessage" class="text-xs text-neutral-500"></p>
+                                <div x-show="folderEntries.length > 0" class="max-h-52 overflow-y-auto rounded-md border border-neutral-200 bg-white">
+                                    <template x-for="entry in folderEntries" :key="`${entry.type}-${entry.name}`">
+                                        <div class="flex items-center justify-between gap-3 border-b border-neutral-100 px-3 py-2 text-sm last:border-b-0">
+                                            <div class="min-w-0">
+                                                <p class="truncate font-medium text-neutral-800" x-text="entry.name"></p>
+                                                <p class="text-xs text-neutral-500" x-text="entry.type === 'dir' ? 'Folder' : 'File'"></p>
+                                            </div>
+                                            <div class="text-right text-xs text-neutral-500">
+                                                <p x-text="entry.size || '-'"></p>
+                                                <p x-text="entry.modified_at || ''"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <p x-show="!folderLoading && !folderEntries.length && !folderMessage" class="text-xs text-neutral-500">Belum ada file yang terbaca di folder ini.</p>
+                            </div>
                             <p x-show="domainError" x-text="domainError" class="text-sm text-red-500"></p>
                             @unless ($cpanelConfigured)
                                 <p class="text-sm text-amber-600">Konfigurasi cPanel belum lengkap di `.env`, jadi opsi upload domain belum bisa dipakai.</p>
@@ -270,7 +300,7 @@
                         </div>
                         <div class="flex flex-col-reverse gap-3 px-6 sm:flex-row sm:justify-end">
                             <button type="button" @click="uploadSeoFiles()"
-                                x-show="domainTypeForm === 'subdomain' && domainActionType !== 'download'"
+                                x-show="domainActionType !== 'download'"
                                 :disabled="domainLoading"
                                 class="px-4 py-2 border border-[#ff7100] text-[#ff7100] rounded hover:bg-[#fff1e8] disabled:opacity-60">
                                 <span x-show="!domainLoading">Upload Sitemap SEO</span>
@@ -312,6 +342,10 @@
                         domainError: '',
                         domainTypeForm: 'custom',
                         domainForm: '',
+                        folderLoading: false,
+                        folderPath: '',
+                        folderMessage: '',
+                        folderEntries: [],
                         modalData: {},
 
                         get paginatedData() {
@@ -440,6 +474,52 @@
                             return value;
                         },
 
+                        async fetchDomainFiles() {
+                            const value = this.domainForm.trim();
+
+                            this.folderLoading = true;
+                            this.folderMessage = '';
+                            this.folderEntries = [];
+
+                            if (!value) {
+                                this.folderLoading = false;
+                                this.folderPath = '';
+                                this.folderMessage = this.domainTypeForm === 'subdomain'
+                                    ? 'Isi subdomain dulu untuk melihat foldernya.'
+                                    : 'Isi custom domain dulu untuk melihat foldernya.';
+                                return;
+                            }
+
+                            const query = new URLSearchParams({
+                                type: this.domainTypeForm,
+                                ...(this.domainTypeForm === 'subdomain'
+                                    ? { subdomain: value }
+                                    : { domain: value }),
+                            });
+                            const response = await fetch(`{{ route('product.domain-folder', '') }}/${this.modalData.id}?${query.toString()}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                },
+                            });
+
+                            const result = await response.json().catch(() => ({}));
+
+                            if (!response.ok) {
+                                this.folderLoading = false;
+                                this.folderPath = '';
+                                this.folderMessage = result.message || 'Gagal membaca isi folder domain.';
+                                return;
+                            }
+
+                            this.folderPath = result.path ?? '';
+                            this.folderEntries = Array.isArray(result.entries) ? result.entries : [];
+                            this.folderMessage = this.folderEntries.length
+                                ? ''
+                                : (result.message || 'Folder berhasil dibaca, belum ada file di dalamnya.');
+                            this.folderLoading = false;
+                        },
+
                         openDomainModal(item, actionType = 'upload') {
                             this.closeActionMenu();
                             this.modalData = item;
@@ -456,12 +536,20 @@
                                 : (existingDomain ? this.extractDomainInputValue(existingDomain) : '');
                             this.domainActionType = actionType;
                             this.domainError = '';
+                            this.folderPath = '';
+                            this.folderMessage = '';
+                            this.folderEntries = [];
                             this.domainModalOpen = true;
+
+                            if (this.domainForm.trim()) {
+                                this.fetchDomainFiles();
+                            }
                         },
 
                         closeDomainModal() {
                             this.domainModalOpen = false;
                             this.domainLoading = false;
+                            this.folderLoading = false;
                             this.domainError = '';
                         },
 
@@ -551,6 +639,7 @@
                                         ? { ...item, domain: this.modalData.domain }
                                         : item
                                     );
+                                    await this.fetchDomainFiles();
                                     this.closeDomainModal();
                                     return;
                                 }
@@ -583,6 +672,7 @@
                                     ? { ...item, domain: this.modalData.domain }
                                     : item
                                 );
+                                await this.fetchDomainFiles();
                                 this.closeDomainModal();
                             } catch (error) {
                                 this.domainError = error.message;
@@ -592,19 +682,20 @@
 
                         async uploadSeoFiles() {
                             try {
-                                if (this.domainTypeForm !== 'subdomain') {
-                                    this.domainError = 'Upload sitemap hanya tersedia untuk subdomain.';
-                                    return;
-                                }
-
                                 await this.persistDomain();
                                 this.domainLoading = true;
                                 this.domainError = '';
 
                                 const formData = new FormData();
-                                formData.append('subdomain', this.domainForm.trim());
+                                if (this.domainTypeForm === 'subdomain') {
+                                    formData.append('subdomain', this.domainForm.trim());
+                                } else {
+                                    formData.append('domain', this.buildDomainValueForSaving());
+                                }
 
-                                const response = await fetch(`{{ route('product.upload-domain-sitemap', '') }}/${this.modalData.id}`, {
+                                const response = await fetch(`${this.domainTypeForm === 'subdomain'
+                                    ? `{{ route('product.upload-domain-sitemap', '') }}`
+                                    : `{{ route('product.upload-custom-domain-sitemap', '') }}`}/${this.modalData.id}`, {
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
@@ -620,12 +711,13 @@
                                 }
 
                                 this.modalData.domain = result.domain ?? this.modalData.domain;
-                                this.domainTypeForm = 'subdomain';
+                                this.domainTypeForm = this.inferDomainType(this.modalData.domain);
                                 this.domainForm = this.extractDomainInputValue(this.modalData.domain);
                                 this.data = this.data.map(item => item.id === this.modalData.id
                                     ? { ...item, domain: this.modalData.domain }
                                     : item
                                 );
+                                await this.fetchDomainFiles();
                                 this.domainLoading = false;
                             } catch (error) {
                                 this.domainError = error.message;

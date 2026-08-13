@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/product-upload-domain/{product}', [ProductController::class, 'uploadDomainToCpanel'])->name('product.upload-domain');
     Route::post('/admin/product-upload-custom-domain/{product}', [ProductController::class, 'uploadCustomDomainToCpanel'])->name('product.upload-custom-domain');
     Route::post('/admin/product-upload-domain-sitemap/{product}', [ProductController::class, 'uploadDomainSitemap'])->name('product.upload-domain-sitemap');
+    Route::post('/admin/product-upload-custom-domain-sitemap/{product}', [ProductController::class, 'uploadCustomDomainSitemap'])->name('product.upload-custom-domain-sitemap');
     Route::get('/admin/product-domain-folder/{product}', [ProductController::class, 'browseDomainFolder'])->name('product.domain-folder');
 
     Route::resource('/admin/product-gallery', ProductGalleryController::class);
