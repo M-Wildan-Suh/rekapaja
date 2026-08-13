@@ -143,6 +143,7 @@
                                             placeholder="Masukkan Nama Usaha..."
                                             name="name" 
                                             id="name"
+                                            maxlength="100"
                                             x-model="inputName"
                                             value="{{ old('name', $product->name) }}"
                                             required
@@ -166,12 +167,12 @@
                                         }
                                     </script>
                                 </div>
-                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" />
-                                <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" />
-                                <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" />
-                                <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" />
+                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" maxlength="120" />
+                                <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" maxlength="20" />
+                                <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" maxlength="255" />
+                                <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" maxlength="255" />
 
-                                <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" />
+                                <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description" maxlength="1200" helper="Deskripsi usaha maksimal 1200 karakter." />
                                 
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <x-admin.component.categoryinput title="Category" :value="$product->category" :tag="$category" name="category[]" />

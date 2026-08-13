@@ -65,6 +65,7 @@
                                         placeholder="Masukkan Nama Usaha..."
                                         name="name" 
                                         id="name"
+                                        maxlength="100"
                                         x-model="inputName"
                                         value="{{ old('name') }}"
                                         required
@@ -89,15 +90,15 @@
                                 </script>
                             </div>
 
-                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" />
+                            <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" maxlength="120" />
                             
-                            <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" />
+                            <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" maxlength="20" />
 
-                            <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="''" name="domain" />
+                            <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="''" name="domain" maxlength="255" />
 
-                            <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" />
+                            <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" maxlength="255" />
 
-                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" />
+                            <x-admin.component.textareainput title="Tentang Usaha Anda" placeholder="Jelaskan Usaha Anda..." :value="''" name="description" maxlength="1200" helper="Deskripsi usaha maksimal 1200 karakter." />
                             
                             <x-admin.component.categoryinput title="Category" :value="null" :tag="$category" name="category[]" />
 

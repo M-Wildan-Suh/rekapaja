@@ -23,9 +23,71 @@ use RuntimeException;
 
 class ProductController extends Controller
 {
+    private const BUSINESS_FIELD_LIMITS = [
+        'name' => 100,
+        'subtitle' => 120,
+        'description' => 1200,
+        'address' => 255,
+        'no_tlp' => 20,
+        'domain' => 255,
+        'price_prefix' => 50,
+        'link' => 255,
+        'category' => 255,
+        'tag' => 255,
+    ];
+
     public function __construct(
         private readonly CpanelDomainPublisher $cpanelDomainPublisher
     ) {
+    }
+
+    private function productValidationRules(?Product $product = null): array
+    {
+        return array_merge([
+            'name' => [
+                'required',
+                'string',
+                'max:' . self::BUSINESS_FIELD_LIMITS['name'],
+                Rule::unique('products', 'name')->ignore($product?->id),
+            ],
+            'subtitle' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['subtitle']],
+            'price' => ['nullable', 'regex:/^\d+$/'],
+            'template_id' => ['required', 'exists:templates,id'],
+            'description' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['description']],
+            'address' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['address']],
+            'no_tlp' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['no_tlp']],
+            'domain' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['domain'], function ($attribute, $value, $fail) {
+                if ($value && !$this->normalizeDomainUrl($value)) {
+                    $fail('Domain tidak valid.');
+                }
+            }],
+            'price_prefix' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['price_prefix']],
+            'link' => ['nullable', 'url', 'max:' . self::BUSINESS_FIELD_LIMITS['link']],
+            'category' => ['nullable', 'array'],
+            'category.*' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['category']],
+            'tag' => ['nullable', 'array'],
+            'tag.*' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['tag']],
+            'access' => ['nullable', 'array'],
+            'access.*' => ['nullable', 'integer', 'exists:users,id'],
+        ], $this->canManageQris() ? [
+            'qris' => ['nullable', 'image'],
+        ] : []);
+    }
+
+    private function productValidationMessages(): array
+    {
+        return [
+            'name.max' => 'Nama usaha maksimal ' . self::BUSINESS_FIELD_LIMITS['name'] . ' karakter.',
+            'subtitle.max' => 'Tagline maksimal ' . self::BUSINESS_FIELD_LIMITS['subtitle'] . ' karakter.',
+            'description.max' => 'Deskripsi usaha maksimal ' . self::BUSINESS_FIELD_LIMITS['description'] . ' karakter.',
+            'address.max' => 'Alamat maksimal ' . self::BUSINESS_FIELD_LIMITS['address'] . ' karakter.',
+            'no_tlp.max' => 'Nomor WhatsApp maksimal ' . self::BUSINESS_FIELD_LIMITS['no_tlp'] . ' karakter.',
+            'domain.max' => 'Domain maksimal ' . self::BUSINESS_FIELD_LIMITS['domain'] . ' karakter.',
+            'price_prefix.max' => 'Prefix harga maksimal ' . self::BUSINESS_FIELD_LIMITS['price_prefix'] . ' karakter.',
+            'link.max' => 'Link YouTube maksimal ' . self::BUSINESS_FIELD_LIMITS['link'] . ' karakter.',
+            'category.*.max' => 'Nama kategori maksimal ' . self::BUSINESS_FIELD_LIMITS['category'] . ' karakter.',
+            'tag.*.max' => 'Nama tag maksimal ' . self::BUSINESS_FIELD_LIMITS['tag'] . ' karakter.',
+        ];
     }
 
     private function normalizeWholeNumberPrice(mixed $price): ?int
@@ -206,34 +268,12 @@ class ProductController extends Controller
     {
         $this->ensureAdmin();
 
-        $validated = $request->validate(array_merge([
-            'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-            'subtitle' => ['required', 'string', 'max:255'],
-            'price' => ['nullable', 'regex:/^\d+$/'],
-            'template_id' => ['required', 'exists:templates,id'],
-            'description' => ['required', 'string'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'no_tlp' => ['nullable', 'string', 'max:20'],
-            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
-                if ($value && !$this->normalizeDomainUrl($value)) {
-                    $fail('Domain tidak valid.');
-                }
-            }],
-            'price_prefix' => ['nullable', 'string', 'max:255'],
-            'link' => ['nullable', 'url', 'max:255'],
+        $validated = $request->validate(array_merge($this->productValidationRules(), [
             'home_button' => ['required', 'in:on,off'],
             'thumbnail' => ['required', 'image'],
-            'category' => ['nullable', 'array'],
-            'category.*' => ['nullable', 'string', 'max:255'],
-            'tag' => ['nullable', 'array'],
-            'tag.*' => ['nullable', 'string', 'max:255'],
-            'access' => ['nullable', 'array'],
-            'access.*' => ['nullable', 'integer', 'exists:users,id'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
-        ], $this->canManageQris() ? [
-            'qris' => ['nullable', 'image'],
-        ] : []));
+        ]), $this->productValidationMessages());
 
         $newdata= new Product();
 
@@ -729,36 +769,15 @@ PHP;
 
         $activeTab = $request->input('active_tab', 'product');
 
-        $validated = $request->validate(array_merge([
-            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($product->id)],
-            'subtitle' => ['required', 'string', 'max:255'],
-            'price' => ['nullable', 'regex:/^\d+$/'],
-            'template_id' => ['required', 'exists:templates,id'],
-            'description' => ['required', 'string'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'no_tlp' => ['nullable', 'string', 'max:20'],
-            'domain' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
-                if ($value && !$this->normalizeDomainUrl($value)) {
-                    $fail('Domain tidak valid.');
-                }
-            }],
-            'price_prefix' => ['nullable', 'string', 'max:255'],
-            'link' => ['nullable', 'url', 'max:255'],
+        $validated = $request->validate(array_merge($this->productValidationRules($product), [
             'home_button' => ['nullable', 'in:on,off'],
             'status' => ['nullable', 'in:active,unactive'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
             'thumbnail' => ['nullable', 'image'],
-            'category' => ['nullable', 'array'],
-            'category.*' => ['nullable', 'string', 'max:255'],
-            'tag' => ['nullable', 'array'],
-            'tag.*' => ['nullable', 'string', 'max:255'],
-            'access' => ['nullable', 'array'],
-            'access.*' => ['nullable', 'integer', 'exists:users,id'],
         ], $this->canManageQris() ? [
-            'qris' => ['nullable', 'image'],
             'remove_qris' => ['nullable', 'boolean'],
-        ] : []));
+        ] : []), $this->productValidationMessages());
 
         $product->name = $validated['name'];
         $product->slug = Str::slug($product->name);

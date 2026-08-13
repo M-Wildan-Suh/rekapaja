@@ -1,4 +1,4 @@
-@props(['title', 'placeholder', 'link', 'name', 'value', 'xModel' => null, 'required' => false])
+@props(['title', 'placeholder', 'link', 'name', 'value', 'xModel' => null, 'required' => false, 'maxlength' => null, 'helper' => null])
 
 @php
     $fieldValue = old($name, $value);
@@ -16,7 +16,11 @@
                 @endif
                 value="{{$fieldValue}}"
                 @required($required)
+                @if($maxlength) maxlength="{{ $maxlength }}" @endif
                 class="flex-grow min-w-0 text-sm sm:text-base font-normal rounded-r-md border border-gray-300 focus:ring-0 focus:border-none">
         </div>
+        @if($helper || $maxlength)
+            <p class="text-xs text-neutral-500">{{ $helper ?? 'Maksimal ' . $maxlength . ' karakter.' }}</p>
+        @endif
     </div>
 </div>
