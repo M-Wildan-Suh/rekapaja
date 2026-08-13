@@ -1,4 +1,4 @@
-<x-layout.guest>
+<x-layout.guest title="Beranda" desc="Bangun usaha online dengan sistem rekap otomatis. Temukan bisnis terdaftar, website usaha, dan fitur instan rekap dari RekapAja.">
     @include('components.guest.header')
     <div class=" w-full h-[340px] sm:h-96 pt-[72px] px-4 sm:px-6 bg-[#0B192C]">
         <div class=" w-full h-full max-w-xl mx-auto text-white">

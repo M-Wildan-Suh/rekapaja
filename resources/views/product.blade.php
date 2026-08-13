@@ -1,4 +1,4 @@
-<x-layout.guest>
+<x-layout.guest title="Bisnis Terdaftar" :desc="'Temukan daftar bisnis aktif di RekapAja' . (($filter ?? null) ? ' untuk kategori ' . $filter : '') . '.'">
     @include('components.guest.header')
     <div class="pt-28 pb-8 px-4 sm:px-6 space-y-8 min-h-[calc(100vh-140px)]">  
         <div class="w-full max-w-xl mx-auto">

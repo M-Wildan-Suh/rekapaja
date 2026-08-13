@@ -2,28 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
-use Illuminate\Support\Str;
+use App\Services\SeoSitemapService;
+use Illuminate\Http\Response;
 
 class SitemapController extends Controller
 {
-    public function index()
+    public function __construct(
+        private readonly SeoSitemapService $seoSitemapService
+    ) {
+    }
+
+    public function index(): Response
     {
-        $sitemap = Sitemap::create()
-            ->add(Url::create('/')->setLastModificationDate(now()))
-            ->add(Url::create('/bisnis')->setLastModificationDate(now()));
+        $this->seoSitemapService->writeMainSeoFiles();
 
-        // Dynamically add more URLs if needed, such as from a database
-        foreach (Product::where('status', 'active')->get() as $model) {
-            $slug = Str::slug($model->name, '-');
-            $sitemap->add(Url::create("/{$slug}")->setLastModificationDate($model->updated_at));
-        }
+        return response($this->seoSitemapService->mainSitemapIndexXml(), 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+        ]);
+    }
 
-        $sitemap->writeToFile(public_path('sitemap.xml'));
-        // return response()->download(public_path('sitemap.xml'));
-        return redirect('/sitemap.xml');
+    public function pages(): Response
+    {
+        return response($this->seoSitemapService->mainPagesSitemapXml(), 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+        ]);
+    }
+
+    public function businesses(): Response
+    {
+        return response($this->seoSitemapService->mainBusinessesSitemapXml(), 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+        ]);
     }
 }
-

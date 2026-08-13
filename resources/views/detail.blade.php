@@ -1,11 +1,17 @@
 @php
     $hideBusinessProfileSections = in_array(($template->head_type ?? null), ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'], true);
+    $metaDescription = $hideBusinessProfileSections
+        ? ($data->description ?: $data->subtitle)
+        : ($data->subtitle ?: $data->description);
+    $canonicalUrl = $data->domain ? rtrim($data->domain, '/') : route('detail', ['slug' => $data->slug]);
 @endphp
 
 <x-layout.guest
     :title="$data->name"
-    :desc="$hideBusinessProfileSections ? null : $data->subtitle"
+    :desc="$metaDescription"
     :tags="$hideBusinessProfileSections ? collect() : $data->productTags"
+    :canonical="$canonicalUrl"
+    :image="$data->image"
 >
     <div class=" mx-auto rounded-md bg-white min-h-screen relative">
         <div class=" space-y-6">

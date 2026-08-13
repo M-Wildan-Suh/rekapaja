@@ -13,6 +13,7 @@ use App\Models\ProductTag;
 use App\Models\Template;
 use App\Models\User;
 use App\Services\CpanelDomainPublisher;
+use App\Services\SeoSitemapService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -37,7 +38,8 @@ class ProductController extends Controller
     ];
 
     public function __construct(
-        private readonly CpanelDomainPublisher $cpanelDomainPublisher
+        private readonly CpanelDomainPublisher $cpanelDomainPublisher,
+        private readonly SeoSitemapService $seoSitemapService
     ) {
     }
 
@@ -666,6 +668,14 @@ echo \$html;
 PHP;
     }
 
+    private function buildDomainSeoFiles(Product $product, string $publicUrl): array
+    {
+        return [
+            'sitemap.xml' => $this->seoSitemapService->businessSitemapXml($product, $publicUrl),
+            'robots.txt' => $this->seoSitemapService->businessRobotsTxt($product, $publicUrl),
+        ];
+    }
+
     public function downloadDomainFile(Product $product)
     {
         $this->ensureProductAccess($product);
@@ -689,19 +699,53 @@ PHP;
 
         try {
             $subdomain = $this->cpanelDomainPublisher->normalizeSubdomain($validated['subdomain']);
-            $result = $this->cpanelDomainPublisher->publish($subdomain, $this->buildDomainFileContent($product));
+            $publicUrl = $this->cpanelDomainPublisher->buildPublicUrl($subdomain);
+            $result = $this->cpanelDomainPublisher->publishFiles($subdomain, array_merge([
+                'index.php' => $this->buildDomainFileContent($product),
+            ], $this->buildDomainSeoFiles($product, $publicUrl)));
 
             $product->domain = $result['url'];
             $product->save();
 
             return response()->json([
                 'message' => $result['subdomain_created']
-                    ? 'Subdomain berhasil dibuat dan file berhasil diunggah.'
-                    : 'Subdomain sudah ada. File berhasil diunggah ulang.',
+                    ? 'Subdomain berhasil dibuat dan file website + sitemap berhasil diunggah.'
+                    : 'Subdomain sudah ada. File website + sitemap berhasil diunggah ulang.',
                 'domain' => $result['url'],
                 'subdomain' => $result['subdomain'],
                 'document_root' => $result['document_root'],
                 'subdomain_created' => $result['subdomain_created'],
+                'files' => $result['files'] ?? [],
+            ]);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function uploadDomainSitemap(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'subdomain' => ['required', 'string', 'max:63'],
+        ]);
+
+        try {
+            $subdomain = $this->cpanelDomainPublisher->normalizeSubdomain($validated['subdomain']);
+            $publicUrl = $this->cpanelDomainPublisher->buildPublicUrl($subdomain);
+            $result = $this->cpanelDomainPublisher->publishFiles($subdomain, $this->buildDomainSeoFiles($product, $publicUrl));
+
+            $product->domain = $result['url'];
+            $product->save();
+
+            return response()->json([
+                'message' => 'Sitemap.xml dan robots.txt berhasil diunggah ke subdomain.',
+                'domain' => $result['url'],
+                'subdomain' => $result['subdomain'],
+                'document_root' => $result['document_root'],
+                'files' => $result['files'] ?? [],
             ]);
         } catch (RuntimeException $exception) {
             return response()->json([

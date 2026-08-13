@@ -40,6 +40,13 @@ class CpanelDomainPublisher
 
     public function publish(string $subdomain, string $fileContent): array
     {
+        return $this->publishFiles($subdomain, [
+            'index.php' => $fileContent,
+        ]);
+    }
+
+    public function publishFiles(string $subdomain, array $files): array
+    {
         if (!$this->isConfigured()) {
             throw new RuntimeException('Konfigurasi cPanel belum lengkap di file .env.');
         }
@@ -51,13 +58,16 @@ class CpanelDomainPublisher
         $subdomainResult = $this->createSubdomain($subdomain, $parentDomain, $requestedDocumentRoot);
         $documentRoot = $subdomainResult['document_root'];
 
-        $this->saveFile($documentRoot, 'index.php', $fileContent);
+        foreach ($files as $filename => $content) {
+            $this->saveFile($documentRoot, (string) $filename, (string) $content);
+        }
 
         return [
             'url' => $this->buildPublicUrl($subdomain),
             'document_root' => $documentRoot,
             'subdomain' => $subdomain,
             'subdomain_created' => $subdomainResult['created'],
+            'files' => array_keys($files),
         ];
     }
 

@@ -56,6 +56,9 @@ Route::post('/store-product', [PageController::class, 'storeproduct'])->name('st
 Route::post('/order/{no_tlp}', [PageController::class, 'order'])->name('order');
 
 Route::get('/sitemap', [SitemapController::class, 'index']);
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+Route::get('/sitemaps/pages.xml', [SitemapController::class, 'pages']);
+Route::get('/sitemaps/businesses.xml', [SitemapController::class, 'businesses']);
 
 Route::get('/create-product', [PageController::class, 'createproduct'])->name('create.product');
 
@@ -86,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/product-domain/{product}', [ProductController::class, 'updateDomain'])->name('product.domain');
     Route::get('/admin/product-download-domain/{product}', [ProductController::class, 'downloadDomainFile'])->name('product.download-domain');
     Route::post('/admin/product-upload-domain/{product}', [ProductController::class, 'uploadDomainToCpanel'])->name('product.upload-domain');
+    Route::post('/admin/product-upload-domain-sitemap/{product}', [ProductController::class, 'uploadDomainSitemap'])->name('product.upload-domain-sitemap');
     Route::get('/admin/product-domain-folder/{product}', [ProductController::class, 'browseDomainFolder'])->name('product.domain-folder');
 
     Route::resource('/admin/product-gallery', ProductGalleryController::class);

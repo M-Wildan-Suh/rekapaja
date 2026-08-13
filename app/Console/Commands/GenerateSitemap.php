@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Product;
+use App\Services\SeoSitemapService;
 use Illuminate\Console\Command;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
-use Illuminate\Support\Str;
 
 class GenerateSitemap extends Command
 {
@@ -22,24 +19,21 @@ class GenerateSitemap extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Generate sitemap.xml, child sitemaps, and robots.txt for the main website';
+
+    public function __construct(
+        private readonly SeoSitemapService $seoSitemapService
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $sitemap = Sitemap::create()
-            ->add(Url::create('/')->setLastModificationDate(now()))
-            ->add(Url::create('/product')->setLastModificationDate(now()));
+        $this->seoSitemapService->writeMainSeoFiles();
 
-            foreach (Product::all() as $model) {
-                $slug = Str::slug($model->name, '-');
-                $sitemap->add(Url::create("/{$slug}")->setLastModificationDate($model->updated_at));
-            }
-
-        $sitemap->writeToFile(public_path('sitemap.xml'));
-
-        $this->info('Sitemap generated successfully!');
+        $this->info('SEO files generated: sitemap.xml, sitemaps/pages.xml, sitemaps/businesses.xml, robots.txt');
     }
 }

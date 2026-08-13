@@ -305,6 +305,13 @@
                                 class="px-4 py-2 border border-[#ff7100] text-[#ff7100] rounded hover:bg-[#fff1e8]">
                                 Download biasa
                             </button>
+                            <button type="button" @click="uploadSeoFiles()"
+                                x-show="domainTypeForm === 'subdomain'"
+                                :disabled="domainLoading"
+                                class="px-4 py-2 border border-[#ff7100] text-[#ff7100] rounded hover:bg-[#fff1e8] disabled:opacity-60">
+                                <span x-show="!domainLoading">Upload Sitemap SEO</span>
+                                <span x-show="domainLoading">Mengunggah...</span>
+                            </button>
                             <button type="button" @click="saveDomain()"
                                 :disabled="domainLoading"
                                 class="px-4 py-2 bg-neutral-200 text-neutral-800 rounded hover:bg-neutral-300 disabled:opacity-60">
@@ -609,6 +616,50 @@
 
                                 this.modalData.domain = result.domain ?? '';
                                 this.domainTypeForm = 'subdomain';
+                                this.domainForm = this.extractDomainInputValue(this.modalData.domain);
+                                await this.fetchSubdomainFiles();
+                                this.folderMessage = result.message || this.folderMessage;
+                                this.data = this.data.map(item => item.id === this.modalData.id
+                                    ? { ...item, domain: this.modalData.domain }
+                                    : item
+                                );
+                                this.domainLoading = false;
+                            } catch (error) {
+                                this.domainError = error.message;
+                                this.domainLoading = false;
+                            }
+                        },
+
+                        async uploadSeoFiles() {
+                            try {
+                                if (this.domainTypeForm !== 'subdomain') {
+                                    this.domainError = 'Upload sitemap hanya tersedia untuk subdomain.';
+                                    return;
+                                }
+
+                                await this.persistDomain();
+                                this.domainLoading = true;
+                                this.domainError = '';
+
+                                const formData = new FormData();
+                                formData.append('subdomain', this.domainForm.trim());
+
+                                const response = await fetch(`{{ route('product.upload-domain-sitemap', '') }}/${this.modalData.id}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
+                                        'Accept': 'application/json',
+                                    },
+                                    body: formData,
+                                });
+
+                                const result = await response.json().catch(() => ({}));
+
+                                if (!response.ok) {
+                                    throw new Error(result.message || 'Gagal upload sitemap ke cPanel.');
+                                }
+
+                                this.modalData.domain = result.domain ?? this.modalData.domain;
                                 this.domainForm = this.extractDomainInputValue(this.modalData.domain);
                                 await this.fetchSubdomainFiles();
                                 this.folderMessage = result.message || this.folderMessage;

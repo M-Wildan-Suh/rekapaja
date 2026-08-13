@@ -1,4 +1,4 @@
-<x-layout.guest>
+<x-layout.guest title="Template" desc="Pilih template website usaha yang tersedia di RekapAja untuk membantu bisnis tampil lebih profesional.">
     @include('components.guest.header')
     <div class="pt-28 px-4 space-y-16">
         <div class="w-full max-w-[1080px] mx-auto">

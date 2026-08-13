@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductTag;
 use App\Models\Template;
+use App\Services\SeoSitemapService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Str;
@@ -29,6 +30,11 @@ use Intervention\Image\ImageManager;
 
 class PageController extends Controller
 {
+    public function __construct(
+        private readonly SeoSitemapService $seoSitemapService
+    ) {
+    }
+
     private function resolveProductPremiumContext(Product $product): array
     {
         $accesses = Access::with('user')->where('product_id', $product->id)->get();
@@ -62,34 +68,7 @@ class PageController extends Controller
 
     private function normalizeDomainUrl(?string $domain): ?string
     {
-        $domain = trim((string) $domain);
-
-        if ($domain === '') {
-            return null;
-        }
-
-        if (!preg_match('~^https?://~i', $domain)) {
-            $domain = 'https://' . $domain;
-        }
-
-        $parts = parse_url($domain);
-
-        if (!$parts || empty($parts['host'])) {
-            return null;
-        }
-
-        $scheme = strtolower($parts['scheme'] ?? 'https');
-        if (!in_array($scheme, ['http', 'https'], true)) {
-            return null;
-        }
-
-        $normalized = $scheme . '://' . strtolower($parts['host']);
-
-        if (!empty($parts['port'])) {
-            $normalized .= ':' . $parts['port'];
-        }
-
-        return rtrim($normalized, '/');
+        return $this->seoSitemapService->normalizeUrl($domain);
     }
 
     public function home(Request $request) {

@@ -1,15 +1,35 @@
 <!DOCTYPE html>
-@props(['title' => null, 'desc' => null, 'tags' => null])
+@props(['title' => null, 'desc' => null, 'tags' => null, 'canonical' => null, 'image' => null, 'robots' => 'index,follow'])
+@php
+    $metaTitle = $title ? 'RekapAja.com - ' . $title : 'RekapAja.com';
+    $metaDescription = trim((string) ($desc ?? 'Bangun usaha online dengan sistem rekap otomatis bersama RekapAja.'));
+    $metaKeywords = collect($tags)->pluck('productTag.tag')->filter()->implode(', ');
+    $canonicalUrl = $canonical ?: url()->current();
+    $metaImage = $image ?: asset('/assets/images/logo.webp');
+@endphp
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>RekapAja.com{{$title ? ' - '.$title : ''}}</title>
+        <title>{{ $metaTitle }}</title>
 
-        <meta name="description" content="{{ $desc ?? '' }}">
-        <meta name="keywords" content="{{ collect($tags)->pluck('productTag.tag')->implode(', ') }}">
-        <link rel="canonical" href="{{ url()->current() }}">
+        <meta name="description" content="{{ $metaDescription }}">
+        <meta name="keywords" content="{{ $metaKeywords }}">
+        <meta name="robots" content="{{ $robots }}">
+        <meta name="googlebot" content="{{ $robots }},max-image-preview:large">
+        <link rel="canonical" href="{{ $canonicalUrl }}">
+        <meta property="og:site_name" content="RekapAja.com">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ $metaTitle }}">
+        <meta property="og:description" content="{{ $metaDescription }}">
+        <meta property="og:url" content="{{ $canonicalUrl }}">
+        <meta property="og:image" content="{{ $metaImage }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $metaTitle }}">
+        <meta name="twitter:description" content="{{ $metaDescription }}">
+        <meta name="twitter:image" content="{{ $metaImage }}">
+        <meta name="theme-color" content="#ff7100">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -37,6 +57,17 @@
         @else
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
+
+        <script type="application/ld+json">
+            {!! json_encode([
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => $metaTitle,
+                'description' => $metaDescription,
+                'url' => $canonicalUrl,
+                'image' => $metaImage,
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+        </script>
     </head>
     <body class="antialiased">
         @include('components.page-loading')
