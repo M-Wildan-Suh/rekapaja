@@ -43,6 +43,7 @@ return [
         'api_token' => env('CPANEL_API_TOKEN'),
         'parent_domain' => env('CPANEL_PARENT_DOMAIN', 'rekapaja.com'),
         'home_directory' => env('CPANEL_HOME_DIRECTORY'),
+        'custom_domain_root' => env('CPANEL_CUSTOM_DOMAIN_ROOT', 'domains'),
     ],
 
 

@@ -250,7 +250,8 @@
                                         placeholder="contoh: tokoanda.com"
                                         class="w-full border-0 px-3 py-2 text-sm focus:ring-0">
                                 </div>
-                                <p class="text-xs text-neutral-500">Isi domain tujuan yang ingin dipakai untuk usaha ini.</p>
+                                <p class="text-xs text-neutral-500">Isi domain tujuan yang ingin dipakai untuk usaha ini. Saat di-upload, sistem akan mencoba mendaftarkan domain sebagai addon domain di cPanel lalu mengunggah file website, `sitemap.xml`, dan `robots.txt`.</p>
+                                <p class="text-xs text-amber-600">Pastikan DNS domain sudah diarahkan ke server hosting ini agar website bisa diakses publik.</p>
                             </div>
                             <div x-show="domainTypeForm === 'subdomain'" class="space-y-2">
                                 <label for="product-subdomain-index" class="text-sm font-semibold">Subdomain RekapAja</label>
@@ -284,7 +285,7 @@
                             <button type="button" @click="submitDomainAction()"
                                 :disabled="domainLoading"
                                 class="px-4 py-2 bg-[#ff7100] text-white rounded hover:bg-[#b95300] disabled:opacity-60">
-                                <span x-show="!domainLoading" x-text="domainActionType === 'download' ? 'Download biasa' : (domainTypeForm === 'subdomain' ? 'Upload ke .{{ $cpanelParentDomain }}' : 'Simpan domain custom')"></span>
+                                <span x-show="!domainLoading" x-text="domainActionType === 'download' ? 'Download biasa' : (domainTypeForm === 'subdomain' ? 'Upload ke .{{ $cpanelParentDomain }}' : 'Buat & Upload Custom Domain')"></span>
                                 <span x-show="domainLoading">Memproses...</span>
                             </button>
                         </div>
@@ -522,8 +523,34 @@
 
                         async uploadToCpanel() {
                             try {
-                                if (this.domainTypeForm !== 'subdomain') {
+                                if (this.domainTypeForm === 'custom') {
                                     await this.persistDomain();
+                                    this.domainLoading = true;
+
+                                    const formData = new FormData();
+                                    formData.append('domain', this.buildDomainValueForSaving());
+
+                                    const response = await fetch(`{{ route('product.upload-custom-domain', '') }}/${this.modalData.id}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
+                                            'Accept': 'application/json',
+                                        },
+                                        body: formData,
+                                    });
+
+                                    const result = await response.json().catch(() => ({}));
+
+                                    if (!response.ok) {
+                                        throw new Error(result.message || 'Gagal membuat custom domain di cPanel.');
+                                    }
+
+                                    this.modalData.domain = result.domain ?? this.modalData.domain;
+                                    this.domainForm = this.extractDomainInputValue(this.modalData.domain);
+                                    this.data = this.data.map(item => item.id === this.modalData.id
+                                        ? { ...item, domain: this.modalData.domain }
+                                        : item
+                                    );
                                     this.closeDomainModal();
                                     return;
                                 }

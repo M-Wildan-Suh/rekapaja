@@ -754,6 +754,46 @@ PHP;
         }
     }
 
+    public function uploadCustomDomainToCpanel(Request $request, Product $product)
+    {
+        $this->ensureProductAccess($product);
+
+        $validated = $request->validate([
+            'domain' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if (!$this->normalizeDomainUrl($value)) {
+                    $fail('Domain custom tidak valid.');
+                }
+            }],
+        ]);
+
+        try {
+            $normalizedDomain = $this->normalizeDomainUrl($validated['domain']);
+            $domainHost = parse_url((string) $normalizedDomain, PHP_URL_HOST) ?: '';
+
+            if ($domainHost === '') {
+                throw new RuntimeException('Domain custom tidak valid.');
+            }
+
+            $result = $this->cpanelDomainPublisher->publishCustomDomain($domainHost, array_merge([
+                'index.php' => $this->buildDomainFileContent($product),
+            ], $this->buildDomainSeoFiles($product, 'https://' . $domainHost)));
+
+            $product->domain = $result['url'];
+            $product->save();
+
+            return response()->json([
+                'message' => 'Custom domain berhasil dipasang di cPanel dan file website + sitemap berhasil diunggah. Pastikan DNS domain mengarah ke server hosting ini.',
+                'domain' => $result['url'],
+                'document_root' => $result['document_root'],
+                'files' => $result['files'] ?? [],
+            ]);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
     public function browseDomainFolder(Request $request, Product $product)
     {
         $this->ensureProductAccess($product);

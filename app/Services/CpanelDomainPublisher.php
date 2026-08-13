@@ -38,6 +38,32 @@ class CpanelDomainPublisher
         return 'https://' . $this->normalizeSubdomain($subdomain) . '.' . $this->parentDomain();
     }
 
+    public function normalizeCustomDomain(string $domain): string
+    {
+        $domain = trim(strtolower($domain));
+
+        if ($domain === '') {
+            throw new RuntimeException('Domain custom wajib diisi.');
+        }
+
+        if (!preg_match('~^https?://~i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
+        $parts = parse_url($domain);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+
+        if ($host === '' || !str_contains($host, '.')) {
+            throw new RuntimeException('Domain custom tidak valid.');
+        }
+
+        if (!preg_match('/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/', $host)) {
+            throw new RuntimeException('Format domain custom tidak valid.');
+        }
+
+        return $host;
+    }
+
     public function publish(string $subdomain, string $fileContent): array
     {
         return $this->publishFiles($subdomain, [
@@ -124,9 +150,132 @@ class CpanelDomainPublisher
         ];
     }
 
+    public function publishCustomDomain(string $domain, array $files): array
+    {
+        if (!$this->isConfigured()) {
+            throw new RuntimeException('Konfigurasi cPanel belum lengkap di file .env.');
+        }
+
+        $domain = $this->normalizeCustomDomain($domain);
+        $documentRoot = $this->ensureAddonDomain($domain);
+
+        foreach ($files as $filename => $content) {
+            $this->saveFile($documentRoot, (string) $filename, (string) $content);
+        }
+
+        return [
+            'url' => 'https://' . $domain,
+            'document_root' => $documentRoot,
+            'domain' => $domain,
+            'files' => array_keys($files),
+        ];
+    }
+
     private function documentRootForSubdomain(string $subdomain): string
     {
         return $this->normalizeSubdomain($subdomain) . '.' . $this->parentDomain();
+    }
+
+    private function documentRootForCustomDomain(string $domain): string
+    {
+        $base = trim((string) config('services.cpanel.custom_domain_root', 'domains'), '/');
+
+        return ($base !== '' ? $base . '/' : '') . $this->normalizeCustomDomain($domain);
+    }
+
+    private function addonSubdomainForDomain(string $domain): string
+    {
+        $host = $this->normalizeCustomDomain($domain);
+        $alias = preg_replace('/[^a-z0-9]+/', '-', str_replace('.', '-', $host)) ?: 'domain';
+        $alias = trim($alias, '-');
+        $suffix = substr(md5($host), 0, 8);
+        $maxBaseLength = 54;
+
+        if (strlen($alias) > $maxBaseLength) {
+            $alias = substr($alias, 0, $maxBaseLength);
+        }
+
+        return rtrim($alias, '-') . '-' . $suffix;
+    }
+
+    private function ensureAddonDomain(string $domain): string
+    {
+        $existing = $this->findAddonDomain($domain);
+        if ($existing) {
+            return $existing['document_root'];
+        }
+
+        $documentRoot = $this->documentRootForCustomDomain($domain);
+        $subdomain = $this->addonSubdomainForDomain($domain);
+
+        $response = $this->api2('AddonDomain', 'addaddondomain', [
+            'newdomain' => $domain,
+            'subdomain' => $subdomain,
+            'dir' => $documentRoot,
+        ]);
+
+        $result = (int) data_get($response, 'cpanelresult.event.result', 0);
+        $reason = (string) (data_get($response, 'cpanelresult.error')
+            ?? data_get($response, 'cpanelresult.data.0.reason')
+            ?? '');
+        $reasonLower = strtolower($reason);
+
+        if ($result !== 1 && !str_contains($reasonLower, 'already exists')) {
+            throw new RuntimeException($reason !== '' ? $reason : 'Gagal membuat addon domain di cPanel.');
+        }
+
+        $existing = $this->findAddonDomain($domain);
+
+        return $existing['document_root'] ?? $documentRoot;
+    }
+
+    private function findAddonDomain(string $domain): ?array
+    {
+        $domain = $this->normalizeCustomDomain($domain);
+
+        $response = $this->api2('AddonDomain', 'listaddondomains', [
+            'regex' => '^' . preg_quote($domain, '/') . '$',
+        ]);
+
+        $result = (int) data_get($response, 'cpanelresult.event.result', 0);
+        if ($result !== 1) {
+            return null;
+        }
+
+        $items = data_get($response, 'cpanelresult.data', []);
+        if (!is_array($items)) {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $itemDomain = strtolower((string) ($item['domain'] ?? $item['addon_domain'] ?? $item['domainname'] ?? ''));
+            if ($itemDomain !== $domain) {
+                continue;
+            }
+
+            $fullPath = (string) ($item['dir'] ?? $item['full_path'] ?? '');
+            $documentRoot = trim((string) ($item['basedir'] ?? $item['rootdir'] ?? ''), '/');
+
+            if ($documentRoot === '' && $fullPath !== '') {
+                $homeDirectory = rtrim((string) config('services.cpanel.home_directory'), '/');
+                $prefix = $homeDirectory . '/';
+                $documentRoot = str_starts_with($fullPath, $prefix)
+                    ? trim(substr($fullPath, strlen($prefix)), '/')
+                    : trim($fullPath, '/');
+            }
+
+            return [
+                'domain' => $domain,
+                'document_root' => $documentRoot !== '' ? $documentRoot : $this->documentRootForCustomDomain($domain),
+                'full_path' => $fullPath !== '' ? $fullPath : $this->fullDirectoryPath($documentRoot !== '' ? $documentRoot : $this->documentRootForCustomDomain($domain)),
+            ];
+        }
+
+        return null;
     }
 
     private function fullDirectoryPath(string $documentRoot): string
