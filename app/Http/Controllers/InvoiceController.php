@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\Access;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,16 +22,24 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->role === 'admin') {
+        if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             $data = Invoice::with('product')->latest()->get();
         } else {
-            $data = Invoice::with('product')->whereHas('product.access.user', function ($query) {
-                $query->where('id', Auth::id());
-            })->latest()->get();
+            $productId = Access::where('user_id', Auth::id())
+                ->oldest('id')
+                ->value('product_id');
+
+            $data = Invoice::with('product')
+                ->where('business_id', $productId ?? 0)
+                ->latest()
+                ->get();
         }
         
         $data->transform(function ($data) {
-            $data->date = Carbon::parse($data->created_at)->locale('id')->translatedFormat('d m Y, H:i');
+            $createdAt = Carbon::parse($data->created_at)->locale('id');
+            $data->time = $createdAt->format('H:i');
+            $data->date = $createdAt->translatedFormat('d F Y');
+            $data->status = $data->status ?: 'Pending';
             return $data;
         });
         // dd($data);
@@ -72,9 +81,24 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Invoice $invoice)
+    public function update(Request $request, Invoice $rekap)
     {
-        //
+        $validated = $request->validate([
+            'status' => ['required', 'in:Pending,Selesai'],
+        ]);
+
+        $ownedProductId = Access::where('user_id', Auth::id())
+            ->oldest('id')
+            ->value('product_id');
+
+        $hasAccess = in_array(Auth::user()->role, ['admin', 'superadmin']) || (int) $ownedProductId === $rekap->business_id;
+
+        abort_unless($hasAccess, 403);
+
+        $rekap->status = $validated['status'];
+        $rekap->save();
+
+        return redirect()->back();
     }
 
     /**

@@ -13,7 +13,7 @@
         </div>
 
         <!-- Modal -->
-        <div x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div x-show="open" class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
             <div @click.away="open = false" class="bg-white p-4 rounded-lg shadow-lg w-80 flex flex-col gap-4">
                 <label class="text-base font-semibold">Ganti Video</label>
                 <input x-model="videoUrl" type="text" class="flex-grow text-sm rounded-r-md border border-[#DB9F24] focus:ring-0 focus:border-none bg-neutral-100" placeholder="Input Link Youtube">

@@ -80,6 +80,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:user,premium'],
             'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
@@ -93,6 +94,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $user->name = $validated['name'];
+        $user->email = $validated['email'];
         $user->role = $validated['role'];
         $user->premium_type = $validated['role'] === 'premium' ? $validated['premium_type'] : null;
         $user->expired = $validated['role'] === 'premium' && ($validated['premium_type'] ?? null) !== 'lifetime'

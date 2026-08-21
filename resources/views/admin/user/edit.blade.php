@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div x-show="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 px-4 max-h-screen py-4"
+<div x-show="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] px-4 max-h-screen py-4"
 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
 x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
@@ -32,6 +32,19 @@ x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                             class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm"
                             x-model="name"
                             placeholder="Masukkan nama user"
+                            required>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm"
+                            x-model="email"
+                            placeholder="Masukkan email user"
                             required>
                     </div>
                 </div>
@@ -103,6 +116,7 @@ x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         return {
                             syncedUserId: null,
                             name: '',
+                            email: '',
                             role: 'user',
                             premiumType: '',
                             expiredDate: '',
@@ -113,6 +127,7 @@ x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
                                 this.syncedUserId = editData.id;
                                 this.name = editData.name ?? '';
+                                this.email = editData.email ?? '';
                                 this.role = editData.role ?? 'user';
                                 this.premiumType = editData.premium_type ?? '';
                                 this.expiredDate = editData.expired ?? '';

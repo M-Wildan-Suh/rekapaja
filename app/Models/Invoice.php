@@ -15,6 +15,7 @@ class Invoice extends Model
         'invoice_text',
         'customer_name',
         'customer_address',
+        'status',
     ];
 
     public function product()

@@ -6,6 +6,8 @@ use App\Models\Access;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class AccessController extends Controller
 {
@@ -30,7 +32,10 @@ class AccessController extends Controller
      */
     public function create()
     {
-        $user = User::where('role', '!=', 'admin')->get();
+        $user = User::whereNotIn('role', ['admin', 'superadmin'])
+            ->whereNotIn('id', Access::pluck('user_id'))
+            ->orderBy('name')
+            ->get();
         $access = Access::all();
         $product = Product::whereNotIn('id', $access->pluck('product_id'))->get();
         return view('admin.access.create', compact('user', 'product'));
@@ -42,9 +47,19 @@ class AccessController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user' => ['required', 'exists:users,id'],
-            'product' => ['required', 'exists:products,id'],
+            'user' => ['required', 'exists:users,id', Rule::unique('accesses', 'user_id')],
+            'product' => ['required', 'exists:products,id', Rule::unique('accesses', 'product_id')],
         ]);
+
+        $isEligibleOwner = User::whereKey($validated['user'])
+            ->whereNotIn('role', ['admin', 'superadmin'])
+            ->exists();
+
+        if (!$isEligibleOwner) {
+            throw ValidationException::withMessages([
+                'user' => 'Akun ini tidak dapat digunakan sebagai pemilik usaha.',
+            ]);
+        }
 
         $newdata = new Access;
 

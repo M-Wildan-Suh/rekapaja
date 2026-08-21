@@ -21,11 +21,11 @@ class ProductGalleryController extends Controller
             return;
         }
 
-        $hasAccess = Access::where('user_id', Auth::id())
-            ->where('product_id', $product->id)
-            ->exists();
+        $ownedProductId = Access::where('user_id', Auth::id())
+            ->oldest('id')
+            ->value('product_id');
 
-        abort_unless($hasAccess, 403);
+        abort_unless((int) $ownedProductId === $product->id, 403);
     }
 
     /**

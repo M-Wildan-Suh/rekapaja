@@ -71,6 +71,9 @@
     </head>
     <body class="antialiased">
         @include('components.page-loading')
+        <audio id="order-klink-sound" preload="auto">
+            <source src="{{ asset('assets/audio/order-klink.mp3') }}" type="audio/mpeg">
+        </audio>
         <div class=" min-h-screen">
             {{$slot}}
         </div>
@@ -86,4 +89,58 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script>
+        (() => {
+            const orderSound = document.getElementById('order-klink-sound');
+
+            orderSound.volume = 1;
+            console.info('[Order sound] Initialized', {
+                source: orderSound.currentSrc || orderSound.querySelector('source')?.src,
+                readyState: orderSound.readyState,
+                volume: orderSound.volume,
+            });
+
+            orderSound.addEventListener('canplaythrough', () => {
+                console.info('[Order sound] File is ready to play.');
+            }, { once: true });
+
+            orderSound.addEventListener('error', () => {
+                const mediaError = orderSound.error;
+
+                console.error('[Order sound] Failed to load the file.', {
+                    source: orderSound.currentSrc || orderSound.querySelector('source')?.src,
+                    code: mediaError?.code,
+                    message: mediaError?.message,
+                });
+            });
+
+            window.playOrderKlink = () => {
+                console.info('[Order sound] Play requested.', {
+                    readyState: orderSound.readyState,
+                    paused: orderSound.paused,
+                    source: orderSound.currentSrc || orderSound.querySelector('source')?.src,
+                });
+                orderSound.currentTime = 0;
+                orderSound.play()
+                    .then(() => console.info('[Order sound] Playback started.'))
+                    .catch((error) => console.error('[Order sound] Playback was blocked or failed.', error));
+            };
+
+            document.addEventListener('click', (event) => {
+                const orderControl = event.target.closest("label[for^='order-']");
+
+                if (!orderControl || !event.isTrusted || event.defaultPrevented) {
+                    return;
+                }
+
+                const orderInput = document.getElementById(orderControl.htmlFor);
+
+                if (!orderInput?.checked) {
+                    console.info('[Order sound] Product added to order.', { productId: orderInput?.value });
+                    window.playOrderKlink();
+                }
+            });
+        })();
+    </script>
 </html>

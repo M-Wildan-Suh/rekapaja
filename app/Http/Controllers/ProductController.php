@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use RuntimeException;
@@ -69,8 +70,7 @@ class ProductController extends Controller
             'category.*' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['category']],
             'tag' => ['nullable', 'array'],
             'tag.*' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['tag']],
-            'access' => ['nullable', 'array'],
-            'access.*' => ['nullable', 'integer', 'exists:users,id'],
+            'access' => ['nullable', 'integer', 'exists:users,id'],
         ], $this->canManageQris() ? [
             'qris' => ['nullable', 'image'],
         ] : []);
@@ -183,11 +183,40 @@ class ProductController extends Controller
             return;
         }
 
-        $hasAccess = Access::where('user_id', Auth::id())
-            ->where('product_id', $product->id)
+        $ownedProductId = Access::where('user_id', Auth::id())
+            ->oldest('id')
+            ->value('product_id');
+
+        abort_unless((int) $ownedProductId === $product->id, 403);
+    }
+
+    private function availableAccessUsers(?Product $product = null)
+    {
+        $assignedUserIds = Access::query()
+            ->when($product, fn ($query) => $query->where('product_id', '!=', $product->id))
+            ->pluck('user_id');
+
+        return User::whereNotIn('role', ['admin', 'superadmin'])
+            ->whereNotIn('id', $assignedUserIds)
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function ensureOwnerIsAvailable(int $userId, ?Product $product = null): void
+    {
+        $ownerExists = User::whereKey($userId)
+            ->whereNotIn('role', ['admin', 'superadmin'])
             ->exists();
 
-        abort_unless($hasAccess, 403);
+        $ownerHasAnotherBusiness = Access::where('user_id', $userId)
+            ->when($product, fn ($query) => $query->where('product_id', '!=', $product->id))
+            ->exists();
+
+        if (!$ownerExists || $ownerHasAnotherBusiness) {
+            throw ValidationException::withMessages([
+                'access' => 'Akun ini sudah terhubung dengan usaha lain.',
+            ]);
+        }
     }
 
     private function storeProductImage($imageFile): string
@@ -217,14 +246,18 @@ class ProductController extends Controller
     {
         $no_tlp = NoHandphone::query()->value('no_tlp');
 
-        if (Auth::user()->role === 'admin') {
+        if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             $data = Product::all();
-            $tag = ProductTag::all();
         } else {
-            $productIds = Access::where('user_id', Auth::id())->pluck('product_id');
-            $data = Product::whereIn('id', $productIds)->get();
-            $tag = ProductTag::all();
+            $productId = Access::where('user_id', Auth::id())->oldest('id')->value('product_id');
+
+            if (!$productId) {
+                return redirect()->route('profile.edit')->with('info', 'Akun Anda belum terhubung ke usaha.');
+            }
+
+            return redirect()->route('product.show', $productId);
         }
+
         return view('dashboard', compact('data', 'no_tlp'));
     }
     /**
@@ -233,18 +266,6 @@ class ProductController extends Controller
     public function index()
     {
         return redirect()->route('dashboard');
-        // dd(Auth::user()->role);
-        $no_tlp = NoHandphone::query()->value('no_tlp');
-
-        if (Auth::user()->role === 'admin') {
-            $data = Product::all();
-            $tag = ProductTag::all();
-        } else {
-            $productIds = Access::where('user_id', Auth::id())->pluck('product_id');
-            $data = Product::whereIn('id', $productIds)->get();
-            $tag = ProductTag::all();
-        }
-        return view('admin.product.index', compact('data', 'no_tlp'));
     }
 
     /**
@@ -258,7 +279,7 @@ class ProductController extends Controller
         $category = Category::all();
         $template = Template::all();
         $product = Product::all();
-        $accessUsers = User::where('role', '!=', 'admin')->orderBy('name')->get();
+        $accessUsers = $this->availableAccessUsers();
 
         return view('admin.product.create', compact('tag', 'template', 'product', 'category', 'accessUsers'));
     }
@@ -271,11 +292,14 @@ class ProductController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate(array_merge($this->productValidationRules(), [
+            'access' => ['required', 'integer', 'exists:users,id'],
             'home_button' => ['required', 'in:on,off'],
             'thumbnail' => ['required', 'image'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
         ]), $this->productValidationMessages());
+
+        $this->ensureOwnerIsAvailable((int) $validated['access']);
 
         $newdata= new Product();
 
@@ -348,18 +372,10 @@ class ProductController extends Controller
             }
         }
 
-        if (Auth::user()->role === 'admin') {
-            $userIds = User::where('role', '!=', 'admin')
-                ->whereIn('id', $validated['access'] ?? [])
-                ->pluck('id');
-
-            foreach ($userIds as $userId) {
-                Access::create([
-                    'user_id' => $userId,
-                    'product_id' => $newdata->id,
-                ]);
-            }
-        }
+        Access::create([
+            'user_id' => $validated['access'],
+            'product_id' => $newdata->id,
+        ]);
           
         return redirect()->route('product.index');
     }
@@ -389,7 +405,7 @@ class ProductController extends Controller
 
         $template = Template::all();
         $data = Product::whereNotIn('id', [$product->id])->get();
-        $accessUsers = User::where('role', '!=', 'admin')->orderBy('name')->get();
+        $accessUsers = $this->availableAccessUsers($product);
         
         return view('admin.product.edit', compact('product', 'tag', 'template', 'category', 'data', 'accessUsers'));
         
@@ -1000,20 +1016,18 @@ PHP;
             }
         }
 
-        if (Auth::user()->role === 'admin') {
-            $userIds = User::where('role', '!=', 'admin')
-                ->whereIn('id', $validated['access'] ?? [])
-                ->pluck('id')
-                ->all();
+        if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+            $ownerId = $request->validate([
+                'access' => ['required', 'integer', 'exists:users,id'],
+            ])['access'];
+
+            $this->ensureOwnerIsAvailable((int) $ownerId, $product);
 
             Access::where('product_id', $product->id)->delete();
-
-            foreach ($userIds as $userId) {
-                Access::create([
-                    'user_id' => $userId,
-                    'product_id' => $product->id,
-                ]);
-            }
+            Access::create([
+                'user_id' => $ownerId,
+                'product_id' => $product->id,
+            ]);
         }
         
 

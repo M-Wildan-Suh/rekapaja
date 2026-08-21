@@ -8,7 +8,8 @@
 @endphp
 <div class="flex flex-col gap-2">
     <label class="text-sm sm:text-base font-semibold">{{ $title }}</label>
-    <select class="js-access-input" name="{{ $name }}" multiple="multiple">
+    <select class="js-access-input" name="{{ $name }}">
+        <option value=""></option>
         @foreach ($users as $user)
             <option value="{{ $user->id }}" @selected(in_array((string) $user->id, $selectedValues, true))>{{ $user->name }}</option>
         @endforeach
@@ -59,7 +60,7 @@
     window.addEventListener('load', function () {
         var $j = jQuery.noConflict();
         $j('.js-access-input').select2({
-            placeholder: 'Pilih user yang dapat mengakses usaha ini'
+            placeholder: 'Pilih akun pemilik usaha'
         });
         $j('.js-access-input').trigger('change');
     });

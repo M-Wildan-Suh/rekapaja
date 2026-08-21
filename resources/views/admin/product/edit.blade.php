@@ -36,12 +36,22 @@
             <div class="max-w-xl mx-auto pointer-events-none">
                 <div class="pointer-events-auto rounded-md border border-[#ff7100]/20 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
                     <div class="pr-10 sm:pr-0">
-                        <a href="{{ route('dashboard', ['return_page' => max((int) request('return_page', 1), 1)]) }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Kembali ke daftar usaha</span>
-                        </a>
+                        @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                            <a href="{{ route('dashboard', ['return_page' => max((int) request('return_page', 1), 1)]) }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
+                                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>Kembali ke daftar usaha</span>
+                            </a>
+                        @else
+                            <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
+                                <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2" />
+                                    <path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                                <span>Keterangan akun</span>
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -177,8 +187,8 @@
                                 @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
                                     <x-admin.component.categoryinput title="Category" :value="$product->category" :tag="$category" name="category[]" />
                                     <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]" :tag="$tag"></x-admin.component.taginput>
-                                    @if (Auth::user()->role === 'admin')
-                                        <x-admin.component.accessinput title="Access" :value="$product->access->pluck('user_id')->all()" :users="$accessUsers" name="access[]" />
+                                    @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                                        <x-admin.component.accessinput title="Akun Pemilik" :value="$product->access->pluck('user_id')->take(1)->all()" :users="$accessUsers" name="access" />
                                     @endif
                                 @endif
                                 
@@ -298,7 +308,7 @@
                                         class="font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">
                                         Tambah Produk Massal
                                     </button>
-                                    <div x-show="multiple" class=" fixed inset-0 flex items-center justify-center bg-black/20 z-50 px-4">
+                                    <div x-show="multiple" class=" fixed inset-0 flex items-center justify-center bg-black/20 z-[60] px-4">
                                         <div class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-[#ff7100]">
                                             <button @click="multiple = false"
                                                 class=" absolute top-6 right-6 w-6 h-6 text-white hover:text-red-500 duration-300">

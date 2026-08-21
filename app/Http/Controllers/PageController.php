@@ -345,6 +345,7 @@ class PageController extends Controller
         $invoice->invoice_code = strtoupper(Str::random(10));
         $invoice->customer_name = $customerName;
         $invoice->customer_address = $customerAddress;
+        $invoice->status = 'Pending';
         $invoice->invoice_text = '';
 
         $message = "Halo, saya ingin memesan produk/layanan Anda.\n";
@@ -352,13 +353,10 @@ class PageController extends Controller
         $total = 0;
         $invoiceText = '';
 
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
-        $invoiceText .= "<p>" . $tanggal . "</p>";
+        $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem;"><span style="color: #525252; font-weight: 600;">Tanggal</span><span>' . $tanggal . '</span></div>';
         if ($requiresCustomerData) {
-            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
-            $invoiceText .= '<p>' . e($customerName) . '</p>';
-            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
-            $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+            $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Nama Pemesan</span><span style="text-align: right;">' . e($customerName) . '</span></div>';
+            $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Alamat</span><span style="text-align: right; white-space: pre-line;">' . e($customerAddress) . '</span></div>';
         }
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
 
@@ -399,8 +397,7 @@ class PageController extends Controller
             ], 422);
         }
 
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Total</p>';
-        $invoiceText .= "<b>Rp" . number_format($total, 0, ',', '.') . "</b>";
+        $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Total</span><b>Rp' . number_format($total, 0, ',', '.') . '</b></div>';
         $invoice->invoice_text = $invoiceText;
         $invoice->save();
 
@@ -631,6 +628,7 @@ class PageController extends Controller
         $invoice->invoice_code = strtoupper(Str::random(10));
         $invoice->customer_name = $customerName;
         $invoice->customer_address = $customerAddress;
+        $invoice->status = 'Pending';
         $invoice->invoice_text = '';
         // $data = Highlight::whereIn('id', $request->order)->get();
 
@@ -642,13 +640,10 @@ class PageController extends Controller
         $total = 0;
         $invoiceText = '';
 
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600;">Tanggal</p>';
-        $invoiceText .= "<p>" . $tanggal . "</p>";
+        $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem;"><span style="color: #525252; font-weight: 600;">Tanggal</span><span>' . $tanggal . '</span></div>';
         if ($requiresCustomerData) {
-            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Nama Pemesan</p>';
-            $invoiceText .= '<p>' . e($customerName) . '</p>';
-            $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Alamat</p>';
-            $invoiceText .= '<p>' . nl2br(e($customerAddress)) . '</p>';
+            $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Nama Pemesan</span><span style="text-align: right;">' . e($customerName) . '</span></div>';
+            $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Alamat</span><span style="text-align: right; white-space: pre-line;">' . e($customerAddress) . '</span></div>';
         }
 
         $invoiceText .= '<p style="margin-top:8px;"><b>Detail Rekapan</b></p>';
@@ -670,8 +665,7 @@ class PageController extends Controller
                 }
             }
         }
-        $invoiceText .= '<p style="font-size: 0.875rem; color: #525252; font-weight: 600; margin-top:8px;">Total</p>';
-        $invoiceText .= "<b>Rp" . number_format($total, 0, ',', '.') . "</b>";
+        $invoiceText .= '<div style="font-size: 0.875rem; display: flex; justify-content: space-between; gap: 1rem; margin-top: 8px;"><span style="color: #525252; font-weight: 600;">Total</span><b>Rp' . number_format($total, 0, ',', '.') . '</b></div>';
         $invoice->invoice_text = $invoiceText;
         $invoice->save();
 

@@ -33,8 +33,8 @@
                                             <div class="">
                                                 <button @click="editForm(item)"
                                                     class="w-5 h-5 hover:text-green-500 duration-300">
-                                                    <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="w-full h-full">
+                                                        <path d="M535.6 85.7C513.7 63.8 478.3 63.8 456.4 85.7L432 110.1L529.9 208L554.3 183.6C576.2 161.7 576.2 126.3 554.3 104.4L535.6 85.7zM236.4 305.7C230.3 311.8 225.6 319.3 222.9 327.6L193.3 416.4C190.4 425 192.7 434.5 199.1 441C205.5 447.5 215 449.7 223.7 446.8L312.5 417.2C320.7 414.5 328.2 409.8 334.4 403.7L496 241.9L398.1 144L236.4 305.7zM160 128C107 128 64 171 64 224L64 480C64 533 107 576 160 576L416 576C469 576 512 533 512 480L512 384C512 366.3 497.7 352 480 352C462.3 352 448 366.3 448 384L448 480C448 497.7 433.7 512 416 512L160 512C142.3 512 128 497.7 128 480L128 224C128 206.3 142.3 192 160 192L256 192C273.7 192 288 177.7 288 160C288 142.3 273.7 128 256 128L160 128z" fill="currentColor"></path><path opacity="0"
                                                             d="M3 17.75A3.25 3.25 0 0 0 6.25 21h4.915l.356-1.423c.162-.648.497-1.24.97-1.712l5.902-5.903a3.279 3.279 0 0 1 2.607-.95V6.25A3.25 3.25 0 0 0 17.75 3H11v4.75A3.25 3.25 0 0 1 7.75 11H3v6.75ZM9.5 3.44 3.44 9.5h4.31A1.75 1.75 0 0 0 9.5 7.75V3.44Zm9.6 9.23-5.903 5.902a2.686 2.686 0 0 0-.706 1.247l-.458 1.831a1.087 1.087 0 0 0 1.319 1.318l1.83-.457a2.685 2.685 0 0 0 1.248-.707l5.902-5.902A2.286 2.286 0 0 0 19.1 12.67Z"
                                                             fill="currentColor" class="fill-212121"></path>
                                                     </svg>
@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- Modal -->
-                <div x-show="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 px-4 max-h-screen py-4"
+                <div x-show="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] px-4 max-h-screen py-4"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
@@ -101,7 +101,7 @@
 
                 <!-- Delete Confirmation Modal -->
                 <div x-show="confirmDeleteModal"
-                    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40 px-4">
+                    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60] px-4">
                     <div class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-[#ff7100]">
                         <button @click="confirmDeleteModal = false"
                             class=" absolute top-6 right-6 w-6 h-6 text-white hover:text-red-500 duration-300">

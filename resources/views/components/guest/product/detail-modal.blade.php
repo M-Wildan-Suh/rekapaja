@@ -17,7 +17,15 @@
             const trigger = document.querySelector(`label[for='order-${this.product.id}']`);
 
             if (!trigger) {
+                console.warn('[Order sound] Product order trigger was not found.', { productId: this.product.id });
                 return;
+            }
+
+            console.info('[Order sound] Detail modal order clicked.', { productId: this.product.id });
+            const orderInput = document.getElementById(trigger.htmlFor);
+
+            if (!orderInput?.checked) {
+                window.playOrderKlink?.();
             }
 
             this.closeProductDetail();

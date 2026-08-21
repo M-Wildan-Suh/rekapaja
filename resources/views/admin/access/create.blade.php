@@ -32,7 +32,7 @@
                                 </select>
                             </div>
                             <div class="">
-                                @if (empty($product) || $product->isEmpty())
+                                @if (empty($user) || $user->isEmpty() || empty($product) || $product->isEmpty())
                                     <button disabled class=" opacity-60 cursor-not-allowed font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
                                 @else
                                     <button class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>

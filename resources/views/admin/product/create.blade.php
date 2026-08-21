@@ -104,8 +104,8 @@
 
                             <x-admin.component.taginput title="Tag" :value="null" :tag="$tag" name="tag[]" />
 
-                            @if (Auth::user()->role === 'admin')
-                                <x-admin.component.accessinput title="Access" :value="[]" :users="$accessUsers" name="access[]" />
+                            @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                                <x-admin.component.accessinput title="Akun Pemilik" :value="[]" :users="$accessUsers" name="access" />
                             @endif
 
                             <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="old('home_button', $tagposition ?? '')" name="home_button" required />
