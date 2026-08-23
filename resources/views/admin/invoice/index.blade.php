@@ -25,7 +25,7 @@
                         <thead>
                             <tr class="h-10 bg-[#ff7100] text-white divide-x-2 divide-white">
                                 <th class=" px-1 sm:px-2 py-1">Kode Rekap</th>
-                                <th class=" px-1 sm:px-2 py-1">Tanggal</th>
+                                <th class=" px-1 sm:px-2 py-1">Keterangan</th>
                                 <th class=" px-1 sm:px-2 py-1">Status</th>
                                 <th class=" px-1 sm:px-2 py-1">Opsi</th>
                             </tr>
@@ -43,17 +43,17 @@
                                         </div>
                                     </td>
                                     <td class="px-2 sm:px-4 py-2">
-                                        <div class="text-xs flex flex-col text-right">
-                                                <span class="font-semibold text-neutral-700" x-text="item.time"></span>
-                                                <span class="text-neutral-700 text-nowrap" x-text="item.date"></span>
-                                            </div>
+                                        <div class="space-y-1 flex flex-col text-xs text-neutral-700">
+                                            <span class="font-semibold" x-text="item.customer_name || '-'"></span>
+                                            <span class="font-semibold text-nowrap" x-text="item.total_price"></span>
+                                            <span class="font-semibold text-nowrap" x-text="item.date"></span>
                                         </div>
                                     </td>
                                     <td class="px-2 sm:px-4 py-2">
                                         <div x-data="{ open: false }" class="relative flex justify-center">
                                             <button type="button" @click="open = !open"
                                                 :class="(item.status || 'Pending') === 'Selesai' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'"
-                                                class="inline-flex min-w-[110px] items-center justify-between gap-2 rounded-md px-3 py-1 text-sm font-semibold text-white duration-200">
+                                                class="inline-flex min-w-[110px] items-center justify-between gap-1 rounded-md px-2 py-1 text-sm font-semibold text-white duration-200">
                                                 <span x-text="item.status || 'Pending'"></span>
                                                 <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M7.21 5.23a.75.75 0 0 1 1.06-.02l4.5 4.25a.75.75 0 0 1 0 1.09l-4.5 4.25a.75.75 0 1 1-1.04-1.09L11.17 10 7.23 6.29a.75.75 0 0 1-.02-1.06Z" clip-rule="evenodd" />
@@ -78,12 +78,6 @@
                                     </td>
                                     <td class=" px-1 sm:px-2">
                                         <div class="flex gap-2 justify-center">
-                                            <!-- Open rekap page -->
-                                            <a :href="'{{ url('/rekap') }}/' + item.invoice_code" title="Buka halaman rekap"
-                                                target="_blank" rel="noopener noreferrer"
-                                                class="w-5 h-5 hover:text-[#ff7100] duration-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="w-full h-full"><path fill="currentcolor" d="M354.4 83.8C359.4 71.8 371.1 64 384 64L544 64C561.7 64 576 78.3 576 96L576 256C576 268.9 568.2 280.6 556.2 285.6C544.2 290.6 530.5 287.8 521.3 278.7L464 221.3L310.6 374.6C298.1 387.1 277.8 387.1 265.3 374.6C252.8 362.1 252.8 341.8 265.3 329.3L418.7 176L361.4 118.6C352.2 109.4 349.5 95.7 354.5 83.7zM64 240C64 195.8 99.8 160 144 160L224 160C241.7 160 256 174.3 256 192C256 209.7 241.7 224 224 224L144 224C135.2 224 128 231.2 128 240L128 496C128 504.8 135.2 512 144 512L400 512C408.8 512 416 504.8 416 496L416 416C416 398.3 430.3 384 448 384C465.7 384 480 398.3 480 416L480 496C480 540.2 444.2 576 400 576L144 576C99.8 576 64 540.2 64 496L64 240z"/></svg>
-                                            </a>
                                             <!-- Detail -->
                                             <button @click="showDetail(item)" class="w-5 h-5 hover:text-blue-500 duration-300">
                                                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

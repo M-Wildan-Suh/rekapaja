@@ -37,8 +37,10 @@ class InvoiceController extends Controller
         
         $data->transform(function ($data) {
             $createdAt = Carbon::parse($data->created_at)->locale('id');
-            $data->time = $createdAt->format('H:i');
             $data->date = $createdAt->translatedFormat('d F Y');
+            preg_match('/Total\s*Rp\s*([0-9.,]+)/u', strip_tags($data->invoice_text), $totalMatch);
+            $total = isset($totalMatch[1]) ? (int) preg_replace('/[^0-9]/', '', $totalMatch[1]) : 0;
+            $data->total_price = 'Rp' . number_format($total, 0, ',', '.');
             $data->status = $data->status ?: 'Pending';
             return $data;
         });
