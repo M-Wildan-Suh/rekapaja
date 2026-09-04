@@ -13,9 +13,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @if (config('app.deploy', true))
-            <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
+            <link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}">
         @else
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
@@ -37,6 +36,6 @@
         </div>
     </body>
     @if (config('app.deploy', true))
-        <script src="{{ asset('build/assets/app.js') }}"></script>
+        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
     @endif
 </html>

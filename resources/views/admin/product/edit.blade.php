@@ -44,13 +44,23 @@
                                 <span>Kembali ke daftar usaha</span>
                             </a>
                         @else
-                            <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
+                            <div class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100]">
                                 <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2" />
                                     <path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                                 </svg>
-                                <span>Keterangan akun</span>
-                            </a>
+                                @if (Auth::user()->role === 'premium')
+                                    @if (Auth::user()->premium_type === 'lifetime')
+                                        <span>Premium Aktif — Masa aktif: Lifetime</span>
+                                    @elseif (Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired)))
+                                        <span>Premium Aktif — Masa aktif hingga {{ Auth::user()->expired }}</span>
+                                    @else
+                                        <span>Premium Tidak Aktif — Berakhir {{ Auth::user()->expired }}</span>
+                                    @endif
+                                @else
+                                    <span>Anda adalah User Gratis</span>
+                                @endif
+                            </div>
                         @endif
                     </div>
                 </div>
