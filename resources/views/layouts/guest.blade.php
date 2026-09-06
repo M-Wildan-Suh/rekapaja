@@ -13,11 +13,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        @if (config('app.deploy', true))
-            <link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}">
-        @else
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @endif
+        {!! app(\App\Support\ProjectVite::class)->tags(['resources/css/app.css', 'resources/js/app.js']) !!}
     </head>
     <body class="font-sans text-gray-900 antialiased">
         @include('components.page-loading')
@@ -35,7 +31,4 @@
             </div>
         </div>
     </body>
-    @if (config('app.deploy', true))
-        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
-    @endif
 </html>

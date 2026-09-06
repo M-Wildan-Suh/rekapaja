@@ -51,11 +51,7 @@
 
         <link rel="icon" href="{{ asset('/assets/images/logo.webp') }}" type="image/x-icon">
 
-        @if (config('app.deploy', true))
-            <link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}">
-        @else
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @endif
+        {!! app(\App\Support\ProjectVite::class)->tags(['resources/css/app.css', 'resources/js/app.js']) !!}
 
         <script type="application/ld+json">
             {!! json_encode([
@@ -78,10 +74,6 @@
         </div>
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    @if (config('app.deploy', true))
-        <script type="module" src="{{ Vite::asset('resources/js/app.js') }}"></script>
-    @endif
-
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
