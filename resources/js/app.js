@@ -93,21 +93,16 @@ document.addEventListener('submit', (event) => {
 window.addEventListener('pageshow', hidePageLoader);
 window.addEventListener('load', hidePageLoader);
 
-const bannerClampTargets = () => Array.from(document.querySelectorAll(
-    '.banner-clamp-safe [class*="line-clamp-"]:not(.banner-clamp-description)'
+const bannerAutoResizeTargets = () => Array.from(document.querySelectorAll(
+    '.banner-auto-resize [data-auto-resize-text]'
 ));
 
-const clampLineCount = (element) => {
-    const className = Array.from(element.classList).find((name) => /^line-clamp-\d+$/.test(name));
+const autoResizeLineCount = (element) => Math.max(1, Number(element.dataset.autoResizeLines) || 1);
 
-    return className ? Number(className.replace('line-clamp-', '')) : 1;
-};
-
-const measureBannerClamp = (element, fontSize) => {
+const measureBannerText = (element, fontSize) => {
     const styles = window.getComputedStyle(element);
     const clone = element.cloneNode(true);
 
-    clone.classList.remove('line-clamp-1', 'line-clamp-2', 'line-clamp-3', 'line-clamp-4');
     clone.style.cssText += `
         position: fixed !important;
         visibility: hidden !important;
@@ -120,8 +115,6 @@ const measureBannerClamp = (element, fontSize) => {
         height: auto !important;
         min-height: 0 !important;
         overflow: visible !important;
-        -webkit-line-clamp: unset !important;
-        -webkit-box-orient: initial !important;
         font-size: ${fontSize}px !important;
     `;
 
@@ -133,14 +126,16 @@ const measureBannerClamp = (element, fontSize) => {
     const baseLineHeight = Number.parseFloat(styles.lineHeight) || baseFontSize * 1.2;
     const lineHeight = (baseLineHeight / baseFontSize) * fontSize;
 
-    return height <= (lineHeight * clampLineCount(element)) + 1;
+    return height <= (lineHeight * autoResizeLineCount(element)) + 1;
 };
 
-const fitBannerClamp = (element) => {
+const fitBannerText = (element) => {
     if (!element.clientWidth || !element.textContent.trim()) {
         return;
     }
 
+    // Kata panjang tanpa spasi tetap dapat ditampilkan utuh saat ukuran minimum tercapai.
+    element.style.overflowWrap = 'anywhere';
     const currentInlineSize = element.style.fontSize;
     element.style.fontSize = '';
     const baseSize = Number.parseFloat(window.getComputedStyle(element).fontSize);
@@ -150,11 +145,12 @@ const fitBannerClamp = (element) => {
         return;
     }
 
-    const minimumSize = baseSize * 0.72;
+    // Tetap terbaca pada banner kecil, namun tidak pernah lebih kecil dari 8px.
+    const minimumSize = Math.max(8, baseSize * 0.6);
     let low = minimumSize;
     let high = baseSize;
 
-    if (measureBannerClamp(element, high)) {
+    if (measureBannerText(element, high)) {
         element.style.fontSize = '';
         return;
     }
@@ -162,7 +158,7 @@ const fitBannerClamp = (element) => {
     for (let index = 0; index < 7; index += 1) {
         const candidate = (low + high) / 2;
 
-        if (measureBannerClamp(element, candidate)) {
+        if (measureBannerText(element, candidate)) {
             low = candidate;
         } else {
             high = candidate;
@@ -172,18 +168,45 @@ const fitBannerClamp = (element) => {
     element.style.fontSize = `${low.toFixed(2)}px`;
 };
 
-const initialiseBannerClampAutoResize = () => {
-    const targets = bannerClampTargets();
+const initialiseBannerTextAutoResize = () => {
+    let frameId;
+    const fitAll = () => {
+        frameId = undefined;
+        bannerAutoResizeTargets().forEach(fitBannerText);
+    };
+    const scheduleFit = () => {
+        if (!frameId) {
+            frameId = window.requestAnimationFrame(fitAll);
+        }
+    };
 
-    if (!targets.length) {
-        return;
-    }
+    const resizeObserver = new ResizeObserver(scheduleFit);
+    document.querySelectorAll('.banner-auto-resize').forEach((banner) => resizeObserver.observe(banner));
+    window.addEventListener('resize', scheduleFit);
+    const contentObserver = new MutationObserver((mutations) => {
+        const bannerContentChanged = mutations.some((mutation) => {
+            const target = mutation.target.nodeType === Node.ELEMENT_NODE
+                ? mutation.target
+                : mutation.target.parentElement;
 
-    const fitAll = () => targets.forEach(fitBannerClamp);
-    const observer = new ResizeObserver(() => window.requestAnimationFrame(fitAll));
+            return target?.closest('.banner-auto-resize')
+                || Array.from(mutation.addedNodes).some((node) => node.nodeType === Node.ELEMENT_NODE
+                    && node.matches?.('.banner-auto-resize, .banner-auto-resize *'));
+        });
 
-    targets.forEach((target) => observer.observe(target));
-    fitAll();
+        if (bannerContentChanged) {
+            scheduleFit();
+        }
+    });
+    contentObserver.observe(document.body, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+    });
+    scheduleFit();
+
+    // Dapat dipanggil kembali setelah konten banner diubah lewat JavaScript.
+    window.resizeBannerText = scheduleFit;
 };
 
-initialiseBannerClampAutoResize();
+initialiseBannerTextAutoResize();

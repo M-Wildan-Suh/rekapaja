@@ -20,7 +20,7 @@
     }
 @endphp
 
-<div class="banner-clamp-safe w-full relative overflow-hidden">
+<div class="banner-auto-resize w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $puddingBg }};">
             <div class="absolute inset-0">
@@ -40,7 +40,7 @@
                         @endif
 
                         <div class="space-y-0.5">
-                            <p class="line-clamp-1 text-[1.45rem] font-bold leading-none md:text-[2.35rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPink }};">
+                            <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.45rem] font-bold leading-none md:text-[2.35rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPink }};">
                                 {{ $data->name }}
                             </p>
 
@@ -53,12 +53,12 @@
                                 @endphp
                                 <div class="space-y-0.5">
                                     @if (filled($subtitlePrimary))
-                                        <p class="line-clamp-1 text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPurple }};">
+                                        <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingPurple }};">
                                             {{ $subtitlePrimary }}
                                         </p>
                                     @endif
                                     @if (filled($subtitleAccent))
-                                        <p class="line-clamp-1 text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingBrown }};">
+                                        <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.05rem] font-bold leading-none md:text-[1.95rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $puddingBrown }};">
                                             {{ $subtitleAccent }}
                                         </p>
                                     @endif
@@ -70,12 +70,12 @@
                             <div class="pt-1">
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[0.48rem] font-bold md:px-3.5 md:text-[0.82rem]" style="color: {{ $puddingPink }};">
                                     <span class="text-[0.7rem] leading-none md:text-[0.95rem]">♡</span>
-                                    <span class="line-clamp-2">{{ $puddingHeroTag }}</span>
+                                    <span data-auto-resize-text data-auto-resize-lines="2">{{ $puddingHeroTag }}</span>
                                 </span>
                             </div>
                         @endif
 
-                        <p class="banner-clamp-description line-clamp-3 pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
                             {!! nl2br(e($puddingDescription)) !!}
                         </p>
                     </div>
@@ -98,7 +98,7 @@
                                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-full border text-[1rem] font-black md:h-10 md:w-10 md:text-[1.15rem]" style="border-color: {{ $tagTheme['border'] }}; color: {{ $tagTheme['accent'] }};">
                                         o
                                     </span>
-                                    <span class="line-clamp-2 text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $puddingText }};">
+                                    <span data-auto-resize-text data-auto-resize-lines="2" class="text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $puddingText }};">
                                         {{ $tag }}
                                     </span>
                                 </div>

@@ -12,7 +12,7 @@
         ->take(4);
 @endphp
 
-<div class="banner-clamp-safe w-full relative overflow-hidden">
+<div class="banner-auto-resize w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-black/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
         <div
             class="relative aspect-[4/3] overflow-hidden"
@@ -31,15 +31,15 @@
                                 </p>
                             </div>
                         @endif
-                        <p class="line-clamp-1 text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenText }};">
                             {{ $data->name }}
                         </p>
                         @if (filled($data->subtitle))
-                            <p class="line-clamp-2 text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenAccent }};">
+                            <p data-auto-resize-text data-auto-resize-lines="2" class="text-[1.7rem] font-semibold italic leading-[0.95] md:text-[2.8rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $ramenAccent }};">
                                 {{ $data->subtitle }}
                             </p>
                         @endif
-                        <p class="banner-clamp-description line-clamp-3 pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
                             {!! nl2br(e($ramenDescription)) !!}
                         </p>
                         @if ($ramenTags->isNotEmpty())
@@ -52,7 +52,7 @@
                                         <span class="inline-flex items-center justify-center text-[1rem] font-bold md:text-[1.25rem]" style="color: {{ $ramenAccent }};">
                                             o
                                         </span>
-                                        <span class="line-clamp-2 text-[0.42rem] font-semibold leading-[1.25] md:text-[0.62rem]" style="color: {{ $ramenText }};">
+                                        <span data-auto-resize-text data-auto-resize-lines="2" class="text-[0.42rem] font-semibold leading-[1.25] md:text-[0.62rem]" style="color: {{ $ramenText }};">
                                             {{ $tag }}
                                         </span>
                                     </div>

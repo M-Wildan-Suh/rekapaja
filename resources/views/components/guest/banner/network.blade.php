@@ -11,7 +11,7 @@
         ->take(3);
 @endphp
 
-<div class="banner-clamp-safe w-full relative overflow-hidden">
+<div class="banner-auto-resize w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2.25rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $networkSurface }};">
             <div class="absolute inset-y-0 right-0 w-full">
@@ -29,11 +29,11 @@
                     @endif
 
                     <div class="space-y-1">
-                        <p class="line-clamp-1 text-[1.2rem] font-black leading-[1.02] tracking-[-0.03em] md:text-[2.1rem]" style="color: {{ $networkText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.2rem] font-black leading-[1.02] tracking-[-0.03em] md:text-[2.1rem]" style="color: {{ $networkText }};">
                             {{ $data->name }}
                         </p>
                         @if (filled($data->subtitle))
-                            <p class="line-clamp-2 text-[1.2rem] font-black leading-[1.02] tracking-[-0.03em] md:text-[2.1rem]" style="color: {{ $networkAccent }};">
+                            <p data-auto-resize-text data-auto-resize-lines="2" class="text-[1.2rem] font-black leading-[1.02] tracking-[-0.03em] md:text-[2.1rem]" style="color: {{ $networkAccent }};">
                                 {{ $data->subtitle }}
                             </p>
                         @endif
@@ -44,14 +44,14 @@
                             @foreach ($networkTags->take(3) as $tag)
                                 <span class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[0.4rem] font-bold md:px-2.5 md:text-[0.68rem]" style="background-color: {{ $networkGold }}; color: {{ $networkText }};">
                                     <span class="inline-block h-1.5 w-1.5 rounded-full" style="background-color: {{ $networkText }};"></span>
-                                    <span class="line-clamp-1">{{ $tag }}</span>
+                                    <span data-auto-resize-text data-auto-resize-lines="1">{{ $tag }}</span>
                                 </span>
                             @endforeach
                         </div>
                     @endif
 
                     @if (filled($networkDescription))
-                        <p class="banner-clamp-description line-clamp-3 max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
                             {!! nl2br(e($networkDescription)) !!}
                         </p>
                     @endif

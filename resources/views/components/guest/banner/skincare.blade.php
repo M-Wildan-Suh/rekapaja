@@ -19,7 +19,7 @@
 
 @endphp
 
-<div class="banner-clamp-safe w-full relative overflow-hidden">
+<div class="banner-auto-resize w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $skincareBg }};">
             <div class="absolute inset-0">
@@ -40,12 +40,12 @@
                             </p>
                         @endif
 
-                        <p class="line-clamp-1 text-[1.4rem] font-black leading-tight md:text-[2.2rem]" style="color: {{ $skincareText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.4rem] font-black leading-tight md:text-[2.2rem]" style="color: {{ $skincareText }};">
                             {{ $data->name }}
                         </p>
 
                         @if (filled($data->subtitle))
-                            <p class="line-clamp-1 text-[1.4rem] font-black italic leading-[0.95] md:text-[2.2rem]" style="color: {{ $skincareAccent }};">
+                            <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.4rem] font-black italic leading-[0.95] md:text-[2.2rem]" style="color: {{ $skincareAccent }};">
                                 {{ $data->subtitle }}
                             </p>
                         @endif
@@ -53,14 +53,14 @@
                         @if ($skincareHeroTags->isNotEmpty())
                             <div class="flex flex-wrap gap-1.5 pt-1 md:gap-2">
                                 @foreach ($skincareHeroTags as $tag)
-                                    <span class="line-clamp-2 rounded-full px-2.5 py-1 text-[0.4rem] font-bold text-white md:px-3.5 md:text-[0.82rem]" style="background-color: rgba(181,120,221,0.9);">
+                                    <span data-auto-resize-text data-auto-resize-lines="2" class="rounded-full px-2.5 py-1 text-[0.4rem] font-bold text-white md:px-3.5 md:text-[0.82rem]" style="background-color: rgba(181,120,221,0.9);">
                                         {{ $tag }}
                                     </span>
                                 @endforeach
                             </div>
                         @endif
 
-                        <p class="banner-clamp-description line-clamp-3 pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $skincareText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $skincareText }};">
                             {!! nl2br(e($skincareDescription)) !!}
                         </p>
                     </div>
@@ -72,7 +72,7 @@
                                     <span class="inline-flex items-center justify-center text-[0.84rem] font-black md:text-[1rem]" style="color: {{ $skincareAccent }};">
                                         o
                                     </span>
-                                    <span class="line-clamp-2 text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $skincareText }};">
+                                    <span data-auto-resize-text data-auto-resize-lines="2" class="text-[0.5rem] font-semibold leading-[1.25] md:text-[0.72rem]" style="color: {{ $skincareText }};">
                                         {{ $tag }}
                                     </span>
                                 </div>

@@ -20,7 +20,7 @@
     }
 @endphp
 
-<div class="banner-clamp-safe w-full relative mb-20">
+<div class="banner-auto-resize w-full relative mb-20">
     <div class="w-full bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
         <div class="relative">
             <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $sembakoBg }};">
@@ -37,12 +37,12 @@
                         @endif
 
                         <div class="space-y-0.5">
-                            <p class="line-clamp-1 text-[1.35rem] font-bold leading-none md:text-[2.4rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $sembakoAccent }};">
+                            <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.35rem] font-bold leading-none md:text-[2.4rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $sembakoAccent }};">
                                 {{ $data->name }}
                             </p>
 
                             @if (filled($data->subtitle))
-                                <p class="line-clamp-1 text-[1.35rem] font-bold leading-none md:text-[2.4rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $sembakoGold }};">
+                                <p data-auto-resize-text data-auto-resize-lines="1" class="text-[1.35rem] font-bold leading-none md:text-[2.4rem]" style="font-family: 'Patrick Hand', cursive; color: {{ $sembakoGold }};">
                                     {{ $data->subtitle }}
                                 </p>
                             @endif
@@ -50,13 +50,13 @@
 
                         @if (filled($sembakoHeroTag))
                             <div class="pt-1">
-                                <span class="line-clamp-1 inline-flex items-center rounded-full px-2.5 py-1 text-[0.48rem] font-bold md:px-3.5 md:text-[0.8rem]" style="background-color: {{ $sembakoPill }}; color: {{ $sembakoText }};">
+                                <span data-auto-resize-text data-auto-resize-lines="1" class="inline-flex items-center rounded-full px-2.5 py-1 text-[0.48rem] font-bold md:px-3.5 md:text-[0.8rem]" style="background-color: {{ $sembakoPill }}; color: {{ $sembakoText }};">
                                     {{ $sembakoHeroTag }}
                                 </span>
                             </div>
                         @endif
 
-                        <p class="banner-clamp-description line-clamp-4 pt-1 text-[0.64rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="4" class="pt-1 text-[0.64rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
                             {!! nl2br(e($sembakoDescription)) !!}
                         </p>
                     </div>
@@ -84,7 +84,7 @@
                                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-full border text-[1rem] font-black md:h-10 md:w-10 md:text-[1.1rem]" style="border-color: {{ $tagTheme['border'] }}; color: {{ $tagTheme['accent'] }};">
                                         o
                                     </span>
-                                    <span class="line-clamp-1 text-[0.46rem] font-semibold leading-[1.25] md:text-[0.68rem]" style="color: {{ $sembakoText }};">
+                                    <span data-auto-resize-text data-auto-resize-lines="1" class="text-[0.46rem] font-semibold leading-[1.25] md:text-[0.68rem]" style="color: {{ $sembakoText }};">
                                         {{ $tag }}
                                     </span>
                                 </div>
