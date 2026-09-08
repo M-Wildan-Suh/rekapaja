@@ -39,7 +39,7 @@
                                 {{ $data->subtitle }}
                             </p>
                         @endif
-                        <p class="line-clamp-3 pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
+                        <p class="banner-clamp-description line-clamp-3 pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
                             {!! nl2br(e($ramenDescription)) !!}
                         </p>
                         @if ($ramenTags->isNotEmpty())

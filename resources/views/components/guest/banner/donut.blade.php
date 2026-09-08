@@ -46,7 +46,7 @@
                             </div>
                         @endif
                         @if (filled($donutDescription))
-                            <p class="line-clamp-3 pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $donutText }};">
+                            <p class="banner-clamp-description line-clamp-3 pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $donutText }};">
                                 {!! nl2br(e($donutDescription)) !!}
                             </p>
                         @endif

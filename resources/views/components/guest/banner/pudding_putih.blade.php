@@ -75,7 +75,7 @@
                             </div>
                         @endif
 
-                        <p class="line-clamp-3 pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
+                        <p class="banner-clamp-description line-clamp-3 pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
                             {!! nl2br(e($puddingDescription)) !!}
                         </p>
                     </div>

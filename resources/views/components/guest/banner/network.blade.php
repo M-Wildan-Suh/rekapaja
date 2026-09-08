@@ -51,7 +51,7 @@
                     @endif
 
                     @if (filled($networkDescription))
-                        <p class="line-clamp-3 max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
+                        <p class="banner-clamp-description line-clamp-3 max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
                             {!! nl2br(e($networkDescription)) !!}
                         </p>
                     @endif

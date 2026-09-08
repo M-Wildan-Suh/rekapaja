@@ -56,7 +56,7 @@
                             </div>
                         @endif
 
-                        <p class="line-clamp-4 pt-1 text-[0.64rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
+                        <p class="banner-clamp-description line-clamp-4 pt-1 text-[0.64rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
                             {!! nl2br(e($sembakoDescription)) !!}
                         </p>
                     </div>
