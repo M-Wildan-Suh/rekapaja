@@ -33,6 +33,8 @@ class ProductController extends Controller
         'no_tlp' => 20,
         'domain' => 255,
         'price_prefix' => 50,
+        'product_title' => 255,
+        'order_title' => 255,
         'link' => 255,
         'category' => 255,
         'tag' => 255,
@@ -65,6 +67,8 @@ class ProductController extends Controller
                 }
             }],
             'price_prefix' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['price_prefix']],
+            'product_title' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['product_title']],
+            'order_title' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['order_title']],
             'link' => ['nullable', 'url', 'max:' . self::BUSINESS_FIELD_LIMITS['link']],
             'category' => ['nullable', 'array'],
             'category.*' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['category']],
@@ -86,6 +90,8 @@ class ProductController extends Controller
             'no_tlp.max' => 'Nomor WhatsApp maksimal ' . self::BUSINESS_FIELD_LIMITS['no_tlp'] . ' karakter.',
             'domain.max' => 'Domain maksimal ' . self::BUSINESS_FIELD_LIMITS['domain'] . ' karakter.',
             'price_prefix.max' => 'Prefix harga maksimal ' . self::BUSINESS_FIELD_LIMITS['price_prefix'] . ' karakter.',
+            'product_title.max' => 'Judul produk maksimal ' . self::BUSINESS_FIELD_LIMITS['product_title'] . ' karakter.',
+            'order_title.max' => 'Teks tombol order maksimal ' . self::BUSINESS_FIELD_LIMITS['order_title'] . ' karakter.',
             'link.max' => 'Link YouTube maksimal ' . self::BUSINESS_FIELD_LIMITS['link'] . ' karakter.',
             'category.*.max' => 'Nama kategori maksimal ' . self::BUSINESS_FIELD_LIMITS['category'] . ' karakter.',
             'tag.*.max' => 'Nama tag maksimal ' . self::BUSINESS_FIELD_LIMITS['tag'] . ' karakter.',
@@ -212,7 +218,13 @@ class ProductController extends Controller
             ->when($product, fn ($query) => $query->where('product_id', '!=', $product->id))
             ->exists();
 
-        if (!$ownerExists || $ownerHasAnotherBusiness) {
+        if (!$ownerExists) {
+            throw ValidationException::withMessages([
+                'access' => 'Pilih akun pemilik yang valid.',
+            ]);
+        }
+
+        if ($ownerHasAnotherBusiness) {
             throw ValidationException::withMessages([
                 'access' => 'Akun ini sudah terhubung dengan usaha lain.',
             ]);
@@ -292,14 +304,19 @@ class ProductController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate(array_merge($this->productValidationRules(), [
-            'access' => ['required', 'integer', 'exists:users,id'],
             'home_button' => ['required', 'in:on,off'],
+            'product_title' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['product_title']],
+            'order_title' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['order_title']],
             'thumbnail' => ['required', 'image'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
         ]), $this->productValidationMessages());
 
-        $this->ensureOwnerIsAvailable((int) $validated['access']);
+        $ownerId = $validated['access'] ?? null;
+
+        if ($ownerId) {
+            $this->ensureOwnerIsAvailable((int) $ownerId);
+        }
 
         $newdata= new Product();
 
@@ -310,6 +327,8 @@ class ProductController extends Controller
         $newdata->template_id = $validated['template_id'];
         $newdata->description = $validated['description'] ?? null;
         $newdata->price_prefix = $validated['price_prefix'] ?? null;
+        $newdata->product_title = $validated['product_title'];
+        $newdata->order_title = $validated['order_title'];
         $newdata->address = $validated['address'] ?? null;
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
         $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
@@ -372,10 +391,12 @@ class ProductController extends Controller
             }
         }
 
-        Access::create([
-            'user_id' => $validated['access'],
-            'product_id' => $newdata->id,
-        ]);
+        if ($ownerId) {
+            Access::create([
+                'user_id' => $ownerId,
+                'product_id' => $newdata->id,
+            ]);
+        }
           
         return redirect()->route('product.index');
     }
@@ -417,63 +438,6 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         //
-    }
-
-    public function productorder($id, Request $request)
-    {
-        $validated = $request->validate([
-            'order_title' => ['required', 'string', 'max:255'],
-        ]);
-
-        $data = Product::findOrFail($id);
-        $this->ensureProductAccess($data);
-
-        $data->order_title = $validated['order_title'];
-
-        $data->save();
-
-        return redirect()
-            ->route('product.show', $data)
-            ->with('highlight', 'highlight')
-            ->with('success', 'Tombol order berhasil diperbarui.');
-    }
-    
-    
-    public function producttitle($id, Request $request)
-    {
-        $validated = $request->validate([
-            'product_title' => ['required', 'string', 'max:255'],
-        ]);
-
-        $data = Product::findOrFail($id);
-        $this->ensureProductAccess($data);
-
-        $data->product_title = $validated['product_title'];
-
-        $data->save();
-
-        return redirect()
-            ->route('product.show', $data)
-            ->with('highlight', 'highlight')
-            ->with('success', 'Judul produk berhasil diperbarui.');
-    }
-
-    public function productpriceprefix($id, Request $request)
-    {
-        $validated = $request->validate([
-            'price_prefix' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $data = Product::findOrFail($id);
-        $this->ensureProductAccess($data);
-
-        $data->price_prefix = $validated['price_prefix'] ?? null;
-        $data->save();
-
-        return redirect()
-            ->route('product.show', $data)
-            ->with('highlight', 'highlight')
-            ->with('success', 'Teks sebelum harga berhasil diperbarui.');
     }
 
     private function buildDomainFileContent(Product $product): string
@@ -928,6 +892,8 @@ PHP;
         $product->template_id = $validated['template_id'];
         $product->description = $validated['description'] ?? null;
         $product->price_prefix = $validated['price_prefix'] ?? null;
+        $product->product_title = $validated['product_title'] ?? $product->product_title;
+        $product->order_title = $validated['order_title'] ?? $product->order_title;
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
         $product->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
@@ -1017,17 +983,20 @@ PHP;
         }
 
         if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
-            $ownerId = $request->validate([
-                'access' => ['required', 'integer', 'exists:users,id'],
-            ])['access'];
+            $ownerId = $validated['access'] ?? null;
 
-            $this->ensureOwnerIsAvailable((int) $ownerId, $product);
+            if ($ownerId) {
+                $this->ensureOwnerIsAvailable((int) $ownerId, $product);
+            }
 
             Access::where('product_id', $product->id)->delete();
-            Access::create([
-                'user_id' => $ownerId,
-                'product_id' => $product->id,
-            ]);
+
+            if ($ownerId) {
+                Access::create([
+                    'user_id' => $ownerId,
+                    'product_id' => $product->id,
+                ]);
+            }
         }
         
 

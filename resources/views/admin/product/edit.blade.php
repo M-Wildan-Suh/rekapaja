@@ -188,6 +188,9 @@
                                     </script>
                                 </div>
                                 <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="$product->subtitle" name="subtitle" maxlength="120" />
+                                <x-admin.component.textinput title="Tombol Order" placeholder="Contoh: Beli Sekarang" :value="$product->order_title" name="order_title" maxlength="255" required />
+                                <x-admin.component.textinput title="Title Produk" placeholder="Contoh: Produk Kami" :value="$product->product_title" name="product_title" maxlength="255" required />
+                                <x-admin.component.textinput title="Teks Sebelum Harga (Optional)" placeholder="Contoh: Mulai dari" :value="$product->price_prefix" name="price_prefix" maxlength="50" />
                                 <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp" maxlength="20" />
                                 <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain" maxlength="255" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." :value="$product->youtube" name="link" link="Url" maxlength="255" />
@@ -261,38 +264,6 @@
                         </div>
                     </div>
                     <div x-show="activeTab === 'highlight'" class=" p-4 md:p-6 text-gray-900 space-y-4">
-                        @if (Auth::user()->role === 'admin' || (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') || (Auth::user()->role === 'premium' && Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
-                            <div class=" space-y-2">
-                                <label for="order" class=" text-sm sm:text-base font-semibold">Edit Tombol Order</label>
-                                <div class=" w-full">
-                                    <form action="{{route('product.order', ['id' => $product->id])}}" method="post">
-                                        @csrf
-                                        @method('put')
-                                        <x-admin.component.sectiontitleinput placeholder="Masukkan nama tombol order..." value="{{$product->order_title}}" name="order_title"></x-admin.component.sectiontitleinput>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class=" space-y-2">
-                                <label for="order" class=" text-sm sm:text-base font-semibold">Edit Title Produk</label>
-                                <div class=" w-full">
-                                    <form action="{{route('product.title', ['id' => $product->id])}}" method="post">
-                                        @csrf
-                                        @method('put')
-                                        <x-admin.component.sectiontitleinput placeholder="Masukkan nama Title Produk..." value="{{$product->product_title}}" name="product_title"></x-admin.component.sectiontitleinput>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class=" space-y-2">
-                                <label for="price_prefix" class=" text-sm sm:text-base font-semibold">Teks Sebelum Harga</label>
-                                <div class=" w-full">
-                                    <form action="{{route('product.price-prefix', ['id' => $product->id])}}" method="post">
-                                        @csrf
-                                        @method('put')
-                                        <x-admin.component.sectiontitleinput placeholder="Contoh: Mulai dari" value="{{$product->price_prefix}}" name="price_prefix"></x-admin.component.sectiontitleinput>
-                                    </form>
-                                </div>
-                            </div>
-                        @endif
                         @php
                             $viewerRole = Auth::user()->role;
 

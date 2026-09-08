@@ -91,6 +91,12 @@
                             </div>
 
                             <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..." :value="''" name="subtitle" maxlength="120" />
+
+                            <x-admin.component.textinput title="Tombol Order" placeholder="Contoh: Beli Sekarang" value="Beli" name="order_title" maxlength="255" required />
+
+                            <x-admin.component.textinput title="Title Produk" placeholder="Contoh: Produk Kami" value="Produk Kami" name="product_title" maxlength="255" required />
+
+                            <x-admin.component.textinput title="Teks Sebelum Harga (Optional)" placeholder="Contoh: Mulai dari" :value="''" name="price_prefix" maxlength="50" />
                             
                             <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" maxlength="20" />
 

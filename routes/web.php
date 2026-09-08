@@ -83,9 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/premium', [AdminController::class, 'premium'])->name('premium.index');
 
     Route::resource('/admin/product', ProductController::class);
-    Route::put('/admin/product-order/{id}', [ProductController::class, 'productorder'])->name('product.order');
-    Route::put('/admin/product-title/{id}', [ProductController::class, 'producttitle'])->name('product.title');
-    Route::put('/admin/product-price-prefix/{id}', [ProductController::class, 'productpriceprefix'])->name('product.price-prefix');
     Route::put('/admin/product-domain/{product}', [ProductController::class, 'updateDomain'])->name('product.domain');
     Route::get('/admin/product-download-domain/{product}', [ProductController::class, 'downloadDomainFile'])->name('product.download-domain');
     Route::post('/admin/product-upload-domain/{product}', [ProductController::class, 'uploadDomainToCpanel'])->name('product.upload-domain');
