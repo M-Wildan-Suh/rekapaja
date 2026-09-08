@@ -129,14 +129,6 @@
                         </div>
                     </div>
                     <div x-show="activeTab === 'product'" class=" p-4 md:p-6 text-gray-900">
-                        <div class=" space-y-6 mb-6">
-                            <x-admin.component.textinput title="Tombol Order" placeholder="Contoh: Beli Sekarang"
-                                :value="$product->order_title" name="order_title" maxlength="255" required />
-                            <x-admin.component.textinput title="Title Produk" placeholder="Contoh: Produk Kami"
-                                :value="$product->product_title" name="product_title" maxlength="255" required />
-                            <x-admin.component.textinput title="Teks Sebelum Harga (Optional)"
-                                placeholder="Contoh: Mulai dari" :value="$product->price_prefix" name="price_prefix" maxlength="50" />
-                        </div>
                         <form id="bussiness" action="{{ route('product.update', ['product' => $product->id]) }}"
                             method="POST" enctype="multipart/form-data">
                             @csrf
@@ -339,6 +331,14 @@
                                 $viewerRole = 'user';
                             }
                         @endphp
+                        <div class=" space-y-6 mb-6">
+                            <x-admin.component.textinput title="Tombol Order" placeholder="Contoh: Beli Sekarang"
+                                :value="$product->order_title" name="order_title" maxlength="255" required />
+                            <x-admin.component.textinput title="Title Produk" placeholder="Contoh: Produk Kami"
+                                :value="$product->product_title" name="product_title" maxlength="255" required />
+                            <x-admin.component.textinput title="Teks Sebelum Harga (Optional)"
+                                placeholder="Contoh: Mulai dari" :value="$product->price_prefix" name="price_prefix" maxlength="50" />
+                        </div>
                         <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ $viewerRole }}')" class=" space-y-4">
                             <div class=" space-y-2">
                                 <p class=" text-sm sm:text-base font-semibold">Produk / Layanan

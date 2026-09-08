@@ -1,5 +1,5 @@
 <div class="w-full grid gap-4">
-    <form id="highlight-form" action="{{ route('highlight.bulk-update', ['product' => $product->id]) }}" method="POST" enctype="multipart/form-data">
+    <form id="highlight-form" action="{{ route('highlight.bulk-update', ['product' => $product->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')
         <input type="hidden" name="active_tab" value="highlight">
