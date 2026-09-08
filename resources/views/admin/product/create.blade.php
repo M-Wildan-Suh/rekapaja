@@ -100,7 +100,7 @@
                             
                             <x-admin.component.numberinput title="No. Whatsapp (Optional)" placeholder="Masukkan Nomor..." :value="''" name="no_tlp" maxlength="20" />
 
-                            <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="''" name="domain" maxlength="255" />
+                            <x-admin.component.textinput title="Domain (Optional)" placeholder="contoh: tokoanda.com" :value="''" name="domain" maxlength="255" :strip-protocol="true" />
 
                             <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..." value="" name="link" link="Url" maxlength="255" />
 

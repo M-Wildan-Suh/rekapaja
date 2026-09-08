@@ -186,6 +186,16 @@ class PageController extends Controller
             return view('not-found');
         }
 
+        return $this->renderProductDetail($request, $data);
+    }
+
+    public function detailById(Request $request, Product $product)
+    {
+        return $this->renderProductDetail($request, $product);
+    }
+
+    private function renderProductDetail(Request $request, Product $data)
+    {
         $customDomain = $this->normalizeDomainUrl($data->domain);
         $currentOrigin = rtrim($request->getSchemeAndHttpHost(), '/');
 
@@ -300,6 +310,12 @@ class PageController extends Controller
         ]);
     }
 
+    public function businessApiById(Product $product)
+    {
+        // URL pemanggilan memakai ID tetap; slug hanya dibaca di server untuk kompatibilitas API lama.
+        return $this->businessApi($product->slug);
+    }
+
     public function businessOrderApi(Request $request, $slug)
     {
         $product = Product::with(['access.user'])->where('slug', $slug)->first();
@@ -411,6 +427,12 @@ class PageController extends Controller
             'redirect_url' => $whatsappUrl,
             'invoice_url' => $invoiceUrl,
         ]);
+    }
+
+    public function businessOrderApiById(Request $request, Product $product)
+    {
+        // File yang sudah diunggah tetap valid walaupun slug usaha diubah.
+        return $this->businessOrderApi($request, $product->slug);
     }
 
     public function createproduct() {

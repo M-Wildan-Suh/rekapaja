@@ -122,5 +122,6 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::get('/embed/event', [PageController::class, 'test'])->name('test');
+Route::get('/domain/preview/{product}', [PageController::class, 'detailById'])->name('domain.preview');
 Route::get('/{slug}', [PageController::class, 'detail'])->name('detail');
 Route::get('/template/{slug}', [PageController::class, 'templatedetail'])->name('template.detail');

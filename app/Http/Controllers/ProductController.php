@@ -443,9 +443,8 @@ class ProductController extends Controller
     private function buildDomainFileContent(Product $product): string
     {
         $appUrl = rtrim(config('app.url'), '/');
-        $detailUrl = $appUrl . '/' . $product->slug . '?domain_preview=1';
-        $orderApiUrl = $appUrl . '/api/business/' . $product->slug . '/order';
-        $slug = $product->slug;
+        $detailUrl = route('domain.preview', ['product' => $product->id]) . '?domain_preview=1';
+        $orderApiUrl = route('api.business.id.order', ['product' => $product->id]);
         $title = addslashes($product->name);
 
         return <<<PHP
@@ -453,7 +452,6 @@ class ProductController extends Controller
 \$sourceUrl = '{$detailUrl}';
 \$originUrl = '{$appUrl}';
 \$orderApiUrl = '{$orderApiUrl}';
-\$slug = '{$slug}';
 
 function loadRemoteHtml(\$url) {
     \$errors = [];

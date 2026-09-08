@@ -21,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/business/{slug}', [PageController::class, 'businessApi'])->name('api.business.show');
 Route::post('/business/{slug}/order', [PageController::class, 'businessOrderApi'])->name('api.business.order');
+Route::get('/business/id/{product}', [PageController::class, 'businessApiById'])->name('api.business.id.show');
+Route::post('/business/id/{product}/order', [PageController::class, 'businessOrderApiById'])->name('api.business.id.order');

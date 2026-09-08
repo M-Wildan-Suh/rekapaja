@@ -207,7 +207,7 @@
                                     maxlength="20" />
                                 <x-admin.component.textinput title="Domain (Optional)"
                                     placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain"
-                                    maxlength="255" />
+                                    maxlength="255" :strip-protocol="true" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..."
                                     :value="$product->youtube" name="link" link="Url" maxlength="255" />
 

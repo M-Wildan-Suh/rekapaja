@@ -1,7 +1,10 @@
-@props(['title', 'placeholder', 'name', 'value'=> null, 'xModel' => null, 'required' => false, 'maxlength' => null, 'helper' => null])
+@props(['title', 'placeholder', 'name', 'value'=> null, 'xModel' => null, 'required' => false, 'maxlength' => null, 'helper' => null, 'stripProtocol' => false])
 
 @php
     $fieldValue = old($name, $value);
+    if ($stripProtocol && is_string($fieldValue)) {
+        $fieldValue = preg_replace('~^https?://~i', '', $fieldValue);
+    }
 @endphp
 
 <div class="w-full">
@@ -17,6 +20,7 @@
                 x-bind:value="{{ $xModel ? '' : $fieldValue }}" 
             @endif
             value="{{ $fieldValue }}"
+            @if($stripProtocol) oninput="if (this.value.toLowerCase().startsWith('https://')) this.value = this.value.slice(8); else if (this.value.toLowerCase().startsWith('http://')) this.value = this.value.slice(7)" @endif
             @required($required)
             @if($maxlength) maxlength="{{ $maxlength }}" @endif
             class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm">
