@@ -20,7 +20,7 @@
     }
 @endphp
 
-<div class="w-full relative mb-20">
+<div class="banner-clamp-safe w-full relative mb-20">
     <div class="w-full bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
         <div class="relative">
             <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $sembakoBg }};">

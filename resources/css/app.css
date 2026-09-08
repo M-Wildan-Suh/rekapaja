@@ -6,6 +6,15 @@
     display: none !important;
 }
 
+/* Preserve descenders (g, j, p, q, y) inside clamped text without changing line-height or layout. */
+.banner-clamp-safe .line-clamp-1,
+.banner-clamp-safe .line-clamp-2,
+.banner-clamp-safe .line-clamp-3,
+.banner-clamp-safe .line-clamp-4 {
+    padding-block: 0.12em;
+    margin-block: -0.12em;
+}
+
 .page-loading-overlay {
     position: fixed;
     inset: 0;

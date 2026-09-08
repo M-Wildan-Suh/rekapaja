@@ -12,7 +12,7 @@
         ->take(4);
 @endphp
 
-<div class="w-full relative overflow-hidden">
+<div class="banner-clamp-safe w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-black/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
         <div
             class="relative aspect-[4/3] overflow-hidden"

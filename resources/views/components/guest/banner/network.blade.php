@@ -11,7 +11,7 @@
         ->take(3);
 @endphp
 
-<div class="w-full relative overflow-hidden">
+<div class="banner-clamp-safe w-full relative overflow-hidden">
     <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2.25rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $networkSurface }};">
             <div class="absolute inset-y-0 right-0 w-full">
