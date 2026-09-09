@@ -6,7 +6,6 @@
         cartBounceActive: false,
         cartBounceTimeout: null,
         showOrderModal: false,
-        showQrisPreviewModal: false,
         customerName: '',
         customerAddress: '',
         isPremiumBusiness: @js(in_array($role, ['admin', 'premium'])),
@@ -77,16 +76,6 @@
         closeOrderModal() {
             this.showOrderModal = false;
         },
-        openQrisPreview() {
-            if (!this.qrisUrl) {
-                return;
-            }
-
-            this.showQrisPreviewModal = true;
-        },
-        closeQrisPreview() {
-            this.showQrisPreviewModal = false;
-        },
         get totalPrice() {
             return this.checkedItems.reduce((total, item) => {
                 return total + ((parseInt(item.price || 0)) * (parseInt(item.quantity || 1)));
@@ -131,32 +120,7 @@
             this.$refs.orderForm.submit();
         }
     }" class="w-full">
-        <div x-show="showQrisSection" x-cloak
-            style="background-color: {{ $template->desc_main_color }}; color: {{ $template->desc_text_color ?? '#ffffff' }}"
-            class="mb-4 rounded-md overflow-hidden p-4 shadow-sm">
-            <div class="flex items-center justify-between gap-3">
-                <p class="w-full font-bold tracking-wide text-lg sm:text-xl">Qris</p>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="openQrisPreview()" :disabled="!qrisUrl"
-                    style="background-color: {{ $template->desc_text_color ?? '#ffffff' }}; color: {{ $template->desc_main_color }}"
-                    class="flex h-10 w-10 items-center justify-center rounded-md text-xs font-semibold duration-300 hover:opacity-80 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500">
-                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 12S5.63636 5 12 5s10 7 10 7-3.6364 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
-                    </svg>
-                </button>
-                <button type="button" @click="downloadQris()" :disabled="!qrisUrl"
-                    style="background-color: {{ $template->desc_text_color ?? '#ffffff' }}; color: {{ $template->desc_main_color }}"
-                    class="flex h-10 w-10 items-center justify-center rounded-md text-xs font-semibold duration-300 hover:opacity-80 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500">
-                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 3V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                        <path d="M8 10L12 14L16 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M5 17H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            </div>
-            </div>
-        </div>
+
         <div style="background-color: {{ $template->desc_main_color }}"
             class="mb-4 p-4 w-full text-white rounded-md overflow-hidden">
             <p class=" w-full font-bold tracking-wide text-lg sm:text-xl">{{$data->product_title}}</p>
@@ -193,7 +157,7 @@
                                             <!-- Checkbox Input -->
                                             <input type="checkbox" class="hidden" name="order[{{$item->id}}][id]" value="{{ $item->id }}" id="order-{{ $item->id }}"
                                                 @input="toggleCheckedItem({ id: {{ $item->id }}, title: '{{ addslashes($item->title) }}', quantity: 1, price: {{ (int) ($item->price ?? 0) }} })">
-                                            
+
                                             <!-- Hidden Input for Quantity -->
                                             <input type="number" class="hidden" name="order[{{$item->id}}][quantity]" 
                                                    :value="checkedItems.find(item => item.id === {{ $item->id }})?.quantity || 1" 
@@ -321,21 +285,6 @@
             </div>
         </div>
 
-        <div x-show="showQrisPreviewModal" x-transition.opacity class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm px-4 py-6" style="display: none;">
-            <div class="flex min-h-full items-center justify-center">
-                <div @click.outside="closeQrisPreview()" class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
-                    <div class="flex items-start justify-between gap-4 border-b border-gray-100 bg-white px-5 py-5">
-                        <div>
-                            <p class="text-lg font-bold text-gray-900">Preview QRIS</p>
-                        </div>
-                        <button type="button" @click="closeQrisPreview()" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
-                    </div>
-                    <div class="px-5 py-5">
-                        <img x-show="qrisUrl" :src="qrisUrl" alt="QRIS" class="mx-auto w-full max-w-[280px] rounded-2xl border border-gray-200">
-                        <p x-show="!qrisUrl" class="text-center text-sm text-gray-500">QRIS belum tersedia untuk usaha ini.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>

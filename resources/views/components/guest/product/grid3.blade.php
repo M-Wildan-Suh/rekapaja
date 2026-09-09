@@ -159,26 +159,7 @@
         }"
         class="w-full"
     >
-        <div x-show="showQrisSection" x-cloak class="rounded-md border px-5 py-5 sm:px-6 shadow-[0_10px_30px_rgba(15,23,42,0.08)]" style="border-color: {{ $gridBorder }}; background-color: {{ $gridSurface }};">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex min-w-0 items-center gap-3">
-                    <div class="flex h-12 w-12 flex-none items-center justify-center rounded-full text-white" style="background-color: {{ $gridAccent }};">
-                        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 7h16M7 4v6M17 4v6M5 11h4v4H5zm10 0h4v4h-4zM5 17h4v3H5zm10 0h4v3h-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <p class="text-base sm:text-xl font-black leading-tight" style="color: {{ $gridText }};">Pembayaran QRIS</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button type="button" @click="openQrisPreview()" :disabled="!qrisUrl" class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs sm:px-4 sm:text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-neutral-300" style="background-color: {{ $gridAccent }};">
-                        Lihat
-                    </button>
-                    <button type="button" @click="downloadQris()" :disabled="!qrisUrl" class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs sm:px-4 sm:text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-neutral-300" style="background-color: {{ $gridWhatsapp }};">
-                        Download
-                    </button>
-                </div>
-            </div>
-        </div>
+
 
         <div class="w-full relative py-4">
             <div class="flex items-center justify-center gap-3 text-center sm:gap-4">
@@ -236,14 +217,14 @@
                                     type="button"
                                     x-data='@json(['product' => $productDetail])'
                                     @click='window.dispatchEvent(new CustomEvent("open-product-detail", { detail: product }))'
-                                    class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-2 transition hover:opacity-80"
+                                    class="text-left text-[8px] sm:text-[13px] font-bold leading-[1.15] line-clamp-1 transition hover:opacity-80"
                                     style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : ($template->accent_color ?? $gridAccent) }};"
                                 >
                                     {{ $item->title }}
                                 </button>
                             </div>
                             <p class="text-left text-[7px] sm:text-[11px] leading-[1.25] line-clamp-2" style="color: {{ $cardTheme['text'] }};">
-                                {{ $item->description ?: 'Deskripsi produk akan tampil langsung pada kartu grid 3.' }}
+                                {{ $item->description ?: '' }}
                             </p>
                             @if ($item->price)
                                 <p class="text-left text-[8px] sm:text-[13px] font-extrabold" style="color: {{ $pastelGridHeader ? $cardTheme['accent'] : $cardTheme['text'] }};">

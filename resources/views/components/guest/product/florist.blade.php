@@ -142,26 +142,7 @@
         }"
         class="w-full"
     >
-        <div x-show="showQrisSection" x-cloak class="rounded-md border px-5 py-5 sm:px-6 shadow-[0_10px_30px_rgba(236,72,153,0.10)]" style="border-color: {{ $floristBorder }}; background-color: {{ $floristSurface }};">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex min-w-0 items-center gap-3">
-                    <div class="flex h-12 w-12 flex-none items-center justify-center rounded-full text-white" style="background: linear-gradient(135deg, {{ $floristAccent }} 0%, {{ $floristAccentDark }} 100%);">
-                        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 7h16M7 4v6M17 4v6M5 11h4v4H5zm10 0h4v4h-4zM5 17h4v3H5zm10 0h4v3h-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <p class="text-lg sm:text-xl font-black leading-tight" style="color: {{ $floristText }};">Pembayaran QRIS</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button type="button" @click="openQrisPreview()" :disabled="!qrisUrl" class="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-neutral-300" style="background-color: {{ $floristAccent }};">
-                        Lihat
-                    </button>
-                    <button type="button" @click="downloadQris()" :disabled="!qrisUrl" class="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-neutral-300" style="background-color: {{ $floristWhatsapp }};">
-                        Download
-                    </button>
-                </div>
-            </div>
-        </div>
+
 
         <div class="w-full relative py-4">
             <div class="flex items-center justify-center gap-4 text-center">

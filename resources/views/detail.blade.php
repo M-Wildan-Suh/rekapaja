@@ -28,6 +28,8 @@
                     @includeFirst(['components.guest.description-' . ($template->desc_type ?? 'default'), 'components.guest.description'])
                 @endunless
 
+                @include('components.guest.qris-section')
+
                 @includeFirst(['components.guest.product.' . $template->product_type, 'components.guest.product.grid2'])
 
                 @unless($hideBusinessProfileSections)
