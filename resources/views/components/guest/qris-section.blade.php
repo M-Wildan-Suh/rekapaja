@@ -1,7 +1,9 @@
-@if (($data->qris_status ?? 'active') === 'active')
+@if (filled($data->qris) && ($data->qris_status ?? 'active') === 'active')
     @php
         $qrisUrl = $data->qris ? asset('storage/images/product/qris/' . $data->qris) : null;
-        $qrisBackground = $template->desc_main_color ?: '#FFFFFF';
+        $qrisBackground = in_array(($template->head_type ?? null), ['skincare', 'pudding_putih'], true)
+            ? '#FFFFFF'
+            : ($template->product_main_color ?: '#FFFFFF');
         $qrisText = $template->desc_text_color ?: '#0F172A';
         $qrisaccent = $template->accent_color ?: '#0F172A';
     @endphp
