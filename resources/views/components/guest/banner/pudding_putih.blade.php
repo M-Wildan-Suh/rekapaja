@@ -30,6 +30,8 @@
             <div class="absolute left-[6%] top-[15%] h-10 w-10 rounded-full bg-[#F9BCD4]/35 blur-xl"></div>
             <div class="absolute right-[10%] top-[14%] h-16 w-16 rounded-full bg-[#E9D8FD]/40 blur-2xl"></div>
 
+            <x-guest.banner-gradient :color="$puddingBg" />
+
             <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
                 <div class="w-[54%] space-y-2.5 md:w-[52%] md:space-y-3">
                     <div class="space-y-1.5">

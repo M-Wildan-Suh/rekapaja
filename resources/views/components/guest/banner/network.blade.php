@@ -18,6 +18,8 @@
                 <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
             </div>
 
+            <x-guest.banner-gradient :color="$networkSurface" />
+
             <div class="relative z-10 flex h-full items-center px-4 py-4 md:px-6 md:py-6">
                 <div class="w-[64%] space-y-2 md:w-[56%] md:space-y-3">
                     @if (filled($networkBadge))

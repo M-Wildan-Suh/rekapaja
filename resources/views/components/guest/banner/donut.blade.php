@@ -25,6 +25,8 @@
                 <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
             </div>
 
+            <x-guest.banner-gradient :color="$donutBg" />
+
             <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
                 <div class="w-[45%] space-y-2.5 md:w-[55%] md:space-y-3">
                     <div class="space-y-1.5">

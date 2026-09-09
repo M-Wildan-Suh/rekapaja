@@ -11,6 +11,8 @@
         <div class="absolute right-[6%] top-[16%] h-[68%] w-[36%] rounded-full border border-white/50"></div>
         <div class="absolute inset-0 opacity-[0.08] bg-cover bg-center bg-no-repeat" style="background-image: url('{{ $data->image }}');"></div>
 
+        <x-guest.banner-gradient color="#FFF5F8" />
+
         <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-8">
             <div class="max-w-[46%] space-y-2 sm:space-y-3">
                 <p class="text-[1.45rem] sm:text-[2.2rem] font-black leading-tight" style="font-family: 'Segoe Script', 'Brush Script MT', cursive; color: #6A1B4D;">

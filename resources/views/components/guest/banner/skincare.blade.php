@@ -31,6 +31,8 @@
             <div class="absolute left-[62%] top-[14%] h-2 w-2 rounded-full bg-white/80"></div>
             <div class="absolute right-[10%] top-[18%] h-2.5 w-2.5 rounded-full bg-white/80"></div>
 
+            <x-guest.banner-gradient :color="$skincareBg" />
+
             <div class="relative z-10 flex h-full items-center px-5 py-5 md:px-7 md:py-7">
                 <div class="w-[54%] space-y-2.5 md:w-[52%] md:space-y-3">
                     <div class="space-y-1.5">
