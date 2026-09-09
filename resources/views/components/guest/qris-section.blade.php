@@ -4,7 +4,7 @@
         $qrisBackground = in_array(($template->head_type ?? null), ['skincare', 'pudding_putih'], true)
             ? '#FFFFFF'
             : ($template->product_main_color ?: '#FFFFFF');
-        $qrisText = $template->desc_text_color ?: '#0F172A';
+        $qrisText = $template->product_text_color ?: '#0F172A';
         $qrisaccent = $template->accent_color ?: '#0F172A';
     @endphp
 
