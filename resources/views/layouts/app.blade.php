@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        
+
         <link rel="icon" href="{{ asset('/assets/images/logo.webp') }}" type="image/x-icon">
 
         <title>{{$title ?? ''}}</title>
@@ -25,6 +25,7 @@
     </head>
     <body class="font-sans antialiased">
         @include('components.page-loading')
+        <x-notifications />
         <div class="min-h-screen bg-neutral-100">
             @include('layouts.navigation')
 
@@ -40,6 +41,7 @@
             <!-- Page Content -->
             <main>
                 {{ $slot }}
+                <x-voucher-results-modal />
             </main>
         </div>
     </body>

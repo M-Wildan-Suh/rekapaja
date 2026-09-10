@@ -5,9 +5,15 @@
         </h2>
     </x-slot>
 
+    @php
+        $canRedeemVoucher = !\App\Models\Access::where('user_id', Auth::id())->exists();
+    @endphp
     <div class="py-4 px-4 space-y-4">
+        <div class="max-w-xl mx-auto space-y-3">
+
+        </div>
         <div class="max-w-xl mx-auto">
-            @if (Auth::user()->role === 'admin')
+            @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
                 <div class="font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] text-white rounded-md text-center">
                     Anda adalah Admin</div>
             @elseif (Auth::user()->role === 'premium')
@@ -33,27 +39,39 @@
             @endif
         </div>
         <div class="max-w-xl mx-auto">
-            <div x-data="auctionTable()"
+            <div x-data="auctionTable()" x-init="$watch('domainError', message => { if (message) $dispatch('notify', { type: 'error', message }); })"
                 class="w-full p-4 sm:p-8 bg-[#F8FAFC] rounded-md shadow-md shadow-black/20 flex flex-col gap-6">
                 <!-- Top Actions -->
                 <div class="w-full flex flex-col sm:flex-row gap-2 justify-between items-center">
-                    @if (Auth::user()->role === 'admin')
+                    <div class="flex w-full sm:w-auto items-center gap-2 shrink-0">
+                    @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
                         <a href="{{ route('product.create') }}"
-                            class=" w-full text-sm sm:text-base sm:w-auto px-4 py-2 bg-[#ff7100] text-white rounded-md font-semibold border border-[#ff7100] hover:border-[#b95300] hover:bg-[#b95300] duration-300">
+                            class=" flex-1 whitespace-nowrap text-sm sm:text-base sm:w-auto px-4 py-2 bg-[#ff7100] text-white rounded-md font-semibold border border-[#ff7100] hover:border-[#b95300] hover:bg-[#b95300] duration-300">
                             Tambah Usaha
                         </a>
                     @else
                         <div class=" text-xl font-bold">Usaha Anda</div>
                     @endif
+                    @if ($canRedeemVoucher)
+                        <button type="button" @click="$dispatch('open-redeem-voucher')"
+                            aria-label="Buat Usaha dengan Voucher" title="Buat Usaha dengan Voucher"
+                            class="flex shrink-0 items-center justify-center rounded-md border border-[#ff7100] bg-[#ff7100] p-2 text-white hover:border-[#b95300] hover:bg-[#b95300] duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ticket" aria-hidden="true">
+                                <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                                <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+                            </svg>
+                        </button>
+                    @endif
+                    </div>
 
                     <!-- Search -->
-                    <div class=" w-full sm:w-auto flex flex-row font-semibold duration-300">
+                    <div class="w-full sm:w-auto min-w-0 flex flex-row font-semibold duration-300">
                         <input type="text" x-model="search" @input="applySearch()" placeholder="Cari..."
-                            class=" w-full text-sm sm:text-base sm:w-auto py-2 px-3 border border-[#ff7100] rounded-md overflow-hidden focus:ring-[#b95300] focus-within:border-[#b95300] font-normal">
+                            class="w-full min-w-0 text-sm sm:text-base py-2 px-3 border border-[#ff7100] rounded-md overflow-hidden focus:ring-[#b95300] focus-within:border-[#b95300] font-normal">
                     </div>
                 </div>
 
-                @if (Auth::user()->role === 'admin')
+                @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
                     <!-- WhatsApp Form -->
                     <div class=" w-full">
                         <div class=" flex flex-col gap-2 font-medium">
@@ -74,7 +92,7 @@
 
                 <!-- Table -->
                 <div class="w-full">
-                    <table class="w-full text-sm sm:text-base rounded-md overflow-hidden">
+                    <table class="w-full text-sm sm:text-base rounded-md">
                         <thead>
                             <tr class="h-10 bg-[#ff7100] text-white divide-x-2 divide-white">
                                 <th class=" px-1 sm:px-2 py-1">Nama Usaha</th>
@@ -99,8 +117,9 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="w-full h-full"><path fill="currentColor" d="M535.6 85.7C513.7 63.8 478.3 63.8 456.4 85.7L432 110.1L529.9 208L554.3 183.6C576.2 161.7 576.2 126.3 554.3 104.4L535.6 85.7zM236.4 305.7C230.3 311.8 225.6 319.3 222.9 327.6L193.3 416.4C190.4 425 192.7 434.5 199.1 441C205.5 447.5 215 449.7 223.7 446.8L312.5 417.2C320.7 414.5 328.2 409.8 334.4 403.7L496 241.9L398.1 144L236.4 305.7zM160 128C107 128 64 171 64 224L64 480C64 533 107 576 160 576L416 576C469 576 512 533 512 480L512 384C512 366.3 497.7 352 480 352C462.3 352 448 366.3 448 384L448 480C448 497.7 433.7 512 416 512L160 512C142.3 512 128 497.7 128 480L128 224C128 206.3 142.3 192 160 192L256 192C273.7 192 288 177.7 288 160C288 142.3 273.7 128 256 128L160 128z"/></svg>
                                             </a>
 
-                                            @if (Auth::user()->role === 'admin')
-                                                <button type="button" @click="openDomainModal(item)"
+                                            @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                                                <div x-data="{ uploadMenu: false }" class="relative" @keydown.escape.window="uploadMenu = false">
+                                                <button type="button" @click="uploadMenu = !uploadMenu" :aria-expanded="uploadMenu.toString()" aria-label="Opsi upload dan voucher"
                                                     class="w-5 h-5 hover:text-[#16a34a] duration-300">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
                                                         class="w-full h-full">
@@ -108,6 +127,11 @@
                                                             d="M352 173.3L352 384C352 401.7 337.7 416 320 416C302.3 416 288 401.7 288 384L288 173.3L246.6 214.7C234.1 227.2 213.8 227.2 201.3 214.7C188.8 202.2 188.8 181.9 201.3 169.4L297.3 73.4C309.8 60.9 330.1 60.9 342.6 73.4L438.6 169.4C451.1 181.9 451.1 202.2 438.6 214.7C426.1 227.2 405.8 227.2 393.3 214.7L352 173.3zM320 464C364.2 464 400 428.2 400 384L480 384C515.3 384 544 412.7 544 448L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 448C96 412.7 124.7 384 160 384L240 384C240 428.2 275.8 464 320 464zM464 488C477.3 488 488 477.3 488 464C488 450.7 477.3 440 464 440C450.7 440 440 450.7 440 464C440 477.3 450.7 488 464 488z" />
                                                     </svg>
                                                 </button>
+                                                <div x-cloak x-show="uploadMenu" @click.outside="uploadMenu = false" class="absolute right-0 top-full z-40 w-44 rounded-md bg-white py-1 shadow-lg border border-gray-200">
+                                                    <button type="button" @click="uploadMenu = false; openDomainModal(item)" class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">Upload</button>
+                                                    <button type="button" @click="uploadMenu = false; $dispatch('open-voucher', { productId: item.id })" class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">Generate Voucher</button>
+                                                </div>
+                                                </div>
 
                                                 <!-- Delete -->
                                                 <button @click="confirmDelete(item)"
@@ -330,7 +354,6 @@
                                 <p x-show="!folderLoading && !folderEntries.length && !folderMessage"
                                     class="text-xs text-neutral-500">Belum ada file yang terbaca di folder ini.</p>
                             </div>
-                            <p x-show="domainError" x-text="domainError" class="text-sm text-red-500"></p>
                             @unless ($cpanelConfigured)
                                 <p class="text-sm text-amber-600">Konfigurasi cPanel belum lengkap di `.env`, jadi opsi
                                     upload domain belum bisa dipakai.</p>
@@ -779,4 +802,21 @@
             </div>
         </div>
     </div> --}}
+    @if ($canRedeemVoucher)
+        <div x-data="{ open: @js($errors->has('voucher')) }"
+            @open-redeem-voucher.window="open = true; $nextTick(() => $refs.voucherInput.focus())"
+            @keydown.escape.window="open = false">
+            <x-voucher-modal-layout title="Buat Usaha dengan Voucher" title-id="redeem-voucher-title" :action="route('voucher.redeem')" submit-label="Buat Usaha">
+                    <div class="flex items-center gap-1">
+                        <label for="business-voucher" class="text-sm font-semibold">Kode Voucher</label>
+                        <x-input-tooltip text="Usaha akan disalin dari usaha asal voucher. Status premium akun Anda tetap." />
+                    </div>
+                    <input x-ref="voucherInput" id="business-voucher" name="voucher" value="{{ old('voucher') }}" required maxlength="64" class="w-full rounded-md border border-[#ff7100] px-3 py-2 text-sm focus:border-[#b95300] focus:ring-[#b95300]" placeholder="Masukkan kode voucher">
+
+            </x-voucher-modal-layout>
+        </div>
+    @endif
+    @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+        <x-voucher-create-modal :products="$data" :from-business="true" />
+    @endif
 </x-app-layout>

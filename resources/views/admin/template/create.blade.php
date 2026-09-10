@@ -12,11 +12,7 @@
             </div>
             <form action="{{ route('template.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @if ($errors->any())
-                    <div class="relative border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6">
-                        {{ $errors->first() }}
-                    </div>
-                @endif
+
                 @include('components.admin.template.background')
                 <div class=" bg-white p-4 sm:p-6 relative">
                     <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="''" name="name" />
@@ -117,7 +113,7 @@
                                 @include('components.admin.template.article')
                                 <div x-show="desctype === 'default'" id="desc-default-preview" style="background-color: {{$background ?? 'white'}}" class="w-full rounded-md shadow-md p-4 space-y-2 overflow-hidden relative">
                                     <p class="w-full font-bold tracking-wide text-lg">Tentang Kami</p>
-            
+
                                     @include('components.guest.termandcondition')
 
                                     <div class=" text-sm rounded-md">

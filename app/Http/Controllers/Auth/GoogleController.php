@@ -23,12 +23,9 @@ class GoogleController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'password' => bcrypt(uniqid()), // Bisa dibuat null jika tidak ingin password
-                ]);
+                return redirect()->route('register')
+                    ->withInput(['name' => $googleUser->getName(), 'email' => $googleUser->getEmail()])
+                    ->with('info', 'Lengkapi pendaftaran dengan password dan kode voucher terlebih dahulu.');
             }
 
             Auth::login($user);

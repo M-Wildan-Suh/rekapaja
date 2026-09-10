@@ -369,7 +369,7 @@
             </div>
         </div>
     </div>
-    @include('components.validation-error')
+
     @include('components.guest.footer')
     @include('components.admin.mobile-navbar')
 </x-layout.guest>

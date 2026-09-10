@@ -264,7 +264,7 @@ class ProductController extends Controller
             $productId = Access::where('user_id', Auth::id())->oldest('id')->value('product_id');
 
             if (!$productId) {
-                return redirect()->route('profile.edit')->with('info', 'Akun Anda belum terhubung ke usaha.');
+                return view('dashboard', ['data' => collect(), 'no_tlp' => $no_tlp]);
             }
 
             return redirect()->route('product.show', $productId);
@@ -334,7 +334,7 @@ class ProductController extends Controller
         $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
         $newdata->youtube = $validated['link'] ?? null;
         $newdata->home_button = $validated['home_button'];
-        $newdata->customer_data = $validated['customer_data'] ?? 'active';
+        $newdata->customer_data = $validated['customer_data'] ?? 'unactive';
         $newdata->order_via_whatsapp = $validated['order_via_whatsapp'] ?? 'instan_rekap';
         $newdata->status = 'active';
 
@@ -398,7 +398,7 @@ class ProductController extends Controller
             ]);
         }
           
-        return redirect()->route('product.index');
+        return redirect()->route('product.index')->with('success', 'Usaha berhasil ditambahkan.');
     }
 
     /**
@@ -894,7 +894,9 @@ PHP;
         $product->order_title = $validated['order_title'] ?? $product->order_title;
         $product->address = $validated['address'] ?? null;
         $product->no_tlp = $validated['no_tlp'] ?? null;
-        $product->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
+        if (array_key_exists('domain', $validated)) {
+            $product->domain = $this->normalizeDomainUrl($validated['domain']);
+        }
         $product->youtube = $validated['link'] ?? null;
 
         if (array_key_exists('home_button', $validated)) {
@@ -1043,6 +1045,6 @@ PHP;
         // Finally, delete the product
         $product->delete();
 
-        return redirect()->back()->with('success', 'product and its gallery images deleted successfully.');
+        return redirect()->back()->with('success', 'Usaha beserta gambar galerinya berhasil dihapus.');
     }
 }

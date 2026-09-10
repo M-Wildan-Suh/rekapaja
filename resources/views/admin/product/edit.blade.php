@@ -6,35 +6,7 @@
     </x-slot>
     <!-- Tab Contents -->
     <div class="mt-4">
-        @if (session('success') || $errors->any())
-            <div class="fixed top-24 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col items-end gap-3 sm:right-6">
-                @if (session('success'))
-                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms
-                        class="w-full rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
-                        <div class="flex items-start gap-3">
-                            <p class="flex-1 font-medium">{{ session('success') }}</p>
-                            <button type="button" @click="show = false"
-                                class="text-green-700 transition hover:text-green-900">&times;</button>
-                        </div>
-                    </div>
-                @endif
 
-                @if ($errors->any())
-                    <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms
-                        class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg">
-                        <div class="flex items-start gap-3">
-                            <div class="flex-1 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <p>{{ $error }}</p>
-                                @endforeach
-                            </div>
-                            <button type="button" @click="show = false"
-                                class="text-red-700 transition hover:text-red-900">&times;</button>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        @endif
 
         <div class="sticky top-[76px] left-0 right-0 z-10 px-4">
             <div class="max-w-xl mx-auto pointer-events-none">
@@ -205,9 +177,6 @@
                                 <x-admin.component.numberinput title="No. Whatsapp (Optional)"
                                     placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp"
                                     maxlength="20" />
-                                <x-admin.component.textinput title="Domain (Optional)"
-                                    placeholder="contoh: tokoanda.com" :value="$product->domain" name="domain"
-                                    maxlength="255" :strip-protocol="true" />
                                 <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..."
                                     :value="$product->youtube" name="link" link="Url" maxlength="255" />
 
@@ -262,14 +231,6 @@
                                     ['label' => 'Unactive', 'value' => 'unactive'],
                                 ]"
                                     :defaultvalue="$product->customer_data ?? 'active'" name="customer_data" form="bussiness" />
-                                <div class="space-y-2">
-                                    <label class="font-semibold">QRIS</label>
-                                    <div
-                                        class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-                                        Status QRIS mengikuti gambar QRIS. Jika ada gambar maka aktif, jika tidak ada
-                                        gambar maka nonaktif.
-                                    </div>
-                                </div>
                             @endif
 
                             @php

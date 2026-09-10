@@ -70,6 +70,7 @@
     </head>
     <body class="antialiased">
         @include('components.page-loading')
+        <x-notifications />
         <audio id="order-klink-sound" preload="auto">
             <source src="{{ asset('assets/audio/order-klink.mp3') }}" type="audio/mpeg">
         </audio>

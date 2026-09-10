@@ -66,7 +66,8 @@
                     </a>
                 @endif
 
-                @if (Auth::user()->role === 'admin')
+                @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                    <a href="{{ route('voucher.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Voucher</a>
                     <a href="{{ route('user.index') }}"
                         class="block px-4 py-2 {{ request()->routeIs('user.index', 'user.create', 'user.show') ? 'bg-orange-50 font-semibold text-[#b95300]' : 'text-gray-700 hover:bg-gray-100' }}">
                         User

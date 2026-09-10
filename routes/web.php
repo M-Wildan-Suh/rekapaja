@@ -16,6 +16,7 @@ use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\TemplateGalleryController;
 use App\Http\Controllers\TemplateHighlightController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +73,9 @@ Route::get('/paket-premium', [PageController::class, 'premiumPackage'])->name('p
 Route::get('/beli-paket/{id}', [PageController::class, 'buyPackage'])->name('buy.package');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/admin/voucher', [VoucherController::class, 'index'])->name('voucher.index');
+    Route::post('/admin/voucher', [VoucherController::class, 'store'])->name('voucher.store');
+    Route::post('/admin/voucher/redeem', [VoucherController::class, 'redeem'])->middleware('throttle:10,1')->name('voucher.redeem');
 
     Route::get('/admin/dashboard', [ProductController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 

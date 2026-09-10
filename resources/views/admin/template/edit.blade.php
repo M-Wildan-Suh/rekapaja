@@ -5,31 +5,7 @@
         </h2>
     </x-slot>
 
-    @if (session('success') || $errors->any())
-        <div class="fixed top-24 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col items-end gap-3 sm:right-6">
-            @if (session('success'))
-                <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-lg">
-                    <div class="flex items-start gap-3">
-                        <p class="flex-1 font-medium">{{ session('success') }}</p>
-                        <button type="button" @click="show = false" class="text-green-700 transition hover:text-green-900">&times;</button>
-                    </div>
-                </div>
-            @endif
 
-            @if ($errors->any())
-                <div x-data="{ show: true }" x-show="show" x-transition.duration.300ms class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg">
-                    <div class="flex items-start gap-3">
-                        <div class="flex-1 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <p>{{ $error }}</p>
-                            @endforeach
-                        </div>
-                        <button type="button" @click="show = false" class="text-red-700 transition hover:text-red-900">&times;</button>
-                    </div>
-                </div>
-            @endif
-        </div>
-    @endif
 
     <div class="px-4 py-6 sm:px-6 lg:px-8">
         <div class="mx-auto mb-6 max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
@@ -204,7 +180,7 @@
                                 @include('components.admin.template.article')
                                 <div x-show="desctype === 'default'" id="desc-default-preview" style="background-color: {{$template->desc_main_color ?? 'white'}};color: {{$template->desc_text_color ?? 'black'}}" class="w-full rounded-md shadow-md p-4 space-y-2 overflow-hidden relative">
                                     <p class="w-full font-bold tracking-wide text-lg">Tentang Kami</p>
-            
+
                                     @include('components.guest.termandcondition')
 
                                     <div class=" text-sm rounded-md">

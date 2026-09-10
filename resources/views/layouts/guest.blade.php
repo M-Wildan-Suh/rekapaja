@@ -21,6 +21,7 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         @include('components.page-loading')
+        <x-notifications />
         <div class="min-h-screen flex flex-col justify-center items-center px-4 pt-6 sm:pt-0 bg-white">
             <div>
                 <a href="/">
