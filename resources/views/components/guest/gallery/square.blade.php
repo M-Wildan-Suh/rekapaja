@@ -1,5 +1,5 @@
-<div class=" w-full max-w-[600px] mx-auto px-4 md:px-0 relative rounded-md overflow-hidden">
-    <div class="swiper h-full max-h-full">
+<div data-business-gallery-section class=" w-full max-w-xl mx-auto px-4 md:px-0 relative rounded-md overflow-hidden">
+    <div data-business-gallery="square" class="swiper h-full max-h-full">
         <!-- Additional required wrapper -->
         <div class="swiper-wrapper">
             @foreach ($data->productGallery as $item)
@@ -7,7 +7,7 @@
             @endforeach
         </div>
         <div
-            class="prev absolute top-1/2 -translate-y-1/2 flex items-center px-2 left-0 z-10 py-3 bg-black/50 rounded-r-md">
+            data-business-gallery-control class="prev absolute top-1/2 -translate-y-1/2 flex items-center px-2 left-0 z-10 py-3 bg-black/50 rounded-r-md">
             <div class=" text-white w-6 h-6">
                 <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div
-            class="next absolute top-1/2 -translate-y-1/2 flex items-center px-2 right-0 z-10 py-3 bg-black/50 rounded-l-md">
+            data-business-gallery-control class="next absolute top-1/2 -translate-y-1/2 flex items-center px-2 right-0 z-10 py-3 bg-black/50 rounded-l-md">
             <div class=" text-white w-6 h-6">
                 <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -27,29 +27,5 @@
             </div>
         </div>
     </div>
-    <script>
-        window.addEventListener('load', function() {
-            const swiper = new Swiper('.swiper', {
-                direction: 'horizontal',
-                slidesPerView: 2,
-                spaceBetween: 16,
-                loop: true,
-                speed: 500,
-                autoplay: {
-                    delay: 6000,
-                    disableOnInteraction: false,
-                },
-                breakpoints: {
-                    640: {
-                        slidesPerView: 3,
-                    },
-                },
-                // Navigation arrows
-                navigation: {
-                    nextEl: '.next',
-                    prevEl: '.prev',
-                },
-            });
-        });
-    </script>
+
 </div>

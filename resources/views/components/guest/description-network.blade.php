@@ -1,6 +1,6 @@
 {{-- ================= TENTANG KAMI ================= --}}
 
-<section class="w-full max-w-[600px] mx-auto px-4 md:px-0 mt-8">
+<section class="w-full max-w-xl mx-auto px-4 md:px-0 mt-8">
 
     <div class="relative overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-100">
 

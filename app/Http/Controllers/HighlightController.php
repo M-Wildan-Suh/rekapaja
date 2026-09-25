@@ -51,17 +51,7 @@ class HighlightController extends Controller
 
     private function ensureProductAccess(Product $product)
     {
-        $user = Auth::user();
-
-        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
-            return;
-        }
-
-        $ownedProductId = Access::where('user_id', Auth::id())
-            ->oldest('id')
-            ->value('product_id');
-
-        abort_unless((int) $ownedProductId === $product->id, 403);
+        abort_unless(Auth::user()?->canManageBusiness($product), 403);
     }
 
     /**
@@ -285,6 +275,12 @@ class HighlightController extends Controller
     {
         $this->ensureProductAccess($product);
 
+        $businessFields = $request->validate([
+            'order_title' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'product_title' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'price_prefix' => ['sometimes', 'nullable', 'string', 'max:50'],
+        ]);
+
         $highlights = $product->productHighlight()->get()->keyBy('id');
         $submittedHighlights = $request->input('highlights', []);
 
@@ -341,6 +337,13 @@ class HighlightController extends Controller
             $highlight->available = $requestedAvailable && $this->canBeMarkedAvailable($highlight);
 
             $highlight->save();
+        }
+
+        foreach ($businessFields as $field => $value) {
+            $product->{$field} = $value;
+        }
+        if ($product->isDirty()) {
+            $product->save();
         }
 
         return redirect()

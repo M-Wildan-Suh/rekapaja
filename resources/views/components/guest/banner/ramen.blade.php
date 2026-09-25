@@ -2,7 +2,7 @@
     $ramenBg = $template->bg_main_color ?? '#F7EFE5';
     $ramenText = '#231914';
     $ramenAccent = $template->accent_color ?? '#A72018';
-    $ramenCategory = optional($data->category->first())->category;
+    $ramenCategory = $data->category->pluck('category')->filter()->take(3)->implode(', ');
     $ramenDescription = filled($data->description)
         ? $data->description
         : 'Ramen berkualitas dengan kuah kaya rasa, mie kenyal, dan topping premium pilihan.';
@@ -13,7 +13,7 @@
 @endphp
 
 <div class="banner-auto-resize w-full relative overflow-hidden">
-    <div class="w-full overflow-hidden bg-white shadow-md shadow-black/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
+    <div class="w-full overflow-hidden bg-white shadow-md shadow-black/10 rounded-none md:max-w-xl md:mx-auto md:rounded-[2rem]">
         <div
             class="relative aspect-[4/3] overflow-hidden"
             style="background-color: {{ $ramenBg }};"
@@ -41,7 +41,7 @@
                                 {{ $data->subtitle }}
                             </p>
                         @endif
-                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="line-clamp-3 mt-2 text-[0.62rem] md:text-[0.92rem]" style="color: {{ $ramenText }};">
                             {!! nl2br(e($ramenDescription)) !!}
                         </p>
                         @if ($ramenTags->isNotEmpty())

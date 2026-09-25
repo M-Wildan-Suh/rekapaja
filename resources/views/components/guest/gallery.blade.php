@@ -40,6 +40,7 @@
         </div>
     @endforeach
 </div>
+@unless ($editorPreview ?? false)
 <script>
     window.onload = function() {
         Fancybox.bind('#gallery a', {
@@ -47,3 +48,4 @@
         });
     };
 </script>
+@endunless

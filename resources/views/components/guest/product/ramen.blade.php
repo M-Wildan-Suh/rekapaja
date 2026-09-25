@@ -10,7 +10,7 @@
 
 @include('components.guest.product.cart-animation-style')
 
-<div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative space-y-6">
+<div class="w-full max-w-xl mx-auto px-4 md:px-0 relative space-y-6">
     <div
         x-data="{
             checkedItems: [],
@@ -211,7 +211,7 @@
             </div>
         </form>
 
-        <div class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-[600px]" x-show="checkedItems.length > 0">
+        <div class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-xl" x-show="checkedItems.length > 0">
             <div x-data="{ dropdownOpen: false }" class="relative">
                 <button @click="dropdownOpen = !dropdownOpen" :class="[dropdownOpen ? 'bg-black/85 rounded-b-none' : 'bg-black/70 rounded-b-full', cartBounceActive ? 'cart-feedback' : '']" class="text-base flex flex-col items-center p-2.5 rounded-t-full duration-300 text-white relative backdrop-blur-sm shadow-lg shadow-black/25">
                     <div :class="cartBounceActive ? 'cart-feedback-badge' : ''" class="absolute -top-1 -right-1 bg-red-600 rounded-full w-5 h-5 text-xs flex items-center justify-center" x-text="checkedItems.length"></div>

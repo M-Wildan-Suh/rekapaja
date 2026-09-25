@@ -61,7 +61,8 @@
                                         required >
                                         <option value="" selected disabled>Pilih Role</option>
                                         <option value="user" @selected(old('role') === 'user')>User</option>
-                                        <option value="premium" @selected(old('role') === 'premium')>Premium User</option>
+                                        <option value="operator" @selected(old('role') === 'operator')>Operator</option>
+                            <option value="premium" @selected(old('role') === 'premium')>Premium User</option>
                                     </select>
                                 </div>
                             </div>

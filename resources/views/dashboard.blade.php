@@ -6,7 +6,7 @@
     </x-slot>
 
     @php
-        $canRedeemVoucher = !\App\Models\Access::where('user_id', Auth::id())->exists();
+        $canRedeemVoucher = Auth::user()->role === 'operator' || !\App\Models\Access::where('user_id', Auth::id())->exists();
     @endphp
     <div class="py-4 px-4 space-y-4">
         <div class="max-w-xl mx-auto space-y-3">
@@ -16,6 +16,8 @@
             @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
                 <div class="font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] text-white rounded-md text-center">
                     Anda adalah Admin</div>
+            @elseif (Auth::user()->role === 'operator')
+                <div class="rounded-md bg-[#ff7100] py-2 text-center font-semibold text-white">Operator</div>
             @elseif (Auth::user()->role === 'premium')
                 <div
                     class="font-bold text-base sm:text-lg w-full py-2 bg-[#ff7100] text-white rounded-md flex justify-center text-center gap-2">
@@ -44,7 +46,7 @@
                 <!-- Top Actions -->
                 <div class="w-full flex flex-col sm:flex-row gap-2 justify-between items-center">
                     <div class="flex w-full sm:w-auto items-center gap-2 shrink-0">
-                    @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                    @if (in_array(Auth::user()->role, ['admin', 'superadmin', 'operator']))
                         <a href="{{ route('product.create') }}"
                             class=" flex-1 whitespace-nowrap text-sm sm:text-base sm:w-auto px-4 py-2 bg-[#ff7100] text-white rounded-md font-semibold border border-[#ff7100] hover:border-[#b95300] hover:bg-[#b95300] duration-300">
                             Tambah Usaha
@@ -133,6 +135,8 @@
                                                 </div>
                                                 </div>
 
+                                            @endif
+                                            @if (in_array(Auth::user()->role, ['admin', 'superadmin', 'operator']))
                                                 <!-- Delete -->
                                                 <button @click="confirmDelete(item)"
                                                     class="w-5 h-5 hover:text-red-500 duration-300">

@@ -3,7 +3,7 @@
     $ramenBg = $template->desc_main_color ?? '#A72018';
 @endphp
 
-<div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative">
+<div class="w-full max-w-xl mx-auto px-4 md:px-0 relative">
     <div class="rounded-md px-5 py-6 sm:px-6 shadow-lg" style="background-color: {{ $ramenBg }}; color: {{ $ramenText }};">
         <div class="space-y-4">
             <div class="flex items-center gap-4">

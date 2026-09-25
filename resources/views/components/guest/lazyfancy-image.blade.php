@@ -20,8 +20,10 @@
         </svg>
     </div>
 </div>
+@unless ($editorPreview ?? false)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         Fancybox.bind("[data-fancybox]", {});
     });
 </script>
+@endunless

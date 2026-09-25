@@ -14,7 +14,7 @@ class VoucherService
 {
     // Explicitly copy presentation fields, never deployment or account state.
     private const PRESENTATION_FIELDS = [
-        'image', 'template', 'template_id', 'youtube', 'subtitle', 'price',
+        'image', 'template_settings', 'youtube', 'subtitle', 'price',
         'description', 'product_title', 'order_title', 'price_prefix',
         'no_tlp', 'address',
     ];
@@ -27,7 +27,7 @@ class VoucherService
             return DB::transaction(function () use ($code, $user, $applyPremium, &$files) {
                 // Serialize redemptions for both the account and the voucher.
                 $owner = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
-                if (Access::where('user_id', $owner->id)->exists()) {
+                if ($owner->role !== 'operator' && Access::where('user_id', $owner->id)->exists()) {
                     throw ValidationException::withMessages(['voucher' => 'Akun ini sudah memiliki usaha.']);
                 }
 
@@ -42,6 +42,7 @@ class VoucherService
                 }
 
                 $product = new Product;
+                $product->created_by = $owner->id;
                 $product->forceFill($source->only(self::PRESENTATION_FIELDS));
                 do {
                     $suffix = Str::upper(Str::random(4));
@@ -73,9 +74,11 @@ class VoucherService
                     $copy->tag_id = $tag->tag_id;
                     $product->productTags()->save($copy);
                 }
-                Access::create(['user_id' => $owner->id, 'product_id' => $product->id]);
+                if ($owner->role !== 'operator') {
+                    Access::create(['user_id' => $owner->id, 'product_id' => $product->id]);
+                }
 
-                if ($applyPremium) {
+                if ($applyPremium && $owner->role !== 'operator') {
                     $owner->role = $voucher->role;
                     $owner->premium_type = $voucher->role === 'premium' ? $voucher->premium_type : null;
                     $owner->expired = $voucher->role === 'premium' && $voucher->premium_type !== 'lifetime'

@@ -1,5 +1,5 @@
 {{-- @props(['color' => null, 'data', 'text' => null]) --}}
-<div class=" w-full max-w-[600px] mx-auto px-4 sm:px-0 relative">
+<div class=" w-full max-w-xl mx-auto px-4 sm:px-0 relative">
     <!-- Accordion Item 1 -->
     <div style="background-color: {{$template->desc_main_color ?? 'white'}}; color: {{$template->desc_text_color ?? 'black'}}" class="p-4 space-y-2 rounded-md">
         

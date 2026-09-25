@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+
+    protected $casts = ['template_settings' => 'array'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Product $product) {
+            $product->template_settings ??= Template::defaultSettings();
+        });
+    }
+
+    public function designTemplate(): Template
+    {
+        return (new Template)->forceFill(array_replace_recursive(
+            Template::defaultSettings(), $this->template_settings ?? []
+        ));
+    }
     public function productGallery()
     {
         return $this->hasMany(ProductGallery::class);

@@ -1,1 +1,1 @@
-@include('components.guest.product.grid')
+@include('components.guest.product.grid3', ['productGridColumns' => 2])

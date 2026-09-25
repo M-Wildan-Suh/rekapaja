@@ -78,6 +78,7 @@ x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                             x-model="role"
                             @change="handleRoleChange">
                             <option value="user">User</option>
+                            <option value="operator" @selected(old('role') === 'operator')>Operator</option>
                             <option value="premium">Premium User</option>
                         </select>
                     </div>

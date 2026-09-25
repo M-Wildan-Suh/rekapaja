@@ -2,7 +2,7 @@
     $skincareBg = $template->bg_main_color ?? '#FFF7FB';
     $skincareText = '#4A2F3A';
     $skincareAccent = $template->accent_color ?? '#EF6AA5';
-    $skincareCategory = optional($data->category->first())->category;
+    $skincareCategory = $data->category->pluck('category')->filter()->take(3)->implode(', ');
     $skincareDescription = filled($data->description)
         ? $data->description
         : 'Rangkaian skincare pilihan dengan bahan berkualitas untuk kulit sehat, cerah, dan glowing setiap hari.';
@@ -20,7 +20,7 @@
 @endphp
 
 <div class="banner-auto-resize w-full relative overflow-hidden">
-    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2rem]">
+    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-xl md:mx-auto md:rounded-[2rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $skincareBg }};">
             <div class="absolute inset-0">
                 <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
@@ -62,7 +62,7 @@
                             </div>
                         @endif
 
-                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-1 text-[0.66rem] md:pt-2 md:text-[0.92rem]" style="color: {{ $skincareText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="line-clamp-3 mt-1 text-[0.66rem] md:mt-2 md:text-[0.92rem]" style="color: {{ $skincareText }};">
                             {!! nl2br(e($skincareDescription)) !!}
                         </p>
                     </div>

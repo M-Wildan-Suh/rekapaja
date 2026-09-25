@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\Template;
 use Tests\VoucherTestCase;
 
 class ProductDomainUpdateTest extends VoucherTestCase
@@ -11,14 +11,14 @@ class ProductDomainUpdateTest extends VoucherTestCase
     public function test_edit_without_domain_preserves_it_and_domain_settings_can_still_update_it(): void
     {
         $product = $this->voucher()->product;
-        $templateId = DB::table('templates')->insertGetId([
+        $templateId = Template::unguarded(fn () => Template::create([
             'name' => 'Test', 'bg_type' => 'color', 'head_type' => 'default',
             'gallery_type' => 'default', 'desc_main_color' => '#ffffff',
             'desc_text_color' => '#000000', 'product_type' => 'list',
             'product_main_color' => '#ffffff', 'product_second_color' => '#ffffff',
             'product_text_color' => '#000000', 'contact_main_color' => '#ffffff',
             'contact_second_color' => '#ffffff',
-        ]);
+        ])->id);
         $this->actingAs(User::factory()->create(['role' => 'admin']));
         $this->put(route('product.update', $product), [
             'name' => $product->name, 'subtitle' => 'Tagline baru',

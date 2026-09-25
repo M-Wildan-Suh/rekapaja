@@ -1,6 +1,6 @@
 @include('components.guest.product.cart-animation-style')
 
-<div class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative space-y-4">
+<div class="w-full max-w-xl mx-auto px-4 md:px-0 relative space-y-4">
     <div x-data="{
         checkedItems: [],
         cartBounceActive: false,
@@ -14,7 +14,7 @@
         askWhatsappUrl: @js('https://wa.me/' . $no_tlp . '?text=' . urlencode("Halo, saya ingin bertanya mengenai produk.\nAsal chat: RekapAja.com")),
         requiresCustomerData: @js(($data->customer_data ?? 'active') === 'active'),
         showQrisSection: @js(($data->qris_status ?? 'active') === 'active'),
-        qrisUrl: @js($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null),
+        qrisUrl: @js($previewImages['qris'] ?? ($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null)),
         get shouldShowOrderModal() {
             if (this.orderViaWhatsapp === 'tanya') {
                 return false;
@@ -125,7 +125,7 @@
             class="mb-4 p-4 w-full text-white rounded-md overflow-hidden">
             <p class=" w-full font-bold tracking-wide text-lg sm:text-xl">{{$data->product_title}}</p>
         </div>
-        <form id="myForm" action="{{ route('order', ['no_tlp' => $no_tlp]) }}" method="post" enctype="multipart/form-data" target="_blank" x-ref="orderForm">
+        <form id="myForm" action="{{ ($editorPreview ?? false) ? '#' : route('order', ['no_tlp' => $no_tlp]) }}" method="post" enctype="multipart/form-data" target="_blank" x-ref="orderForm">
             @csrf
             <input type="hidden" name="customer_name" :value="customerName">
             <input type="hidden" name="customer_address" :value="customerAddress">
@@ -182,7 +182,7 @@
         </form>
 
         <!-- Dropdown with Quantity Control -->
-        <div x-data="{ dropdownOpen: false }" x-show="checkedItems.length > 0" class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-[600px]">
+        <div x-data="{ dropdownOpen: false }" x-show="checkedItems.length > 0" class="fixed top-5 left-1/2 -translate-x-1/2 px-4 md:px-0 flex justify-end z-10 w-full max-w-xl">
             <button @click="dropdownOpen = !dropdownOpen" :class="[dropdownOpen ? 'bg-black/85 rounded-b-none' : 'bg-black/70 rounded-b-full', cartBounceActive ? 'cart-feedback' : '']" class="text-base flex flex-col items-center p-2.5 rounded-t-full duration-300 text-white relative backdrop-blur-sm shadow-lg shadow-black/25">
                 <div :class="cartBounceActive ? 'cart-feedback-badge' : ''" class="absolute -top-1 -right-1 bg-red-600 rounded-full w-5 h-5 text-xs flex items-center justify-center" x-text="checkedItems.length"></div>
                 <div :class="cartBounceActive ? 'cart-feedback-icon' : ''" class="w-6 aspect-square">

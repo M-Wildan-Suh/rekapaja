@@ -26,7 +26,6 @@ class TemplateController extends Controller
         $preset = match ($template->head_type) {
             'skincare' => $this->pastelProductPreset('#F26CA7', '#4A2F3A'),
             'pudding_putih' => $this->pastelProductPreset('#F26CA7', '#5C3446'),
-            'sembako' => $this->pastelProductPreset('#2F9E44', '#24411F'),
             default => null,
         };
 

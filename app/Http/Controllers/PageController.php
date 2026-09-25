@@ -12,7 +12,6 @@ use App\Models\PremiumPackage;
 use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductTag;
-use App\Models\Template;
 use App\Services\SeoSitemapService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -136,9 +135,9 @@ class PageController extends Controller
         );
     
         $category = Category::all();
-        $template = Template::inRandomOrder()->get();
+
     
-        return view('product', compact('data', 'no_tlp', 'template', 'category'));
+        return view('product', compact('data', 'no_tlp', 'category'));
     }
 
     public function categorybusiness($category, Request $request) {
@@ -161,22 +160,8 @@ class PageController extends Controller
         $data->withPath("/bisnis/kategori/{$category->category}/page");
 
         $category = Category::all();
-        $template = Template::inRandomOrder()->get();
-        return view('product', compact('data', 'no_tlp', 'template', 'category', 'filter'));
-    }
 
-    public function template(Request $request) {
-        $no_tlp = $this->getWhatsappNumber();
-        if ($request->search) {
-            $data = Template::where('name', 'like', '%' . $request->search . '%')->get();
-        } else {
-            $data = Template::all();
-        }
-        $data = $data->map(function ($item) {
-            $item->slug = Str::slug($item->name, '-');
-            return $item;
-        });
-        return view('template', compact('data', 'no_tlp'));
+        return view('product', compact('data', 'no_tlp', 'category', 'filter'));
     }
 
     public function detail(Request $request, $slug) {
@@ -194,25 +179,36 @@ class PageController extends Controller
         return $this->renderProductDetail($request, $product);
     }
 
-    private function renderProductDetail(Request $request, Product $data)
+    public function renderEditorPreview(Request $request, Product $data, array $previewImages)
+    {
+        return $this->renderProductDetail($request, $data, true, $previewImages);
+    }
+
+    private function renderProductDetail(Request $request, Product $data, bool $editorPreview = false, array $previewImages = [])
     {
         $customDomain = $this->normalizeDomainUrl($data->domain);
         $currentOrigin = rtrim($request->getSchemeAndHttpHost(), '/');
 
-        if ($customDomain && !$request->boolean('domain_preview')) {
+        if (!$editorPreview && $customDomain && !$request->boolean('domain_preview')) {
             if (strcasecmp($currentOrigin, $customDomain) !== 0) {
                 $queryString = $request->getQueryString();
                 return redirect()->away($customDomain . ($queryString ? '?' . $queryString : ''), 302);
             }
         }
 
-        $template = Template::find($data->template_id);
+        return view($editorPreview ? 'components.guest.business-page' : 'detail', $this->businessPageData($data, $editorPreview, $previewImages));
+    }
+
+    /** Shared presentation data for the public page and the admin Blade include. */
+    public function businessPageData(Product $data, bool $editorPreview = false, array $previewImages = []): array
+    {
+        $template = $data->designTemplate();
 
         $premiumContext = $this->resolveProductPremiumContext($data);
         $no_tlp = $premiumContext['no_tlp'];
         $role = $premiumContext['role'];
 
-        $data->image = asset('storage/images/product/'. $data->image);
+        $data->image = $previewImages['thumbnail'] ?? asset('storage/images/product/'. $data->image);
 
         $data->productGallery = $data->productGallery->map(function ($item) {
             $item->image = asset('storage/images/product/gallery/'. $item->image);
@@ -224,9 +220,6 @@ class PageController extends Controller
             return $item;
         });
 
-        if (!$data) {
-            return redirect()->route('home');
-        }
 
         $no_tlp = $this->formatWhatsappNumber($no_tlp);
 
@@ -255,7 +248,7 @@ class PageController extends Controller
         // Buat embed URL jika ID ditemukan
         $data->embed = $videoId ? "https://www.youtube.com/embed/" . $videoId : $data->youtube;
 
-        return view('detail', compact('data', 'no_tlp', 'role', 'template'));
+        return compact('data', 'no_tlp', 'role', 'template', 'editorPreview', 'previewImages');
 
     }
 
@@ -490,7 +483,7 @@ class PageController extends Controller
         $newdata->name = $request->name;
         $newdata->slug = Str::slug($newdata->name);
         $newdata->subtitle = $request->subtitle;
-        $newdata->template_id = 1;
+
         $newdata->description = $request->desc;
         $newdata->no_tlp = $request->no_tlp;
         $newdata->domain = $this->normalizeDomainUrl($request->domain);

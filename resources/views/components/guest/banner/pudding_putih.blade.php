@@ -4,7 +4,7 @@
     $puddingBrown = '#8B5E3C';
     $puddingPink = $template->accent_color ?? '#F0679A';
     $puddingPurple = '#9B6AE4';
-    $puddingCategory = optional($data->category->first())->category;
+    $puddingCategory = $data->category->pluck('category')->filter()->take(3)->implode(', ');
     $puddingDescription = filled($data->description)
         ? $data->description
         : 'Pilihan camilan manis keluarga dengan rasa lembut, fresh, dan cocok dinikmati kapan saja.';
@@ -21,7 +21,7 @@
 @endphp
 
 <div class="banner-auto-resize w-full relative overflow-hidden">
-    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
+    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-xl md:rounded-[2rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $puddingBg }};">
             <div class="absolute inset-0">
                 <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
@@ -77,7 +77,7 @@
                             </div>
                         @endif
 
-                        <p data-auto-resize-text data-auto-resize-lines="3" class="pt-1 text-[0.62rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="line-clamp-3 mt-1 text-[0.62rem] leading-[1.45] md:mt-2 md:text-[0.92rem]" style="color: {{ $puddingText }};">
                             {!! nl2br(e($puddingDescription)) !!}
                         </p>
                     </div>

@@ -1,6 +1,6 @@
 @if (filled($data->qris) && ($data->qris_status ?? 'active') === 'active')
     @php
-        $qrisUrl = $data->qris ? asset('storage/images/product/qris/' . $data->qris) : null;
+        $qrisUrl = $previewImages['qris'] ?? ($data->qris ? asset('storage/images/product/qris/' . $data->qris) : null);
         $qrisBackground = in_array(($template->head_type ?? null), ['skincare', 'pudding_putih'], true)
             ? '#FFFFFF'
             : ($template->product_main_color ?: '#FFFFFF');
@@ -8,7 +8,7 @@
         $qrisaccent = $template->accent_color ?: '#0F172A';
     @endphp
 
-    <div x-data="{}" class="w-full max-w-[600px] mx-auto px-4 md:px-0 relative">
+    <div x-data="{}" class="w-full max-w-xl mx-auto px-4 md:px-0 relative">
         <div class="overflow-hidden rounded-[2rem] p-5 shadow-lg backdrop-blur-sm"
             style="background-color: {{ $qrisBackground }}; color: {{ $qrisText }};">
             <div class="flex flex-col gap-4 sm:flex-row items-center sm:justify-between">

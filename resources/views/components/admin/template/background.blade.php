@@ -1,19 +1,21 @@
-<div x-data="{background: false}" class="">
+<div @open-business-section.window="if ($event.detail === 'background') background = true" x-data="{background: false}" class="">
+    @unless ($businessContentEditor ?? false)
     <button @click="background = true" type="button" class=" absolute left-0 top-0 pl-2 pt-2 pr-3 pb-3 aspect-square bg-black/50 hover:bg-black duration-300 rounded-br-[70%] z-10">
         <div class=" w-5 sm:w-6 aspect-square text-white">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m18.988 2.012 3 3L19.701 7.3l-3-3zM8 16h3l7.287-7.287-3-3L8 13z" fill="currentColor" class="fill-000000"></path><path d="M19 19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .896-2 2v14c0 1.104.897 2 2 2h14a2 2 0 0 0 2-2v-8.668l-2 2V19z" fill="currentColor" class="fill-000000"></path></svg>
         </div>
     </button>
+    @endunless
 
     <!-- Modal -->
-    <div x-show="background" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] px-4"
+    <div x-cloak x-show="background" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] px-4"
     x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
         <!-- Modal Background -->
-        <div @click.away="background = false" class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative overflow-hidden border-2 border-byolink-1">
-            <div class=" pt-6 pb-3 bg-byolink-1 text-white z-30">
+        <div @click.away="background = false" class="w-full max-w-[720px] bg-white pb-6 rounded-md flex flex-col gap-4 relative max-h-[90vh] overflow-hidden border-2 border-byolink-1">
+            <div class="shrink-0 relative pt-6 pb-3 bg-byolink-1 text-white z-30">
                 <h2 class=" px-6 text-2xl font-bold">Edit Background</h2>
                 <button @click="background = false"
                     type="button"
@@ -26,7 +28,7 @@
                     </svg>
                 </button>
             </div>
-            <div x-data="{ bgType: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="space-y-4">
+            <div x-data="{ bgType: '{{ old('bg_type', $template->bg_type ?? 'normal') }}' }" class="min-h-0 overflow-y-auto overscroll-contain space-y-4">
                 <input type="hidden" name="bg_type" id="bg_type" x-model="bgType">
 
                 <div class="w-full px-4 sm:px-6">
@@ -56,30 +58,22 @@
                             <div class="space-y-2">
                                 <label for="accent_color" class="text-sm sm:text-base font-semibold text-black">Warna Accent</label>
                                 <div class="w-full">
-                                    <div class="flex items-center justify-center overflow-hidden rounded-md shadow-md shadow-black/20 h-10">
-                                        <input type="color" name="accent_color" id="accent_color" class="min-w-[105%] h-14 rounded-md cursor-pointer" value="{{ old('accent_color', $template->accent_color ?? '#A72018') }}">
-                                    </div>
+                                    <x-admin.component.colorinput name="accent_color" :value="old('accent_color', $template->accent_color ?? '#A72018')" />
                                 </div>
                             </div>
                         </div>
 
                         <div class="min-h-[260px]">
                             <div x-show="bgType === 'normal'" class="space-y-2">
-                                <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[260px]">
-                                    <input type="color" name="bg_normal_color" id="bg_normal_color" class="min-w-[120%] h-96 rounded-md cursor-pointer" value="{{ old('bg_normal_color', $template->bg_main_color ?? '#F5F5F5') }}">
-                                </div>
+                                <x-admin.component.colorinput name="bg_normal_color" :value="old('bg_normal_color', $template->bg_main_color ?? '#F5F5F5')" />
                             </div>
 
-                            <div x-show="bgType === 'gradient'" class="flex h-[260px] flex-col justify-between">
+                            <div x-show="bgType === 'gradient'" class="flex flex-col gap-4">
                                 <div class="space-y-2">
-                                    <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[124px]">
-                                        <input type="color" name="bg_main_color" id="bg_main_color" class="min-w-[120%] h-80 rounded-md cursor-pointer" value="{{ old('bg_main_color', $template->bg_main_color ?? '#F5F5F5') }}">
-                                    </div>
+                                    <x-admin.component.colorinput name="bg_main_color" :value="old('bg_main_color', $template->bg_main_color ?? '#F5F5F5')" />
                                 </div>
                                 <div class="space-y-2">
-                                    <div class="w-full flex items-center justify-center overflow-hidden shadow-md shadow-black/20 rounded-md h-[124px]">
-                                        <input type="color" name="bg_second_color" id="bg_second_color" class="min-w-[120%] h-80 rounded-md cursor-pointer" value="{{ old('bg_second_color', $template->bg_second_color ?? '#F5F5F5') }}">
-                                    </div>
+                                    <x-admin.component.colorinput name="bg_second_color" :value="old('bg_second_color', $template->bg_second_color ?? '#F5F5F5')" />
                                 </div>
                             </div>
 
@@ -96,12 +90,12 @@
             </div>
             
 
-            <div class=" sm:pt-4">
+            <div class="shrink-0 sm:pt-4">
                 <div class=" px-4 sm:px-6 w-full flex justify-end items-center gap-4">
                     <button 
                         @click="background = false"
-                        onclick="changebg()"
-                        type="button"
+                        @unless ($businessContentEditor ?? false) onclick="changebg()" @endunless
+                        type="{{ ($businessContentEditor ?? false) ? 'submit' : 'button' }}"
                         class="text-sm sm:text-base w-full sm:w-auto py-2 px-4 bg-byolink-2 text-white rounded hover:bg-black duration-300">
                         Simpan
                     </button>

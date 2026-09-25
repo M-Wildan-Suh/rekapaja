@@ -18,7 +18,7 @@
                         @endif
                         @if ($xModel && old($name) === null)
                             {{ $xModel ? 'x-model='.$xModel : '' }} 
-                            x-bind:value="{{ $xModel ? '' : $selectedValue }}" 
+
                         @endif
                         value="{{$item['value']}}" 
                         @required($required && $loop->first)

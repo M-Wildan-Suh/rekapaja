@@ -15,17 +15,7 @@ class ProductGalleryController extends Controller
 {
     private function ensureProductAccess(Product $product)
     {
-        $user = Auth::user();
-
-        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
-            return;
-        }
-
-        $ownedProductId = Access::where('user_id', Auth::id())
-            ->oldest('id')
-            ->value('product_id');
-
-        abort_unless((int) $ownedProductId === $product->id, 403);
+        abort_unless(Auth::user()?->canManageBusiness($product), 403);
     }
 
     /**

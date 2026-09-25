@@ -10,7 +10,6 @@ use App\Models\PivotProductTag;
 use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductTag;
-use App\Models\Template;
 use App\Models\User;
 use App\Services\CpanelDomainPublisher;
 use App\Services\SeoSitemapService;
@@ -57,7 +56,7 @@ class ProductController extends Controller
             ],
             'subtitle' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['subtitle']],
             'price' => ['nullable', 'regex:/^\d+$/'],
-            'template_id' => ['required', 'exists:templates,id'],
+
             'description' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['description']],
             'address' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['address']],
             'no_tlp' => ['nullable', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['no_tlp']],
@@ -176,33 +175,24 @@ class ProductController extends Controller
         return $imageName;
     }
 
-    private function ensureAdmin()
+    private function ensureBusinessManager()
     {
-        abort_unless(Auth::user() && in_array(Auth::user()->role, ['admin', 'superadmin']), 403);
+        abort_unless(Auth::user() && in_array(Auth::user()->role, ['admin', 'superadmin', 'operator']), 403);
     }
 
     private function ensureProductAccess(Product $product)
     {
-        $user = Auth::user();
-
-        if ($user && in_array($user->role, ['admin', 'superadmin'])) {
-            return;
-        }
-
-        $ownedProductId = Access::where('user_id', Auth::id())
-            ->oldest('id')
-            ->value('product_id');
-
-        abort_unless((int) $ownedProductId === $product->id, 403);
+        abort_unless(Auth::user()?->canManageBusiness($product), 403);
     }
 
     private function availableAccessUsers(?Product $product = null)
     {
+        if (Auth::user()?->role === 'operator') return collect();
         $assignedUserIds = Access::query()
             ->when($product, fn ($query) => $query->where('product_id', '!=', $product->id))
             ->pluck('user_id');
 
-        return User::whereNotIn('role', ['admin', 'superadmin'])
+        return User::whereNotIn('role', ['admin', 'superadmin', 'operator'])
             ->whereNotIn('id', $assignedUserIds)
             ->orderBy('name')
             ->get();
@@ -211,7 +201,7 @@ class ProductController extends Controller
     private function ensureOwnerIsAvailable(int $userId, ?Product $product = null): void
     {
         $ownerExists = User::whereKey($userId)
-            ->whereNotIn('role', ['admin', 'superadmin'])
+            ->whereNotIn('role', ['admin', 'superadmin', 'operator'])
             ->exists();
 
         $ownerHasAnotherBusiness = Access::where('user_id', $userId)
@@ -258,7 +248,9 @@ class ProductController extends Controller
     {
         $no_tlp = NoHandphone::query()->value('no_tlp');
 
-        if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+        if (Auth::user()->role === 'operator') {
+            $data = Product::where('created_by', Auth::id())->get();
+        } elseif (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             $data = Product::all();
         } else {
             $productId = Access::where('user_id', Auth::id())->oldest('id')->value('product_id');
@@ -285,15 +277,15 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $this->ensureAdmin();
+        $this->ensureBusinessManager();
 
         $tag = ProductTag::all();
         $category = Category::all();
-        $template = Template::all();
-        $product = Product::all();
+
+        $product = Product::query()->when(Auth::user()->role === 'operator', fn ($query) => $query->where('created_by', Auth::id()))->get();
         $accessUsers = $this->availableAccessUsers();
 
-        return view('admin.product.create', compact('tag', 'template', 'product', 'category', 'accessUsers'));
+        return view('admin.product.create', compact('tag', 'product', 'category', 'accessUsers'));
     }
 
     /**
@@ -301,10 +293,10 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $this->ensureAdmin();
+        $this->ensureBusinessManager();
 
         $validated = $request->validate(array_merge($this->productValidationRules(), [
-            'home_button' => ['required', 'in:on,off'],
+
             'product_title' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['product_title']],
             'order_title' => ['required', 'string', 'max:' . self::BUSINESS_FIELD_LIMITS['order_title']],
             'thumbnail' => ['required', 'image'],
@@ -312,19 +304,20 @@ class ProductController extends Controller
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
         ]), $this->productValidationMessages());
 
-        $ownerId = $validated['access'] ?? null;
+        $ownerId = Auth::user()->role === 'operator' ? null : ($validated['access'] ?? null);
 
         if ($ownerId) {
             $this->ensureOwnerIsAvailable((int) $ownerId);
         }
 
         $newdata= new Product();
+        $newdata->created_by = Auth::id();
 
         $newdata->name = $validated['name'];
         $newdata->slug = Str::slug($newdata->name);
         $newdata->subtitle = $validated['subtitle'] ?? null;
         $newdata->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
-        $newdata->template_id = $validated['template_id'];
+
         $newdata->description = $validated['description'] ?? null;
         $newdata->price_prefix = $validated['price_prefix'] ?? null;
         $newdata->product_title = $validated['product_title'];
@@ -333,7 +326,7 @@ class ProductController extends Controller
         $newdata->no_tlp = $validated['no_tlp'] ?? null;
         $newdata->domain = $this->normalizeDomainUrl($validated['domain'] ?? null);
         $newdata->youtube = $validated['link'] ?? null;
-        $newdata->home_button = $validated['home_button'];
+        $newdata->home_button = 'off';
         $newdata->customer_data = $validated['customer_data'] ?? 'unactive';
         $newdata->order_via_whatsapp = $validated['order_via_whatsapp'] ?? 'instan_rekap';
         $newdata->status = 'active';
@@ -424,11 +417,13 @@ class ProductController extends Controller
         $category = Category::whereNotIn('id', $categoryexist)->get();
         // dd($tag);
 
-        $template = Template::all();
-        $data = Product::whereNotIn('id', [$product->id])->get();
+        $template = $product->designTemplate();
+        $data = Product::whereNotIn('id', [$product->id])->when(Auth::user()->role === 'operator', fn ($query) => $query->where('created_by', Auth::id()))->get();
         $accessUsers = $this->availableAccessUsers($product);
         
-        return view('admin.product.edit', compact('product', 'tag', 'template', 'category', 'data', 'accessUsers'));
+        // Use a fresh instance so presentation URLs do not mutate the edit form's model.
+        $landingPage = app(PageController::class)->businessPageData($product->fresh(), true);
+        return view('admin.product.edit', compact('product', 'tag', 'template', 'category', 'data', 'accessUsers', 'landingPage'));
         
     }
 
@@ -437,7 +432,63 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        return $this->show($product);
+    }
+
+    public function previewTemplate(Request $request, Product $product, \App\Services\BusinessTemplateService $templates)
+    {
+        $this->ensureProductAccess($product);
+        $validated = $request->validate(array_merge($templates->rules(), [
+            'name' => ['nullable', 'string', 'max:100'],
+            'subtitle' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:1200'],
+            'no_tlp' => ['nullable', 'string', 'max:20'],
+            'link' => ['nullable', 'string', 'max:255'],
+            'order_title' => ['nullable', 'string', 'max:255'],
+            'product_title' => ['nullable', 'string', 'max:255'],
+            'price_prefix' => ['nullable', 'string', 'max:50'],
+
+            'order_via_whatsapp' => ['sometimes', 'in:instan_rekap,tanya'],
+            'customer_data' => ['sometimes', 'in:active,unactive'],
+            'remove_qris' => ['nullable', 'in:0,1'],
+            'thumbnail' => ['nullable', 'image', 'max:5120'],
+            'qris' => ['nullable', 'image', 'max:5120'],
+        ]));
+        foreach (['name', 'subtitle', 'description', 'no_tlp', 'order_title', 'product_title', 'price_prefix', 'order_via_whatsapp', 'customer_data'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $product->{$field} = $validated[$field] ?? '';
+            }
+        }
+        if (array_key_exists('link', $validated)) {
+            $product->youtube = $validated['link'] ?? '';
+        }
+        if ($request->boolean('remove_qris')) {
+            $product->qris = null;
+            $product->qris_status = 'unactive';
+        }
+        $product->template_settings = $templates->preview($validated, $product)->settings();
+        $previewImages = [];
+        foreach (['thumbnail', 'bg_image', 'qris'] as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $previewImages[$field] = 'data:'.$file->getMimeType().';base64,'.base64_encode(file_get_contents($file->getRealPath()));
+            }
+        }
+        if (isset($previewImages['qris'])) {
+            $product->qris = 'preview';
+            $product->qris_status = 'active';
+        }
+
+        return app(PageController::class)->renderEditorPreview($request, $product, $previewImages);
+    }
+
+    public function updateTemplate(Request $request, Product $product, \App\Services\BusinessTemplateService $templates)
+    {
+        $this->ensureProductAccess($product);
+        $templates->update($request, $product);
+
+        return redirect()->route('product.show', $product)
+            ->with('highlight', 'design')->with('success', 'Template usaha berhasil disimpan.');
     }
 
     private function buildDomainFileContent(Product $product): string
@@ -874,7 +925,7 @@ PHP;
         $activeTab = $request->input('active_tab', 'product');
 
         $validated = $request->validate(array_merge($this->productValidationRules($product), [
-            'home_button' => ['nullable', 'in:on,off'],
+
             'status' => ['nullable', 'in:active,unactive'],
             'customer_data' => ['nullable', 'in:active,unactive'],
             'order_via_whatsapp' => ['nullable', 'in:instan_rekap,tanya'],
@@ -887,9 +938,11 @@ PHP;
         $product->slug = Str::slug($product->name);
         $product->subtitle = $validated['subtitle'] ?? null;
         $product->price = $this->normalizeWholeNumberPrice($validated['price'] ?? null);
-        $product->template_id = $validated['template_id'];
+
         $product->description = $validated['description'] ?? null;
-        $product->price_prefix = $validated['price_prefix'] ?? null;
+        if (array_key_exists('price_prefix', $validated)) {
+            $product->price_prefix = $validated['price_prefix'];
+        }
         $product->product_title = $validated['product_title'] ?? $product->product_title;
         $product->order_title = $validated['order_title'] ?? $product->order_title;
         $product->address = $validated['address'] ?? null;
@@ -899,9 +952,7 @@ PHP;
         }
         $product->youtube = $validated['link'] ?? null;
 
-        if (array_key_exists('home_button', $validated)) {
-            $product->home_button = $validated['home_button'];
-        }
+        $product->home_button = 'off';
 
         if (array_key_exists('customer_data', $validated)) {
             $product->customer_data = $validated['customer_data'];
@@ -1011,7 +1062,8 @@ PHP;
      */
     public function destroy(Product $product)
     {
-        $this->ensureAdmin();
+        $this->ensureBusinessManager();
+        $this->ensureProductAccess($product);
 
         // Delete the main product image if it exists
         $path = public_path('storage/images/product/' . $product->image);

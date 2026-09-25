@@ -36,7 +36,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:user,premium'],
+            'role' => ['required', 'in:user,premium,operator'],
             'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
             'expired' => [
                 'nullable',
@@ -49,8 +49,8 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
-            'premium_type' => $request->premium_type,
-            'expired' => $request->expired,
+            'premium_type' => $request->role === 'premium' ? $request->premium_type : null,
+            'expired' => $request->role === 'premium' && $request->premium_type !== 'lifetime' ? $request->expired : null,
             'password' => Hash::make($request->password),
         ]);
 
@@ -82,7 +82,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:user,premium'],
+            'role' => ['required', 'in:user,premium,operator'],
             'premium_type' => ['nullable', 'required_if:role,premium', 'in:month,year,lifetime'],
             'expired' => [
                 'nullable',

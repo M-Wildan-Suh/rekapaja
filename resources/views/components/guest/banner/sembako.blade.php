@@ -4,7 +4,7 @@
     $sembakoAccent = $template->accent_color ?? '#2F9E44';
     $sembakoGold = '#D97706';
     $sembakoPill = '#FACC15';
-    $sembakoCategory = optional($data->category->first())->category;
+    $sembakoCategory = $data->category->pluck('category')->filter()->take(3)->implode(', ');
     $sembakoDescription = filled($data->description)
         ? $data->description
         : 'Menyediakan berbagai kebutuhan sembako pilihan dengan kualitas terjamin dan harga terjangkau untuk keluarga Anda.';
@@ -21,7 +21,7 @@
 @endphp
 
 <div class="banner-auto-resize w-full relative mb-20">
-    <div class="w-full bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-[600px] md:rounded-[2rem]">
+    <div class="w-full bg-white shadow-md shadow-slate-900/10 rounded-none md:mx-auto md:max-w-xl md:rounded-[2rem]">
         <div class="relative">
             <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $sembakoBg }};">
                 <div class="absolute inset-0">
@@ -58,7 +58,7 @@
                             </div>
                         @endif
 
-                        <p data-auto-resize-text data-auto-resize-lines="4" class="pt-1 text-[0.64rem] leading-[1.45] md:pt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="line-clamp-3 mt-1 text-[0.64rem] leading-[1.45] md:mt-2 md:text-[0.92rem]" style="color: {{ $sembakoText }};">
                             {!! nl2br(e($sembakoDescription)) !!}
                         </p>
                     </div>

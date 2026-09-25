@@ -72,10 +72,6 @@
                         class="block px-4 py-2 {{ request()->routeIs('user.index', 'user.create', 'user.show') ? 'bg-orange-50 font-semibold text-[#b95300]' : 'text-gray-700 hover:bg-gray-100' }}">
                         User
                     </a>
-                    <a href="{{ route('template.index') }}"
-                        class="block px-4 py-2 {{ request()->routeIs('template.index', 'template.create', 'template.show') ? 'bg-orange-50 font-semibold text-[#b95300]' : 'text-gray-700 hover:bg-gray-100' }}">
-                        Template
-                    </a>
                     <a href="{{ route('access.index') }}"
                         class="block px-4 py-2 {{ request()->routeIs('access.index', 'access.create', 'access.show') ? 'bg-orange-50 font-semibold text-[#b95300]' : 'text-gray-700 hover:bg-gray-100' }}">
                         Akses
@@ -87,7 +83,9 @@
                 @endif
 
                 <div class="my-1 border-t border-gray-100"></div>
+                @if (Auth::user()->role !== 'operator')
                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">Log Out</button>

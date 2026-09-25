@@ -16,6 +16,7 @@
 
         <!-- CDN -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
         @if (config('app.deploy', true))
             <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
@@ -26,7 +27,7 @@
     <body class="font-sans antialiased">
         @include('components.page-loading')
         <x-notifications />
-        <div class="min-h-screen bg-neutral-100">
+        <div data-app-shell class="min-h-screen bg-neutral-100">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -49,5 +50,8 @@
     @if (config('app.deploy', true))
         <script src="{{ asset('build/assets/app.js') }}"></script>
     @endif
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </html>

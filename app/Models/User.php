@@ -48,6 +48,13 @@ class User extends Authenticatable
         'expired' => 'date',
     ];
 
+    public function canManageBusiness(Product $product): bool
+    {
+        if (in_array($this->role, ['admin', 'superadmin'], true)) return true;
+        if ($this->role === 'operator') return (int) $product->created_by === (int) $this->id;
+        return (int) Access::where('user_id', $this->id)->oldest('id')->value('product_id') === (int) $product->id;
+    }
+
     public function hasActivePremium(): bool
     {
         if ($this->premium_type === 'lifetime') {

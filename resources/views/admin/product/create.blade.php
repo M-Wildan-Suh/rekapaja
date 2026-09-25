@@ -17,15 +17,8 @@
                             <span>Kembali</span>
                         </a>
                     </div>
-                    @php
-                        $templateHeaders = $template->mapWithKeys(fn ($item) => [(string) $item->id => $item->head_type])->all();
-                        $selectedTemplateId = (string) old('template_id', optional($template->first())->id);
-                    @endphp
+
                     <form
-                        x-data="{
-                            selectedTemplateId: @js($selectedTemplateId),
-                            templateHeaders: @js($templateHeaders)
-                        }"
                         action="{{route('product.store')}}"
                         method="POST"
                         enctype="multipart/form-data"
@@ -114,23 +107,10 @@
                                 <x-admin.component.accessinput title="Akun Pemilik" :value="[]" :users="$accessUsers" name="access" />
                             @endif
 
-                            <x-admin.component.radioinput title="Tombol Home" :value="[['label'=>'On', 'value'=>'on'], ['label'=>'Off', 'value'=>'off']]" :defaultvalue="old('home_button', $tagposition ?? '')" name="home_button" required />
 
                             <x-admin.component.radioinput title="Order via WhatsApp" :value="[['label'=>'Instan Rekap', 'value'=>'instan_rekap'], ['label'=>'Tanya', 'value'=>'tanya']]" :defaultvalue="old('order_via_whatsapp', 'instan_rekap')" name="order_via_whatsapp" required />
 
-                            <div class=" space-y-2">
-                                <label for="template" class=" text-sm sm:text-base font-semibold">Template</label>
-                                <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                    @foreach ($template as $item)
-                                        <label class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{$item->id}}" x-model="selectedTemplateId" class="hidden peer" {{ (string) old('template_id', $loop->first ? $item->id : '') === (string) $item->id ? 'checked' : '' }} required>
-                                            <img src="{{asset('/storage/images/template/'.$item->image)}}" class=" w-full h-full object-cover object-top" alt="">
-                                            <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                                            </div>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                            <p class="text-sm text-neutral-500">Template dapat diatur setelah usaha dibuat, melalui halaman Edit Usaha.</p>
                             <div class="">
                                 <button class=" text-sm sm:text-base font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Save</button>
                             </div>

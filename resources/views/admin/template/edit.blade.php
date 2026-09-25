@@ -8,41 +8,8 @@
 
 
     <div class="px-4 py-6 sm:px-6 lg:px-8">
-        <div class="mx-auto mb-6 max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
-            <div class="grid gap-6 px-6 py-6 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(18rem,0.9fr)] lg:items-center">
-                <div class="space-y-4">
-                    <span class="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
-                        UI Template Editor
-                    </span>
-                    <div class="space-y-3">
-                        <h3 class="text-2xl font-black leading-tight sm:text-3xl">
-                            Area edit sekarang dibuat lebih fokus supaya proses cek preview dan revisi terasa lebih nyaman.
-                        </h3>
-                        <p class="max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
-                            Struktur fitur tetap sama. Kita mulai dari perapihan visual halaman edit: identitas template lebih jelas, aksi simpan lebih terlihat, dan preview punya konteks yang lebih kuat.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-3 text-xs font-medium text-slate-200 sm:text-sm">
-                        <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5">Template: {{ $template->name }}</span>
-                        <span class="rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1.5">Header: {{ str_replace('_', ' ', $template->head_type) }}</span>
-                        <span class="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5">Produk: {{ strtoupper($template->product_type ?? 'grid2') }}</span>
-                    </div>
-                </div>
-                <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur">
-                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">Alur Kerja</p>
-                    <div class="mt-4 space-y-3 text-sm leading-6 text-slate-200">
-                        <div class="rounded-2xl border border-white/10 bg-slate-950/35 px-4 py-3">
-                            Edit tiap section dari tombol di pojok preview agar hasilnya langsung terlihat.
-                        </div>
-                        <div class="rounded-2xl border border-white/10 bg-slate-950/35 px-4 py-3">
-                            Setelah selesai, gunakan tombol simpan utama supaya semua perubahan tersimpan ke database.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="w-full max-w-6xl mx-auto bg-neutral-100 rounded-[2rem] shadow-[0_24px_60px_rgba(15,23,42,0.14)] relative overflow-hidden border border-slate-200">
+        <div class="w-full max-w-xl mx-auto bg-neutral-100 rounded-md shadow-[0_24px_60px_rgba(15,23,42,0.14)] relative overflow-hidden border border-slate-200">
             <div id="background" class=" absolute inset-0 flex items-center justify-center">
                 <style>
                     #background {
@@ -60,104 +27,22 @@
                 @method('put')
                 @include('components.admin.template.background')
                 <div class="bg-white/90 p-4 sm:p-6 relative backdrop-blur border-b border-slate-200">
-                    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-end">
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Identitas Template</p>
-                                <h3 class="mt-1 text-xl font-black text-slate-900">Pengaturan Utama</h3>
-                                <p class="mt-2 text-sm leading-6 text-slate-600">
-                                    Ubah nama template di sini, lalu lanjutkan penyesuaian visual lewat preview di bawah.
-                                </p>
-                            </div>
-                            <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="$template->name" name="name" />
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Identitas Template</p>
+                            <h3 class="mt-1 text-xl font-black text-slate-900">Pengaturan Utama</h3>
                         </div>
-                        <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
-                            <p class="text-sm font-semibold text-slate-900">Checklist cepat</p>
-                            <div class="mt-3 space-y-2 text-sm leading-6 text-slate-600">
-                                <p>Preview header, gallery, deskripsi, produk, dan kontak sebelum simpan.</p>
-                                <p>Preset khusus untuk header custom tetap mengikuti aturan lama.</p>
-                            </div>
-                            <div class="mt-4">
-                                <x-admin.component.submitbutton title="Simpan Perubahan" />
-                            </div>
-                        </div>
+                        <x-admin.component.textinput title="Nama Template" placeholder="Masukkan Nama Template..." :value="$template->name" name="name" />
                     </div>
                 </div>
 
                 <div class=" p-4 sm:p-6 space-y-5 sm:space-y-6 relative">
                     <div class=" w-full">
                         <div class="w-full flex items-center justify-center">
-                            <div class=" w-[400px] aspect-[2/1] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
+                            <div class=" w-[400px] aspect-[4/3] max-h-full max-w-full rounded-md overflow-hidden shadow-md shadow-black/20 relative">
                                 @include('components.admin.template.header')
-                                <div class=" w-full relative">
-                                    <img id="header" src="{{ asset($template->head_type === 'network' ? 'assets/images/template/header/network.png' : 'assets/images/template/header/' . (in_array($template->head_type, ['ramen', 'donut', 'skincare', 'pudding_putih', 'sembako']) ? 'one' : $template->head_type) . '.jpg') }}" class=" w-full duration-300 {{ in_array($template->head_type, ['ramen', 'donut', 'skincare', 'pudding_putih', 'sembako']) ? 'opacity-0' : '' }}" alt="">
-                                    <div id="header-ramen-preview" class="{{ $template->head_type === 'ramen' ? '' : 'hidden' }} absolute inset-0 bg-gradient-to-br from-[#F7EFE5] to-[#E7B79A] text-[#8F110E]">
-                                        <div class="flex h-full items-center justify-center">
-                                            <div class="space-y-1 text-center">
-                                                <p id="header-ramen-title-preview" style="color: {{ old('accent_color', $template->accent_color ?? '#A72018') }}" class="text-3xl font-black">Ramen</p>
-                                                <p id="header-ramen-subtitle-preview" class="text-sm font-semibold uppercase tracking-[0.24em] text-neutral-700">Custom Header</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="header-donut-preview" class="{{ $template->head_type === 'donut' ? '' : 'hidden' }} absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8F4] via-[#FFECEF] to-[#FFDCE8] text-[#4A2F22]">
-                                        <div class="absolute left-[6%] top-[12%] h-12 w-12 rounded-full bg-[#F7B4C9]/35 blur-xl"></div>
-                                        <div class="absolute right-[14%] top-[10%] h-16 w-16 rounded-full bg-[#FFD8A8]/30 blur-2xl"></div>
-                                        <div class="absolute bottom-[10%] left-[10%] h-20 w-20 rounded-full border border-white/60"></div>
-                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
-                                            <div class="max-w-[46%] space-y-2">
-                                                <p class="text-[1.35rem] font-black leading-tight text-[#E66B98]" style="font-family: 'Patrick Hand', cursive;">Donat Lezat,</p>
-                                                <p class="text-[1.8rem] font-black leading-[0.95]">Setiap Gigitan</p>
-                                                <p class="text-[1.8rem] font-black leading-[0.95] text-[#E66B98]">Penuh Kenangan</p>
-                                            </div>
-                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/70 shadow-xl shadow-pink-200/40">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="header-skincare-preview" class="{{ $template->head_type === 'skincare' ? '' : 'hidden' }} absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF7FB] via-[#FDECF7] to-[#FBE6EC] text-[#4A2F3A]">
-                                        <div class="absolute left-[6%] top-[14%] h-10 w-10 rounded-full bg-[#F7B4C9]/35 blur-xl"></div>
-                                        <div class="absolute right-[10%] top-[12%] h-14 w-14 rounded-full bg-[#FBD3E2]/35 blur-2xl"></div>
-                                        <div class="absolute bottom-[12%] left-[10%] h-20 w-20 rounded-full border border-white/70"></div>
-                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
-                                            <div class="max-w-[48%] space-y-2">
-                                                <p class="text-[0.85rem] font-semibold italic text-[#D66AA3]" style="font-family: 'Patrick Hand', cursive;">Cantik Alami Setiap Hari</p>
-                                                <p class="text-[1.55rem] font-black leading-tight">Skincare Terbaik</p>
-                                                <p class="text-[1.55rem] font-black leading-tight text-[#EF6AA5]">untuk Kulitmu</p>
-                                            </div>
-                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/70 shadow-xl shadow-pink-200/40">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="header-pudding-preview" class="{{ $template->head_type === 'pudding_putih' ? '' : 'hidden' }} absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8F4] via-[#FDEEF8] to-[#F8EAFE] text-[#5C3446]">
-                                        <div class="absolute left-[6%] top-[14%] h-10 w-10 rounded-full bg-[#F9BCD4]/35 blur-xl"></div>
-                                        <div class="absolute right-[10%] top-[12%] h-14 w-14 rounded-full bg-[#E7D5FF]/35 blur-2xl"></div>
-                                        <div class="absolute bottom-[12%] left-[10%] h-20 w-20 rounded-full border border-white/70"></div>
-                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
-                                            <div class="max-w-[50%] space-y-2">
-                                                <p class="text-[0.95rem] font-semibold italic text-[#8B5E3C]" style="font-family: 'Patrick Hand', cursive;">Manisnya Pas, Lembutnya Juara!</p>
-                                                <p class="text-[1.55rem] font-black leading-none text-[#F0679A]" style="font-family: 'Patrick Hand', cursive;">Puding Putih</p>
-                                                <p class="text-[1.4rem] font-black leading-none text-[#9B6AE4]" style="font-family: 'Patrick Hand', cursive;">Aneka Rasa</p>
-                                            </div>
-                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/75 shadow-xl shadow-pink-200/40">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="header-sembako-preview" class="{{ $template->head_type === 'sembako' ? '' : 'hidden' }} absolute inset-0 overflow-hidden bg-gradient-to-br from-[#FFF8E9] via-[#F7F4DE] to-[#EAF4DE] text-[#24411F]">
-                                        <div class="absolute left-[4%] top-[14%] h-14 w-14 rounded-full bg-[#FDE68A]/40 blur-xl"></div>
-                                        <div class="absolute right-[8%] top-[12%] h-16 w-16 rounded-full bg-[#D9F99D]/35 blur-2xl"></div>
-                                        <div class="relative flex h-full items-center justify-between gap-4 px-5 sm:px-7">
-                                            <div class="max-w-[50%] space-y-2">
-                                                <p class="text-[1.45rem] font-bold leading-none text-[#2F9E44]" style="font-family: 'Patrick Hand', cursive;">Sembako Lengkap,</p>
-                                                <p class="text-[1.45rem] font-bold leading-none text-[#D97706]" style="font-family: 'Patrick Hand', cursive;">Harga Bersahabat!</p>
-                                                <p class="inline-flex rounded-full bg-[#FACC15]/90 px-3 py-1 text-[0.72rem] font-bold text-[#365314]">Belanja harian dari rumah</p>
-                                            </div>
-                                            <div class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] bg-white/80 shadow-xl shadow-lime-200/40">
-                                                <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class=" w-full h-full relative">
+                                    @include('components.admin.template.header-preview')
                                 </div>
                             </div>
                         </div>
@@ -172,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="desc-preview-section" class=" w-full {{ in_array($template->head_type ?? null, ['ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'], true) ? 'hidden' : '' }}">
+                    <div id="desc-preview-section" class=" w-full {{ in_array($template->head_type ?? null, ['one', 'two', 'three', 'four', 'ramen', 'network', 'donut', 'skincare', 'pudding_putih', 'sembako'], true) ? 'hidden' : '' }}">
                         <div class=" w-full flex items-center justify-center">
                             <div x-data="{desctype: 'default'}"
                                 x-init="window.addEventListener('updateDescType', (e) => desctype = e.detail)"
@@ -285,40 +170,11 @@
                                 x-init="
                                     window.addEventListener('updateProductType', (e) => producttype = e.detail);
                                     window.addEventListener('updateHeaderType', (e) => {
-                                        if (['skincare', 'pudding_putih', 'sembako'].includes(e.detail)) producttype = 'grid3';
+                                        if (['skincare', 'pudding_putih'].includes(e.detail)) producttype = 'grid3';
                                     });
                                 "
                                 class=" max-w-[400px] w-full rounded-md relative">
                                 @include('components.admin.template.product')
-                                <div x-show="producttype === 'grid2'" class=" w-full grid grid-cols-2 gap-2 sm:gap-3">
-                                    <div class=" w-full rounded-md overflow-hidden">
-                                        <div class=" w-full aspect-square bg-white">
-                                            <img src="{{asset('assets/images/placeholder.webp')}}" class=" w-full h-full object-cover" alt="">
-                                        </div>
-                                        <div id="product" style="background-color: {{$template->product_main_color}}; color: {{$template->product_text_color}};" class=" px-2 py-1 flex flex-col items-center justify-center text-center gap-1">
-                                            <p class=" text-sm">Tahu Bulat</p>
-                                            <button id="probutton" style="background-color: {{$template->product_second_color}}" type="button" class=" text-xs px-2 py-1 rounded-md">Order</button>
-                                        </div>
-                                    </div>
-                                    <div class=" w-full rounded-md overflow-hidden">
-                                        <div class=" w-full aspect-square bg-white">
-                                            <img src="{{asset('assets/images/placeholder.webp')}}" class=" w-full h-full object-cover" alt="">
-                                        </div>
-                                        <div id="product" style="background-color: {{$template->product_main_color}}; color: {{$template->product_text_color}};" class=" px-2 py-1 flex flex-col items-center justify-center text-center gap-1">
-                                            <p class=" text-sm">Sotong</p>
-                                            <button id="probutton" style="background-color: {{$template->product_second_color}}" type="button" class=" text-xs px-2 py-1 rounded-md">Order</button>
-                                        </div>
-                                    </div>
-                                    <div class=" w-full rounded-md overflow-hidden">
-                                        <div class=" w-full aspect-square bg-white">
-                                            <img src="{{asset('assets/images/placeholder.webp')}}" class=" w-full h-full object-cover" alt="">
-                                        </div>
-                                        <div id="product" style="background-color: {{$template->product_main_color}}; color: {{$template->product_text_color}};" class=" px-2 py-1 flex flex-col items-center justify-center text-center gap-1">
-                                            <p class=" text-sm">Tempe</p>
-                                            <button id="probutton" style="background-color: {{$template->product_second_color}}" type="button" class=" text-xs px-2 py-1 rounded-md">Order</button>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div x-show="producttype === 'list'" class=" w-full space-y-3">
                                     <div id="product" style="background-color: {{$template->product_main_color}}; color: {{$template->product_text_color}};" class="w-full p-3 rounded-xl flex gap-2 relative">
                                         <div class=" min-w-20 h-20 aspect-square rounded-full overflow-hidden bg-white">
@@ -375,13 +231,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="grid3-product-preview" x-show="producttype === 'grid3'" class="w-full space-y-4">
+                                <div id="grid3-product-preview" x-show="producttype === 'grid2' || producttype === 'grid3'" class="w-full space-y-4">
                                     <div class="flex items-center justify-center gap-3 text-center">
                                         <span class="h-px w-8" style="background-color: {{ old('accent_color', $template->accent_color ?? '#EC4899') }};"></span>
-                                        <p class="text-lg sm:text-xl font-black" style="color: {{ $template->product_text_color ?? '#6A1B4D' }};">Produk Grid 3</p>
+                                        <p class="text-lg sm:text-xl font-black" style="color: {{ $template->product_text_color ?? '#6A1B4D' }};" x-text="producttype === 'grid2' ? 'Produk Grid 2' : 'Produk Grid 3'">Produk Grid 3</p>
                                         <span class="h-px w-8" style="background-color: {{ old('accent_color', $template->accent_color ?? '#EC4899') }};"></span>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-2">
+                                    <div class="grid gap-2" :class="producttype === 'grid2' ? 'grid-cols-2' : 'grid-cols-3'">
                                         <div class="overflow-hidden rounded-xl border bg-white shadow-[0_8px_18px_rgba(15,23,42,0.10)]" style="border-color: #E5E7EB;">
                                             <div class="aspect-[4/3] bg-[#F8FAFC]">
                                                 <img src="{{ asset('assets/images/placeholder.webp') }}" class="h-full w-full object-cover" alt="">

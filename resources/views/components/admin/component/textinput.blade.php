@@ -1,4 +1,4 @@
-@props(['title', 'placeholder', 'name', 'value'=> null, 'xModel' => null, 'required' => false, 'maxlength' => null, 'helper' => null, 'stripProtocol' => false])
+@props(['title', 'placeholder', 'name', 'value'=> null, 'xModel' => null, 'required' => false, 'maxlength' => null, 'helper' => null, 'stripProtocol' => false, 'form' => null])
 
 @php
     $fieldValue = old($name, $value);
@@ -11,7 +11,8 @@
     <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
         <label for="{{ $name }}" class=" font-semibold">{{ $title }}</label>
         <input 
-            type="text" 
+            type="text"
+            @if($form) form="{{ $form }}" @endif 
             id="{{ $name }}" 
             name="{{ $name }}" 
             placeholder="{{ $placeholder }}" 

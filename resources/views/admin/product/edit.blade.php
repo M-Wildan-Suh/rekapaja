@@ -8,12 +8,12 @@
     <div class="mt-4">
 
 
-        <div class="sticky top-[76px] left-0 right-0 z-10 px-4">
+        {{-- <div class="sticky top-[76px] left-0 right-0 z-10 px-4">
             <div class="max-w-xl mx-auto pointer-events-none">
                 <div
                     class="pointer-events-auto rounded-md border border-[#ff7100]/20 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
                     <div class="pr-10 sm:pr-0">
-                        @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                        @if (in_array(Auth::user()->role, ['admin', 'superadmin', 'operator']))
                             <a href="{{ route('dashboard', ['return_page' => max((int) request('return_page', 1), 1)]) }}"
                                 class="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#ff7100] hover:text-[#b95300] duration-300">
                                 <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"
@@ -49,15 +49,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="py-4 px-4">
-            <div class="max-w-xl mx-auto">
+        </div> --}}
+        <div class="py-4">
+            <div class="w-full">
                 @php
-                    $templateHeaders = $template
-                        ->mapWithKeys(fn($item) => [(string) $item->id => $item->head_type])
-                        ->all();
-                    $selectedTemplateId = old('template_id', $product->template_id);
-                    $selectedTemplateId = $selectedTemplateId !== null ? (string) $selectedTemplateId : '';
                     $qrisImageUrl =
                         old('remove_qris') === '1'
                             ? null
@@ -66,19 +61,17 @@
                                 : null);
                 @endphp
                 <div x-data="{
-                    activeTab: '{{ old('active_tab', session('highlight', 'product')) }}',
-                    orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}',
-                    selectedTemplateId: @js($selectedTemplateId),
-                    templateHeaders: @js($templateHeaders)
-                }" class="bg-white overflow-hidden shadow-sm rounded-lg">
+                    activeTab: @js(in_array(old('active_tab', session('highlight')), ['highlight', 'feature']) ? old('active_tab', session('highlight')) : 'content'),
+                    orderViaWhatsapp: '{{ old('order_via_whatsapp', $product->order_via_whatsapp ?? 'instan_rekap') }}'
+                }" class="space-y-4">
                     <!-- Tabs -->
-                    <div class="w-full mx-auto pt-4 px-4 md:px-6 pb-0">
-                        <div class=" grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 font-bold">
-                            <button @click="activeTab = 'product'"
-                                :class="activeTab === 'product' ? ' bg-[#ff7100] text-white' :
+                    <div class=" sticky top-[76px] left-0 right-0 z-40 w-full max-w-xl mx-auto p-4 bg-white shadow-sm rounded-lg">
+                        <div class=" grid grid-cols-3 gap-2 sm:gap-4 font-bold">
+                            <button @click="activeTab = 'content'"
+                                :class="activeTab === 'content' ? ' bg-[#ff7100] text-white' :
                                     'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
                                 class="px-3 py-2 rounded-md">
-                                Usaha
+                                Konten
                             </button>
                             <button @click="activeTab = 'highlight'"
                                 :class="activeTab === 'highlight' ? ' bg-[#ff7100] text-white' :
@@ -90,122 +83,16 @@
                                 :class="activeTab === 'feature' ? ' bg-[#ff7100] text-white' :
                                     'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
                                 class="px-3 py-2 rounded-md">
-                                Fitur/Template
-                            </button>
-                            <button @click="activeTab = 'gallery'"
-                                :class="activeTab === 'gallery' ? ' bg-[#ff7100] text-white' :
-                                    'text-neutral-600 border-transparent hover:border-black hover:text-black duration-300'"
-                                class="px-3 py-2 rounded-md">
-                                Galeri
+                                Fitur
                             </button>
                         </div>
                     </div>
-                    <div x-show="activeTab === 'product'" class=" p-4 md:p-6 text-gray-900">
-                        <form id="bussiness" action="{{ route('product.update', ['product' => $product->id]) }}"
-                            method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="active_tab" x-model="activeTab">
-                            <div class=" w-full space-y-6">
-                                <div class=" flex flex-col gap-2">
-                                    <div class=" w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto">
-                                        <x-admin.component.imageinput :value="asset('storage/images/product/' . $product->image . '')" name="thumbnail" />
-                                    </div>
-                                </div>
-                                @if (Auth::user()->canAccessPremiumFeatures())
-                                    <div class=" flex flex-col gap-2">
-                                        <label class="text-sm sm:text-base font-semibold text-center"
-                                            for="qris-input">QRIS (Optional)</label>
-                                        <div
-                                            class="w-1/2 aspect-square overflow-hidden relative rounded-md mx-auto border border-dashed border-gray-300">
-                                            <x-admin.component.imageinput :value="$qrisImageUrl" name="qris" />
-                                        </div>
-                                        <input type="hidden" name="remove_qris" id="remove-qris-input"
-                                            value="{{ old('remove_qris', '0') }}">
-                                        <div class="flex flex-col items-center gap-2 text-center">
-                                            <button type="button" id="remove-qris-button"
-                                                class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">
-                                                Hapus Gambar QRIS
-                                            </button>
-                                            <p class="text-xs text-neutral-500">
-                                                Jika gambar QRIS kosong atau dihapus, fitur QRIS otomatis nonaktif. Jika
-                                                upload gambar baru, fitur otomatis aktif.
-                                            </p>
-                                        </div>
-                                    </div>
-                                @endif
-                                <div x-data="productChecker({{ json_encode(old('name', $product->name)) }})">
-                                    <div class="flex flex-col gap-2 text-sm sm:text-base font-medium">
-                                        <div class=" flex gap-2">
-                                            <label for="name" class=" font-semibold">Nama Usaha Kamu</label>
-                                            <div x-show="isDuplicate" class="relative group pt-1">
-                                                <div class=" w-2 h-2 bg-red-500 rounded-full text-sm cursor-pointer">
-                                                </div>
-                                                <span
-                                                    class="absolute top-0 left-5 hidden group-hover:block w-max bg-gray-800 text-white text-xs rounded px-2 py-1">
-                                                    Nama sudah digunakan
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <input
-                                            class="text-sm sm:text-base w-full border-gray-300 focus:border-[#ff7100] focus:ring-[#ff7100] rounded-md shadow-sm"
-                                            type="text" placeholder="Masukkan Nama Usaha..." name="name"
-                                            id="name" maxlength="100" x-model="inputName"
-                                            value="{{ old('name', $product->name) }}" required
-                                            @input="checkProductName">
-                                    </div>
-                                    <script>
-                                        function productChecker(input) {
-                                            return {
-                                                // Data produk dari backend (menggunakan Blade untuk memasukkan data)
-                                                products: @json($data->pluck('name')).map(name => name
-                                            .toLowerCase()), // Konversi nama produk menjadi huruf kecil
-                                                inputName: input, // Nilai input
-                                                isDuplicate: false, // Status duplikasi
-
-                                                // Fungsi pengecekan
-                                                checkProductName() {
-                                                    // Perbandingan tanpa memperhatikan kapitalisasi
-                                                    this.isDuplicate = this.products.includes(this.inputName.trim().toLowerCase());
-                                                }
-                                            };
-                                        }
-                                    </script>
-                                </div>
-                                <x-admin.component.textinput title="Tagline" placeholder="Masukkan Tagline..."
-                                    :value="$product->subtitle" name="subtitle" maxlength="120" />
-                                <x-admin.component.numberinput title="No. Whatsapp (Optional)"
-                                    placeholder="Masukkan Nomor..." :value="$product->no_tlp" name="no_tlp"
-                                    maxlength="20" />
-                                <x-admin.component.linkinput title="Youtube (Optional)" placeholder="Masukkan link..."
-                                    :value="$product->youtube" name="link" link="Url" maxlength="255" />
-
-                                <x-admin.component.textareainput title="Tentang Usaha Anda"
-                                    placeholder="Jelaskan Usaha Anda..." :value="$product->description" name="description"
-                                    maxlength="1200" helper="Deskripsi usaha maksimal 1200 karakter." />
-
-                                @if (Auth::user()->role === 'admin' ||
-                                        (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') ||
-                                        (Auth::user()->role === 'premium' &&
-                                            Carbon\Carbon::now()->lessThanOrEqualTo(Carbon\Carbon::parse(Auth::user()->expired))))
-                                    <x-admin.component.categoryinput title="Category" :value="$product->category"
-                                        :tag="$category" name="category[]" />
-                                    <x-admin.component.taginput title="Tag" :value="$product->productTags" name="tag[]"
-                                        :tag="$tag"></x-admin.component.taginput>
-                                    @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
-                                        <x-admin.component.accessinput title="Akun Pemilik" :value="$product->access->pluck('user_id')->take(1)->all()"
-                                            :users="$accessUsers" name="access" />
-                                    @endif
-                                @endif
-
-                                <div class="">
-                                    <button
-                                        class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div x-show="activeTab === 'feature'" class=" p-4 md:p-6 text-gray-900">
+                    <form id="bussiness" action="{{ route('product.update', ['product' => $product->id]) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="active_tab" x-model="activeTab">
+                    </form>
+                    <div x-show="activeTab === 'feature'" class="max-w-xl mx-auto bg-white shadow-sm rounded-lg p-4 md:p-6 text-gray-900">
                         <div class="space-y-6">
                             @if (Auth::user()->role === 'admin' ||
                                     (Auth::user()->role === 'premium' && Auth::user()->premium_type === 'lifetime') ||
@@ -218,8 +105,6 @@
                                     ]" :defaultvalue="$product->status"
                                         name="status" form="bussiness" />
                                 @endif
-                                <x-admin.component.radioinput title="Tombol Home" :value="[['label' => 'On', 'value' => 'on'], ['label' => 'Off', 'value' => 'off']]" :defaultvalue="$product->home_button"
-                                    name="home_button" form="bussiness" />
                                 <x-admin.component.radioinput title="Order via WhatsApp" :value="[
                                     ['label' => 'Instan Rekap', 'value' => 'instan_rekap'],
                                     ['label' => 'Tanya', 'value' => 'tanya'],
@@ -232,50 +117,41 @@
                                 ]"
                                     :defaultvalue="$product->customer_data ?? 'active'" name="customer_data" form="bussiness" />
                             @endif
-
-                            @php
-                                $availableTemplateIds = $template->pluck('id')->map(fn($id) => (string) $id);
-                                $selectedTemplateId = old('template_id');
-
-                                if ($selectedTemplateId === null) {
-                                    $selectedTemplateId = $product->template_id;
-                                }
-
-                                $selectedTemplateId =
-                                    $selectedTemplateId !== null ? (string) $selectedTemplateId : null;
-
-                                if (!$selectedTemplateId || !$availableTemplateIds->contains($selectedTemplateId)) {
-                                    $selectedTemplateId = optional($template->first())->id;
-                                    $selectedTemplateId =
-                                        $selectedTemplateId !== null ? (string) $selectedTemplateId : null;
-                                }
-                            @endphp
-
-                            <div class="space-y-2">
-                                <label for="template" class="font-semibold">Template</label>
-                                <div class=" w-full grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                    @foreach ($template as $item)
-                                        <label
-                                            class="w-full rounded-md bg-white aspect-[2/3] overflow-hidden relative">
-                                            <input type="radio" name="template_id" value="{{ $item->id }}"
-                                                form="bussiness" x-model="selectedTemplateId" class="hidden peer"
-                                                {{ $selectedTemplateId === (string) $item->id ? 'checked' : '' }}>
-                                            <img src="{{ asset('/storage/images/template/' . $item->image) }}"
-                                                class=" w-full h-full object-cover object-top" alt="">
-                                            <div class=" absolute inset-0 peer-checked:bg-black/50 duration-300">
-                                            </div>
-                                        </label>
-                                    @endforeach
+                            @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+                                <x-admin.component.accessinput title="Akun Pemilik"
+                                    :value="$product->access->pluck('user_id')->take(1)->all()"
+                                    :users="$accessUsers" name="access" form="bussiness" />
+                            @endif
+                            @if (Auth::user()->canAccessPremiumFeatures())
+                                <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-start gap-4">
+                                    <div class="overflow-hidden rounded-md border border-dashed border-gray-300">
+                                        <x-admin.component.imageinput :value="$qrisImageUrl" name="qris" form="bussiness" />
+                                    </div>
+                                    <div class="min-w-0 space-y-3">
+                                        <label for="qris-input" class="text-sm sm:text-base font-semibold">QRIS (Opsional)</label>
+                                        <p class="text-xs sm:text-sm text-neutral-500">
+                                            Jika gambar QRIS kosong atau dihapus, fitur QRIS otomatis nonaktif.
+                                            Jika upload gambar baru, fitur otomatis aktif.
+                                        </p>
+                                        <input type="hidden" name="remove_qris" id="remove-qris-input" form="bussiness"
+                                            value="{{ old('remove_qris', '0') }}">
+                                        <button type="button" id="remove-qris-button"
+                                            class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">
+                                            Hapus Gambar QRIS
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-
+                            @endif
                             <div class="">
                                 <button @click="document.getElementById('bussiness').submit()"
                                     class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
                             </div>
                         </div>
                     </div>
-                    <div x-show="activeTab === 'highlight'" class=" p-4 md:p-6 text-gray-900 space-y-4">
+                    <div x-show="activeTab === 'content'" x-cloak>
+                        @include('components.admin.template.business-editor', ['businessContentEditor' => true])
+                    </div>
+                    <div x-show="activeTab === 'highlight'" class="max-w-xl mx-auto bg-white shadow-sm rounded-lg p-4 md:p-6 text-gray-900 space-y-4">
                         @php
                             $viewerRole = Auth::user()->role;
 
@@ -294,11 +170,9 @@
                         @endphp
                         <div class=" space-y-6 mb-6">
                             <x-admin.component.textinput title="Tombol Order" placeholder="Contoh: Beli Sekarang"
-                                :value="$product->order_title" name="order_title" maxlength="255" required />
-                            <x-admin.component.textinput title="Title Produk" placeholder="Contoh: Produk Kami"
-                                :value="$product->product_title" name="product_title" maxlength="255" required />
+                                :value="$product->order_title" name="order_title" form="highlight-form" maxlength="255" required />
                             <x-admin.component.textinput title="Teks Sebelum Harga (Optional)"
-                                placeholder="Contoh: Mulai dari" :value="$product->price_prefix" name="price_prefix" maxlength="50" />
+                                placeholder="Contoh: Mulai dari" :value="$product->price_prefix" name="price_prefix" form="highlight-form" maxlength="50" />
                         </div>
                         <div x-data="highlightManager({{ json_encode($product->productHighlight) }}, '{{ $viewerRole }}')" class=" space-y-4">
                             <div class=" space-y-2">
@@ -358,123 +232,11 @@
                             </div>
                         </div>
                     </div>
-                    <div x-show="activeTab === 'gallery'" class=" p-4 md:p-6 text-gray-900 space-y-4">
-                        <div x-data="galleryComponent({{ $product->productGallery }}, {{ $product->id }})" class="flex flex-col gap-2">
-                            <label class="font-semibold" for="image_gallery">Galeri ( Max 9 )</label>
-                            <input type="file" class="hidden" id="image_gallery" name="image_gallery[]" multiple
-                                accept="image/*" @change="addImages($event)">
-                            <div class="w-full grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
-                                <template x-for="(image, index) in images" :key="index">
-                                    <div class="w-full aspect-[3/2] rounded-md relative overflow-hidden">
-                                        <img :src="image.url" class="w-full h-full object-cover"
-                                            alt="Gallery Image Preview">
-                                        <label @click="deleteImage(index)"
-                                            class="w-full text-transparent h-full absolute top-0 left-0 flex justify-center items-center p-[20%] hover:bg-black/60 hover:text-white/50 duration-300 cursor-pointer">
-                                            <svg viewBox="0 0 24 24" class="w-full h-full"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M19.5 8.99h-15a.5.5 0 0 0-.5.5v12.5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9.49a.5.5 0 0 0-.5-.5Zm-9.25 11.5a.75.75 0 0 1-1.5 0v-8.625a.75.75 0 0 1 1.5 0Zm5 0a.75.75 0 0 1-1.5 0v-8.625a.75.75 0 0 1 1.5 0ZM20.922 4.851a11.806 11.806 0 0 0-4.12-1.07 4.945 4.945 0 0 0-9.607 0A12.157 12.157 0 0 0 3.18 4.805 1.943 1.943 0 0 0 2 6.476 1 1 0 0 0 3 7.49h18a1 1 0 0 0 1-.985 1.874 1.874 0 0 0-1.078-1.654ZM11.976 2.01A2.886 2.886 0 0 1 14.6 3.579a44.676 44.676 0 0 0-5.2 0 2.834 2.834 0 0 1 2.576-1.569Z"
-                                                    fill="currentColor" class="fill-000000"></path>
-                                            </svg>
-                                        </label>
-                                    </div>
-                                </template>
-
-                                <div class="w-full aspect-[3/2] border bg-neutral-100 border-neutral-600 rounded-md relative border-dashed overflow-hidden"
-                                    x-show="images.length < 9">
-                                    <label for="image_gallery"
-                                        class="w-full text-neutral-600 h-full absolute top-0 left-0 flex justify-center items-center p-[20%] hover:bg-neutral-600 hover:text-white/50 duration-300 cursor-pointer">
-                                        <svg viewBox="0 0 24 24" class="w-full h-full"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="m9 13 3-4 3 4.5V12h4V5c0-1.103-.897-2-2-2H4c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h8v-4H5l3-4 1 2z"
-                                                fill="currentColor" class="fill-000000"></path>
-                                            <path d="M19 14h-2v3h-3v2h3v3h2v-3h3v-2h-3z" fill="currentColor"
-                                                class="fill-000000"></path>
-                                        </svg>
-                                    </label>
-                                </div>
-                            </div>
-                            <p x-show="errorMessage" class="text-red-500" x-text="errorMessage"></p>
-                            <p x-show="loading" class="text-blue-500">Loading...</p>
-                        </div>
-
-                        <script>
-                            function galleryComponent(initialImages = [], productId) {
-                                return {
-                                    images: initialImages.map(item => ({
-                                        id: item.id,
-                                        url: item.image ? `{{ asset('storage/images/product/gallery/') }}/${item.image}` :
-                                            `{{ asset('assets/images/placeholder.png') }}`
-                                    })),
-                                    errorMessage: '',
-                                    loading: false,
-                                    addImages(event) {
-                                        const files = Array.from(event.target.files);
-
-                                        if (this.images.length + files.length > 9) {
-                                            this.errorMessage = 'You can only upload up to 8 images.';
-                                            return;
-                                        }
-
-                                        this.errorMessage = '';
-                                        this.loading = true;
-
-                                        files.forEach(file => {
-                                            const formData = new FormData();
-                                            formData.append('image_gallery', file);
-                                            formData.append('product_id', productId);
-
-                                            axios.post('/admin/product-gallery', formData)
-                                                .then(response => {
-                                                    const newImage = response.data;
-                                                    const reader = new FileReader();
-                                                    reader.onload = (e) => {
-                                                        this.images.push({
-                                                            id: newImage.id,
-                                                            url: e.target.result
-                                                        });
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                })
-                                                .catch(error => {
-                                                    console.error('Error uploading image:', error);
-                                                    this.errorMessage = 'Error uploading image. Please try again.';
-                                                })
-                                                .finally(() => {
-                                                    this.loading = false;
-                                                });
-                                        });
-                                    },
-                                    deleteImage(index) {
-                                        const image = this.images[index];
-                                        this.loading = true;
-
-                                        axios.delete(`/admin/product-gallery/${image.id}`)
-                                            .then(() => {
-                                                this.images.splice(index, 1);
-                                            })
-                                            .catch(error => {
-                                                console.error('Error deleting image:', error);
-                                                this.errorMessage = 'Error deleting image. Please try again.';
-                                            })
-                                            .finally(() => {
-                                                this.loading = false;
-                                            });
-                                    }
-                                };
-                            }
-                        </script>
-
-                        <div class="">
-                            <button @click="document.getElementById('bussiness').submit()"
-                                class=" font-bold w-full py-2 bg-[#ff7100] hover:bg-[#b95300] duration-300 text-white rounded-md text-center">Simpan</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+    @if (Auth::user()->role !== 'operator')
     <a href="{{ route('detail', ['slug' => $product->slug]) }}" target="_blank">
         <button
             class="fixed z-30 rounded-l-full w-10 h-10 bg-[#ff7100] hover:opacity-60 duration-300 p-2 right-0 top-20">
@@ -485,6 +247,7 @@
             </svg>
         </button>
     </a>
+    @endif
 </x-app-layout>
 @if (Auth::user()->canAccessPremiumFeatures())
     <script>

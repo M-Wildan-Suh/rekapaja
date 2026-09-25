@@ -1,17 +1,5 @@
-<div class=" w-full {{ $role === 'admin' || $role === 'premium' ? 'sticky bottom-0' : ''}} py-2 backdrop-blur px-4 sm:px-8 z-30 rounded-b-md">
-    <div class="grid {{ $data->home_button === 'on' ? 'grid-cols-3' : 'grid-cols-2' }} gap-2 sm:gap-4 w-full max-w-[600px] mx-auto">
-        @if ($data->home_button === 'on')    
-            <a href="{{route('home')}}">
-                <button
-                    style="background-color: {{$template->contact_main_color}}"
-                    class=" text-base w-full flex justify-center gap-1.5 items-center py-2 rounded-md text-white duration-300 relative">
-                    <div class=" w-4 aspect-square">
-                        <svg viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"><path d="m21.146 8.576-7.55-6.135a2.543 2.543 0 0 0-3.192 0L2.855 8.575a1.119 1.119 0 0 0-.416.873v11.543c0 .62.505 1.13 1.125 1.13h5.062c.62 0 1.125-.51 1.125-1.13v-7.306h4.499v7.306c0 .62.505 1.13 1.125 1.13h5.062c.62 0 1.125-.51 1.125-1.13V9.448a1.122 1.122 0 0 0-.416-.872zm-.71 12.421h-5.062V13.68c0-.62-.505-1.119-1.125-1.119H9.75c-.62 0-1.125.499-1.125 1.119v7.317H3.564V9.448l7.55-6.134a1.411 1.411 0 0 1 1.773 0l7.55 6.134v11.549z" fill="currentColor" class="fill-000000"></path></svg>
-                    </div>
-                    <p class=" hidden sm:block text-sm">Home</p>
-                </button>
-            </a>
-        @endif
+<div class=" w-full {{ $role === 'admin' || $role === 'premium' ? 'sticky bottom-0' : ''}} py-2 backdrop-blur px-4 sm:px-8 z-20 rounded-b-md">
+    <div class="grid grid-cols-2 gap-2 sm:gap-4 w-full max-w-xl mx-auto">
         <a href="tel:{{ $no_tlp ?? '' }}">
             <button
                 style="background-color: {{$template->contact_second_color}}"

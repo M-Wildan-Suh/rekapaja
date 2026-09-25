@@ -1,7 +1,7 @@
-@props(['name', 'value', 'status', 'xModel' => null])
-<div class="w-full h-full flex flex-col text-sm font-medium gap-2 justify-center items-center">
-    <div class="w-full h-full relative flex justify-center overflow-hidden">
-        <img id="{{$name}}-preview" class="object-cover w-full" 
+@props(['name', 'value', 'status', 'xModel' => null, 'aspect' => 'aspect-square', 'form' => null])
+<div class="w-full relative {{ $aspect }} flex flex-col text-sm font-medium gap-2 justify-center items-center">
+    <div class="absolute inset-0 w-full h-full flex justify-center overflow-hidden">
+        <img id="{{$name}}-preview" class="object-cover w-full h-full" 
             {{ $xModel ? 'x-bind:src='.$xModel : '' }} 
             src="{{$value == '' ? asset('assets/images/placeholder.jpg') : $value  }}" 
             alt="Logo">
@@ -14,7 +14,8 @@
                 </div>
                 <input accept="image/*" type="file" name="{{$name}}" 
                        class="absolute bottom-0 left-0 z-0 w-40 opacity-0" 
-                       id="{{$name}}-input" 
+                       id="{{$name}}-input"
+                       @if ($form) form="{{ $form }}" @endif 
                        {{($status ?? '') != '' ? 'required' : ''}}
                        onchange="handleImagePreview(this, '{{$name}}-preview')" />
             </label>

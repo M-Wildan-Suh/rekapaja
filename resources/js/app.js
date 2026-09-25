@@ -1,4 +1,6 @@
 import './bootstrap';
+import './components/template-colors';
+import './components/business-live-editor';
 
 import Alpine from 'alpinejs';
 import intersect from '@alpinejs/intersect';

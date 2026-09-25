@@ -16,28 +16,13 @@ return new class extends Migration
             // Template
             $table->string('name')->unique();
             $table->string('image')->nullable();
-            // Background
-            $table->string('bg_type');
-            $table->string('bg_image')->nullable();
-            $table->string('bg_main_color')->nullable();
-            $table->string('bg_second_color')->nullable();
-            $table->string('accent_color')->default('#A72018');
-            // Header
-            $table->string('head_type');
-            // Gallery
-            $table->string('gallery_type');
-            // Description
-            $table->string('desc_type')->default('default');
-            $table->string('desc_main_color');
-            $table->string('desc_text_color');
-            // Product
-            $table->string('product_type');
-            $table->string('product_main_color');
-            $table->string('product_second_color');
-            $table->string('product_text_color');
-            // Contact
-            $table->string('contact_main_color');
-            $table->string('contact_second_color');
+            // Settings are grouped by section; defaults are supplied by Template.
+            $table->json('background')->nullable();
+            $table->json('head')->nullable();
+            $table->json('gallery')->nullable();
+            $table->json('desc')->nullable();
+            $table->json('product')->nullable();
+            $table->json('contact')->nullable();
             $table->timestamps();
         });
     }

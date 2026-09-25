@@ -12,9 +12,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
-use App\Http\Controllers\TemplateController;
-use App\Http\Controllers\TemplateGalleryController;
-use App\Http\Controllers\TemplateHighlightController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Artisan;
@@ -49,7 +46,6 @@ Route::get('/bisnis/page/{page?}', [PageController::class, 'product'])->name('pa
 Route::get('/bisnis/kategori/{category}', [PageController::class, 'categorybusiness'])->name('category.business');
 Route::get('/bisnis/kategori/{category}/page/{page?}', [PageController::class, 'categorybusiness'])->name('category.business.page');
 
-Route::get('/template', [PageController::class, 'template'])->name('alltemplate');
 
 Route::get('/join', [PageController::class, 'join'])->name('join');
 Route::post('/store-product', [PageController::class, 'storeproduct'])->name('store.product');
@@ -87,6 +83,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/premium', [AdminController::class, 'premium'])->name('premium.index');
 
     Route::resource('/admin/product', ProductController::class);
+    Route::post('/admin/product/{product}/template-preview', [ProductController::class, 'previewTemplate'])->name('product.template.preview');
+    Route::put('/admin/product/{product}/template', [ProductController::class, 'updateTemplate'])->name('product.template.update');
     Route::put('/admin/product-domain/{product}', [ProductController::class, 'updateDomain'])->name('product.domain');
     Route::get('/admin/product-download-domain/{product}', [ProductController::class, 'downloadDomainFile'])->name('product.download-domain');
     Route::post('/admin/product-upload-domain/{product}', [ProductController::class, 'uploadDomainToCpanel'])->name('product.upload-domain');
@@ -108,17 +106,13 @@ Route::middleware('auth')->group(function () {
         Route::group(['middleware' => 'cekRole'], function () {
             Route::resource('/admin/user', UserController::class);
     
-            Route::resource('/admin/template', TemplateController::class);
-            Route::put('/template/editimage/{id}', [TemplateController::class, 'editimage'])->name('template.editimage');
         
             Route::resource('/admin/access', AccessController::class);
 
             Route::resource('/admin/package', PremiumPackageController::class);
             Route::resource('/admin/no-handphone', NoHandphoneController::class);
 
-            Route::resource('/admin/template-highlight', TemplateHighlightController::class);
     
-            Route::resource('/admin/template-gallery', TemplateGalleryController::class);
         });
     });
 });
@@ -128,4 +122,3 @@ require __DIR__.'/auth.php';
 Route::get('/embed/event', [PageController::class, 'test'])->name('test');
 Route::get('/domain/preview/{product}', [PageController::class, 'detailById'])->name('domain.preview');
 Route::get('/{slug}', [PageController::class, 'detail'])->name('detail');
-Route::get('/template/{slug}', [PageController::class, 'templatedetail'])->name('template.detail');

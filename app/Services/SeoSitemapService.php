@@ -66,7 +66,6 @@ class SeoSitemapService
         $entries = [
             $this->makeEntry($this->normalizedAppUrl() . '/', now(), 'daily', '1.0'),
             $this->makeEntry(route('allproduct'), now(), 'daily', '0.9'),
-            $this->makeEntry(route('alltemplate'), now(), 'weekly', '0.7'),
             $this->makeEntry(route('join'), now(), 'weekly', '0.7'),
             $this->makeEntry(route('premium.package'), now(), 'weekly', '0.7'),
         ];

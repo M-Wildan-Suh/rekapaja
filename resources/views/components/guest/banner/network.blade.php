@@ -12,7 +12,7 @@
 @endphp
 
 <div class="banner-auto-resize w-full relative overflow-hidden">
-    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-[600px] md:mx-auto md:rounded-[2.25rem]">
+    <div class="w-full overflow-hidden bg-white shadow-md shadow-slate-900/10 rounded-none md:max-w-xl md:mx-auto md:rounded-[2.25rem]">
         <div class="relative aspect-[4/3] overflow-hidden" style="background-color: {{ $networkSurface }};">
             <div class="absolute inset-y-0 right-0 w-full">
                 <img src="{{ $data->image }}" class="h-full w-full object-cover object-center" alt="{{ $data->name }}">
@@ -53,7 +53,7 @@
                     @endif
 
                     @if (filled($networkDescription))
-                        <p data-auto-resize-text data-auto-resize-lines="3" class="max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
+                        <p data-auto-resize-text data-auto-resize-lines="3" class="line-clamp-3 max-w-[15rem] text-[0.62rem] leading-4 md:max-w-[18rem] md:text-[0.88rem] md:leading-6" style="color: {{ $networkText }};">
                             {!! nl2br(e($networkDescription)) !!}
                         </p>
                     @endif
