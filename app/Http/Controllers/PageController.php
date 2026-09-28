@@ -640,6 +640,8 @@ class PageController extends Controller
         $invoice = new Invoice;
 
         $invoice->business_id = $product->id;
+        $invoice->created_at = Carbon::now('Asia/Jakarta');
+        $invoice->updated_at = Carbon::now('Asia/Jakarta');
         $invoice->invoice_code = strtoupper(Str::random(10));
         $invoice->customer_name = $customerName;
         $invoice->customer_address = $customerAddress;
